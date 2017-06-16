@@ -11,7 +11,7 @@ set(BUILTIN_SCHEMA_DIR ${USD_INCLUDE_DIR}/pxr/usd)
 set(CONFIGURED_SCHEMA ${CMAKE_CURRENT_BINARY_DIR}/schema.usda)
 configure_file(schema.usda.in ${CONFIGURED_SCHEMA})
 
-# This is always going to run. Thanks cmake!
+# This is always going to run. TODO: try using add_custom_command differently.
 add_custom_target(schema_gen
     COMMAND usdGenSchema ${CONFIGURED_SCHEMA} ${CMAKE_CURRENT_SOURCE_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
