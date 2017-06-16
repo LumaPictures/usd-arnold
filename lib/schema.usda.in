@@ -42,21 +42,46 @@ class "AiShapeAPI" (
              - The bitmasks `visibility` and `sidedness`
              - The boolean flags `matte`, `opaque`, `self_shadows`, and
                `receive_shadows`.
+            
+            In case of ray types, there is a difference between the 4th
+            and 5th major release of Arnold. We provide both in their
+            respective namespace. In case arnold headers are not present
+            just use the provided macros.
+            USD_ARNOLD_IMPORT_ARNOLD4 pr USD_ARNOLD_IMPORT_ARNOLD5
+    
+            For Arnold 4
+                AI_RAY_UNDEFINED   undefined type
+                AI_RAY_CAMERA      ray originating at the camera
+                AI_RAY_SHADOW      shadow ray towards a light source
+                AI_RAY_REFLECTED   mirror reflection ray
+                AI_RAY_REFRACTED   mirror refraction ray
+                AI_RAY_SUBSURFACE  subsurface scattering probe ray
+                AI_RAY_DIFFUSE     indirect diffuse (also known as diffuse GI) ray
+                AI_RAY_GLOSSY      glossy/blurred reflection ray
+                AI_RAY_ALL         mask for all ray types
+                AI_RAY_GENERIC     mask for all ray types
 
-    #define AI_RAY_UNDEFINED   0x00        undefined type
-    #define AI_RAY_CAMERA      0x01        ray originating at the camera
-    #define AI_RAY_SHADOW      0x02        shadow ray towards a light source
-    #define AI_RAY_REFLECTED   0x04        mirror reflection ray
-    #define AI_RAY_REFRACTED   0x08        mirror refraction ray
-    #define AI_RAY_SUBSURFACE  0x10        subsurface scattering probe ray
-    #define AI_RAY_DIFFUSE     0x20        indirect diffuse (also known as diffuse GI) ray
-    #define AI_RAY_GLOSSY      0x40        glossy/blurred reflection ray
-    #define AI_RAY_ALL         0xFF        mask for all ray types
-    #define AI_RAY_GENERIC     AI_RAY_ALL  mask for all ray types"""
+            For Arnold 5
+                AI_RAY_UNDEFINED         undefined type
+                AI_RAY_CAMERA            ray originating at the camera
+                AI_RAY_SHADOW            shadow ray towards a light source
+                AI_RAY_DIFFUSE_TRANSMIT  indirect diffuse transmission ray
+                AI_RAY_SPECULAR_TRANSMIT indirect specular transmission ray
+                AI_RAY_VOLUME            indirect volume scattering ray
+                AI_RAY_DIFFUSE_REFLECT   indirect diffuse reflection ray
+                AI_RAY_SPECULAR_REFLECT  indirect specular reflection ray
+                AI_RAY_SUBSURFACE        subsurface scattering probe ray
+
+                AI_RAY_ALL_DIFFUSE  all indirect diffuse ray types
+                AI_RAY_ALL_SPECULAR all indirect specular ray types
+                AI_RAY_ALL_REFLECT  all reflection ray types
+                AI_RAY_ALL_TRANSMIT all transmission specular ray types
+                AI_RAY_ALL          mask for all ray types"""
 
     customData = {
         string extraIncludes = """
-#include "pxr/usd/usdAi/rayTypes.h"
+#include "pxr/usd/usdAi/rayTypes4.h"
+#include "pxr/usd/usdAi/rayTypes5.h"
 """
     }
 ) {
