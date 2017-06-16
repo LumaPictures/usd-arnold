@@ -102,3 +102,41 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // 'PXR_NAMESPACE_OPEN_SCOPE', 'PXR_NAMESPACE_CLOSE_SCOPE'.
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
+
+#include "pxr/usd/usdAi/tokens.h"
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+UsdAttribute
+UsdAiNodeAPI::CreateUserAttribute(const TfToken &name,
+                                  const SdfValueTypeName& typeName) const
+{
+    return GetPrim().CreateAttribute(
+        TfToken(UsdAiTokens->userPrefix.GetString() + name.GetString()),
+        typeName);
+}
+
+UsdAttribute
+UsdAiNodeAPI::GetUserAttribute(const TfToken &name) const
+{
+    return GetPrim().GetAttribute(
+        TfToken(UsdAiTokens->userPrefix.GetString() + name.GetString()));
+}
+
+std::vector<UsdAttribute>
+UsdAiNodeAPI::GetUserAttributes() const
+{
+    std::vector<UsdAttribute> result;
+    std::vector<UsdAttribute> attrs = GetPrim().GetAttributes();
+
+    TF_FOR_ALL(attrIter, attrs) {
+        const UsdAttribute& attr = *attrIter;
+        if (TfStringStartsWith(attr.GetName().GetString(),
+                               UsdAiTokens->userPrefix)) {
+            result.push_back(attr);
+        }
+    }
+    return result;
+}
+
+PXR_NAMESPACE_CLOSE_SCOPE

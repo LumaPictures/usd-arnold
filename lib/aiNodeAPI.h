@@ -128,6 +128,18 @@ public:
     //  - Close the include guard with #endif
     // ===================================================================== //
     // --(BEGIN CUSTOM CODE)--
+
+    // Create an attribute representing an Arnold user data parameter. This
+    // simply places it in the "user:" namespace.
+    UsdAttribute CreateUserAttribute(const TfToken &name,
+                                     const SdfValueTypeName& typeName) const;
+
+    // Return the attribute with the given name if it exists in the "user:"
+    // namespace.
+    UsdAttribute GetUserAttribute(const TfToken &name) const;
+
+    // Return all attributes in the "user:" namespace.
+    std::vector<UsdAttribute> GetUserAttributes() const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
