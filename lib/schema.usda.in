@@ -1,0 +1,182 @@
+#usda 1.0
+(
+    "This file describes various Arnold USD schemata for code generation."
+    subLayers = [
+        @${BUILTIN_SCHEMA_DIR}/usd/schema.usda@,
+        @${BUILTIN_SCHEMA_DIR}/usdGeom/schema.usda@,
+        @${BUILTIN_SCHEMA_DIR}/usdShade/schema.usda@
+    ]
+)
+
+def "GLOBAL" (
+    customData = {
+        string libraryName = "usdAi"
+        string libraryPath = "pxr/usd/usdAi"
+        # Because I'm including the "Ai" prefix in the schema class names, I'm
+        # omitting it from the library prefix so the classes don't end up with
+        # names like "UsdAiAiShader".
+        string libraryPrefix = "Usd"
+        string tokensPrefix = "UsdAi"
+        dictionary libraryTokens = {
+            dictionary userPrefix = {
+                string value = "user:"
+                string doc = """The attribute prefix used to qualify user
+                                parameters on nodes using the AiNodeAPI."""
+            }
+        }
+    }
+)
+{
+}
+
+class "AiNodeAPI" (
+    doc = """API for handling prims as Arnold nodes. Provides a consistent
+             interface for getting and setting user parameters."""
+) {
+}
+
+class "AiShapeAPI" (
+    doc = """API for interacting with common Arnold shape parameters on prims.
+
+             Currently handles:
+             - The bitmasks `visibility` and `sidedness`
+             - The boolean flags `matte`, `opaque`, `self_shadows`, and
+               `receive_shadows`.
+
+    #define AI_RAY_UNDEFINED   0x00        undefined type
+    #define AI_RAY_CAMERA      0x01        ray originating at the camera
+    #define AI_RAY_SHADOW      0x02        shadow ray towards a light source
+    #define AI_RAY_REFLECTED   0x04        mirror reflection ray
+    #define AI_RAY_REFRACTED   0x08        mirror refraction ray
+    #define AI_RAY_SUBSURFACE  0x10        subsurface scattering probe ray
+    #define AI_RAY_DIFFUSE     0x20        indirect diffuse (also known as diffuse GI) ray
+    #define AI_RAY_GLOSSY      0x40        glossy/blurred reflection ray
+    #define AI_RAY_ALL         0xFF        mask for all ray types
+    #define AI_RAY_GENERIC     AI_RAY_ALL  mask for all ray types"""
+
+    customData = {
+        string extraIncludes = """
+#include "pxr/usd/usdAi/rayTypes.h"
+"""
+    }
+) {
+    uniform bool opaque = true (
+        doc = """Whether the object should be considered fully opaque. By
+                 default all objects are marked as opaque, because it speeds up
+                 rendering considerably."""
+    )
+
+    uniform bool matte = false (
+        doc = """This attribute, when enabled, turns an object or group into a
+                 holdout matte. This affects primary rays only.
+
+                 The matte color is always black, and the opacity of the object
+                 is preserved. Shaders will not run on the object, and it will
+                 output all black (including the alpha), except if the opaque
+                 flag is off, in which case shaders will be run to compute the
+                 opacity only. Note that even AOVs output by its shaders in this
+                 case will be black."""
+    )
+
+    uniform bool receive_shadows = true (
+        doc = """Whether the object picks up shadows from other objects."""
+        customData = {
+            string apiName = "receiveShadows"
+        }
+    )
+
+    uniform bool self_shadows = true (
+        doc = """Whether the object casts shadows on itself."""
+        customData = {
+            string apiName = "selfShadows"
+        }
+    )
+
+    uniform uchar visibility = 255 (
+        doc = """The visibility of the object for each Arnold ray type, as a
+                 bitmask.
+
+                 You can selectively disable an object's visibility for the
+                 various types of rays in the renderer. By default, objects are
+                 visible to all types of rays."""
+    )
+
+    uniform uchar sidedness = 255 (
+        doc = """The double-sidedness of the object for each Arnold ray type, as
+                 a bitmask.
+
+                 Just as you can disable an object's visibility for specific ray
+                 types, you can also change its sidedness. By default, objects
+                 are double-sided for all rays."""
+    )
+}
+
+class "AiMaterialAPI" (
+    doc = """API for Material prims encapsulating Arnold shading networks."""
+) {
+    rel ai:surface (
+        customData = {
+            string apiName = "surface"
+        }
+    )
+
+    rel ai:displacement (
+        customData = {
+            string apiName = "displacement"
+        }
+    )
+}
+
+class AiShader "AiShader" (
+    doc = """Represents an Arnold shader node."""
+    inherits = </Shader>
+)
+{
+}
+
+class AiProcedural "AiProcedural" (
+    doc = """Represents an Arnold procedural shape node."""
+    inherits = </Boundable>
+) {
+    uniform string dso (
+        doc = """A procedural can point to ass, obj, and ply filetypes, or to a
+                 dll or so, which will be recognized as a compiled procedural
+                 program."""
+    )
+
+    string data = "" (
+        doc = """This string parameter is used to pass parameters that are
+                 parsed by the procedural program and can be used for its
+                 creation/initialization.
+
+                 The format of this string is not standard and is dictated by
+                 the particular implementation of each procedural program. A
+                 better and more compact way of passing parameters and data to
+                 the procedural is through user data."""
+    )
+
+    uniform bool loat_at_init = false (
+        doc = """Whether to force the loading of the procedural during the
+                 initialization process."""
+        customData = {
+            string apiName = "loadAtInit"
+        }
+    )
+}
+
+class AiVolume "AiVolume" (
+    doc = """Represents an Arnold volume node.
+
+             This class inherits AiProcedural because Arnold's volume node has
+             essentially the same parameters as the procedural node, except for
+             a couple of slight variations."""
+    inherits = </AiProcedural>
+) {
+    float step_size = 0 (
+        doc = """Sampling step size inside the volume.
+                 I think 0 means automatic."""
+        customData = {
+            string apiName = "stepSize"
+        }
+    )
+}
