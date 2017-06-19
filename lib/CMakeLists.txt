@@ -77,5 +77,5 @@ install(CODE
 )
 
 install(CODE
-    "file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/usd/usdAi/__init__.py\" \"import ${PYTHON_LIBRARY_NAME}\nfrom pxr import Tf\nTf.PrepareModule(${PYTHON_LIBRARY_NAME}, locals())\ndel Tf\n\ntry:\n\t__import__('pkg_resources').declare_namespace(__name__)\nexcept:\n\tfrom pkgutil import extend_path\n\t__path__ = extend_path(__path__, __name__)\n\")"
+    "file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/usd/${LIBRARY_NAME}/__init__.py\" \"import ${PYTHON_LIBRARY_NAME}\nfrom pxr import Tf\nTf.PrepareModule(${PYTHON_LIBRARY_NAME}, locals())\ndel Tf\n\ntry:\n\t__import__('pkg_resources').declare_namespace(__name__)\nexcept:\n\tfrom pkgutil import extend_path\n\t__path__ = extend_path(__path__, __name__)\n\")"
 )
