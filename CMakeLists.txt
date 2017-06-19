@@ -1,6 +1,7 @@
 project(usdai)
 
-cmake_minimum_required(VERSION 2.8)
+# Multiline strings are only available in 3.0+
+cmake_minimum_required(VERSION 3.0)
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
