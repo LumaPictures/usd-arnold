@@ -44,7 +44,10 @@ install(FILES generatedSchema.usda
     DESTINATION share/usd/plugins/usdAi/resources)
 
 install(CODE
-    "file(WRITE \"${CMAKE_INSTALL_PREFIX}/share/usd/plugins/plugInfo.json\" \"{\n    \\\"Includes\\\": [ \\\"*/resources/\\\" ]\n}\")")
+    "file(WRITE \"${CMAKE_INSTALL_PREFIX}/share/usd/plugins/plugInfo.json\"
+\"{
+    \\\"Includes\\\": [ \\\"*/resources/\\\" ]
+}\")")
 
 set(PLUG_INFO_LIBRARY_PATH "../../../../lib/lib${LIBRARY_NAME}.so")
 set(PLUG_INFO_ROOT "..")
@@ -55,7 +58,7 @@ install(FILES ${CONFIGURED_PLUGINFO}
     DESTINATION share/usd/plugins/usdAi/resources)
 
 install(FILES ${HDR}
-    DESTINATION include/usd/${LIBRARY_NAME})
+    DESTINATION include/pxr/usd/${LIBRARY_NAME})
 
 ##########################################
 # Installing and building python bindings.
@@ -73,10 +76,10 @@ set_target_properties(${PYTHON_LIBRARY_NAME} PROPERTIES INSTALL_RPATH_USE_LINK_P
 
 target_link_libraries(${PYTHON_LIBRARY_NAME} ${LIBRARY_NAME} tf sdf usd vt ${Boost_LIBRARIES})
 install(TARGETS ${PYTHON_LIBRARY_NAME}
-    DESTINATION lib/python/usd/${LIBRARY_NAME})
+    DESTINATION lib/python/pxr/usd/${LIBRARY_NAME})
 
 install(CODE
-"file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/usd/__init__.py\"
+"file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/__init__.py\"
 \"try:
     __import__('pkg_resources').declare_namespace(__name__)
 except:
@@ -86,7 +89,17 @@ except:
 )
 
 install(CODE
-    "file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/usd/${LIBRARY_NAME}/__init__.py\"
+"file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/usd/__init__.py\"
+\"try:
+    __import__('pkg_resources').declare_namespace(__name__)
+except:
+    from pkgutil import extend_path
+    __path__ = extend_path(__path__, __name__)
+\")"
+)
+
+install(CODE
+    "file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/usd/${LIBRARY_NAME}/__init__.py\"
 \"import ${PYTHON_LIBRARY_NAME}
 from pxr import Tf
 Tf.PrepareModule(${PYTHON_LIBRARY_NAME}, locals())

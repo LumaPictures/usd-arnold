@@ -1,5 +1,8 @@
 project(usdai)
 
+option(BUILD_USD_PLUGIN "Building the usd plugin." OFF)
+option(BUILD_USD_MAYA_PLUGIN "Building the usd maya plugin." OFF)
+
 # Multiline strings are only available in 3.0+
 cmake_minimum_required(VERSION 2.8)
 
@@ -18,6 +21,12 @@ link_directories(${USD_LIBRARY_DIR})
 include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
 include_directories(SYSTEM ${TBB_INCLUDE_DIRS})
 
-add_subdirectory(lib)
+if (BUILD_USD_PLUGIN)
+    add_subdirectory(lib)
+endif ()
+
+if (BUILD_USD_MAYA_PLUGIN)
+    add_subdirectory(shaderExporter)
+endif ()
 
 install(FILES README.md DESTINATION .)
