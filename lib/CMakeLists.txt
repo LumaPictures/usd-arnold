@@ -55,7 +55,7 @@ install(FILES ${CONFIGURED_PLUGINFO}
     DESTINATION share/usd/plugins/usdAi/resources)
 
 install(FILES ${HDR}
-    DESTINATION include/${LIBRARY_NAME})
+    DESTINATION include/usd/${LIBRARY_NAME})
 
 ##########################################
 # Installing and building python bindings.
