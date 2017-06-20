@@ -20,11 +20,22 @@
 
 #include <tbb/tick_count.h>
 
-#include <dlfcn.h>
+#include <scene/MayaScene.h>
+#include <translators/NodeTranslator.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
+    AtNode* mtoa_export_node(const MObject& obj, const char* plugName) {
+        MStatus status;
+        MFnDependencyNode node(obj, &status);
+        if (!status) { return 0; }
+        auto* arnoldSession = CMayaScene::GetArnoldSession();
+        if (arnoldSession == nullptr) { return nullptr; }
+        auto* trans = arnoldSession->ExportNode(node.findPlug(plugName));
+        return trans == nullptr ? nullptr : trans->GetArnoldRootNode();
+    }
+
     inline GfMatrix4f NodeGetMatrix(const AtNode* node, const char* param) {
         AtMatrix mat;
         AiNodeGetMatrix(node, param, mat);
@@ -47,86 +58,6 @@ namespace {
         }
         return en[id];
     }
-
-    struct ArnoldCtx {
-        // TODO: rewrite to std::function and use static_cast / reinterpret_cast
-        // mtoa functions
-        void (*mtoa_init_export_session) () = nullptr;
-        AtNode* (*mtoa_export_node) (void*, const char*) = nullptr;
-        void (*mtoa_destroy_export_session) () = nullptr;
-
-        void* mtoa_handle = nullptr;
-        void* ai_handle = nullptr;
-        enum State {
-            STATE_UNINITIALIZED,
-            STATE_VALID,
-            STATE_INVALID
-        };
-        State state = STATE_UNINITIALIZED;
-
-        template <typename T>
-        void convert_ptr(T& trg, void* sym) {
-            trg = reinterpret_cast<T>(sym);
-        }
-
-        template <typename T>
-        void mtoa_ptr(T& trg, const char* name) {
-            auto tmp = dlsym(mtoa_handle, name);
-            if (tmp == nullptr) {
-                throw std::runtime_error(std::string("Error loading : ") + std::string(name));
-            }
-            convert_ptr(trg, tmp);
-        }
-
-        template <typename T>
-        void ai_ptr(T& trg, const char* name) {
-            auto tmp = dlsym(ai_handle, name);
-            if (tmp == nullptr) {
-                throw std::runtime_error(std::string("Error loading : ") + std::string(name));
-            }
-            convert_ptr(trg, tmp);
-        }
-
-        bool is_valid() {
-            if (state == STATE_INVALID) {
-                return false;
-            } else if (state == STATE_VALID) {
-                return true;
-            }
-
-            state = STATE_INVALID;
-            auto ai_handle = dlopen("libai.so", RTLD_LAZY | RTLD_GLOBAL);
-            if (ai_handle == nullptr) { return false; }
-            std::string mtoa_path = std::string(getenv("MTOA_HOME")) + std::string("/plug-ins/mtoa.so");
-            auto mtoa_handle = dlopen(mtoa_path.c_str(), RTLD_LAZY | RTLD_GLOBAL);
-            if (mtoa_handle == nullptr) { return false; }
-            try {
-                mtoa_ptr(mtoa_init_export_session, "mtoa_init_export_session");
-                mtoa_ptr(mtoa_export_node, "mtoa_export_node");
-                mtoa_ptr(mtoa_destroy_export_session, "mtoa_destroy_export_session");
-            } catch (std::exception& e) {
-                std::cerr << e.what() << std::endl;
-                return false;
-            }
-            state = STATE_VALID;
-            return true;
-        }
-
-        ArnoldCtx() {
-
-        }
-
-        ~ArnoldCtx() {
-            if (mtoa_handle != nullptr) {
-                dlclose(mtoa_handle);
-            }
-            if (ai_handle != nullptr) {
-                dlclose(ai_handle);
-            }
-        }
-    };
-
-    ArnoldCtx ai;
 
     template <typename LHT, typename RHT> inline
     void convert(LHT& l, const RHT& r) {
@@ -319,7 +250,10 @@ ArnoldShaderExport::ArnoldShaderExport(const UsdStageRefPtr& _stage, UsdTimeCode
     m_stage(_stage), m_dag_to_usd(dag_to_usd),
     m_shaders_scope(parent_scope.empty() ? "/Looks" : (parent_scope + "/Looks")), m_time_code(_time_code) {
     UsdGeomScope::Define(m_stage, m_shaders_scope);
-    ai.mtoa_init_export_session();
+    CMayaScene::End();
+    AiMsgSetConsoleFlags(AI_LOG_NONE);
+    CMayaScene::Begin(MTOA_SESSION_ASS);
+    AiMsgSetConsoleFlags(AI_LOG_NONE);
     const auto transform_assignment = TfGetenv("PXR_MAYA_TRANSFORM_ASSIGNMENT", "disable");
     if (transform_assignment == "common") {
         m_transform_assignment = TRANSFORM_ASSIGNMENT_COMMON;
@@ -331,12 +265,7 @@ ArnoldShaderExport::ArnoldShaderExport(const UsdStageRefPtr& _stage, UsdTimeCode
 }
 
 ArnoldShaderExport::~ArnoldShaderExport() {
-    ai.mtoa_destroy_export_session();
-}
-
-bool
-ArnoldShaderExport::is_valid() {
-    return ai.is_valid();
+    CMayaScene::End();
 }
 
 void
@@ -462,7 +391,7 @@ ArnoldShaderExport::write_arnold_node(const AtNode* arnold_node, SdfPath parent_
 SdfPath
 ArnoldShaderExport::export_shader(MObject obj) {
     if (!obj.hasFn(MFn::kShadingEngine)) { return SdfPath(); }
-    auto arnold_node = ai.mtoa_export_node(&obj, "message");
+    auto arnold_node = mtoa_export_node(obj, "message");
     if (arnold_node == nullptr) { return SdfPath(); }
     // we can't store the material in the map
     MFnDependencyNode node(obj);
@@ -482,9 +411,9 @@ ArnoldShaderExport::export_shader(MObject obj) {
     if (conns.length() == 0) { return material_path; }
     auto disp_obj = conns[0].node();
     auto disp_path = write_arnold_node(
-        ai.mtoa_export_node(&disp_obj,
-                            conns[0].partialName(false, false, false, false, false, true).asChar()),
-                            m_shaders_scope);
+        mtoa_export_node(disp_obj,
+                         conns[0].partialName(false, false, false, false, false, true).asChar()),
+                         m_shaders_scope);
     if (!disp_path.IsEmpty()) {
         auto rel = material_prim.CreateRelationship(ai_displacement_token);
         rel.AppendTarget(disp_path);
@@ -515,7 +444,7 @@ ArnoldShaderExport::setup_shader(const MDagPath& dg, const SdfPath& path) {
     if (obj.hasFn(MFn::kPluginShape)) {
         MFnDependencyNode dn(obj);
         if (dn.typeName() == "vdb_visualizer") {
-            auto* volume_node = ai.mtoa_export_node(&obj, "message");
+            auto* volume_node = mtoa_export_node(obj, "message");
             if (!AiNodeIs(volume_node, "volume")) { return; }
             const auto* linked_shader = reinterpret_cast<const AtNode*>(AiNodeGetPtr(volume_node, "shader"));
             if (linked_shader == nullptr) { return; }

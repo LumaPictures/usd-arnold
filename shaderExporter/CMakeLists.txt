@@ -7,10 +7,15 @@ find_package(Maya)
 include_directories(${MAYA_INCLUDE_DIRS})
 link_directories(${MAYA_LIBRARY_DIR})
 
-find_package(Arnold)
+find_package(Arnold REQUIRED)
 include_directories(${ARNOLD_INCLUDE_DIR})
 
+find_package(MtoA REQUIRED)
+include_directories(${MTOA_INCLUDE_DIR})
+
 set(MAYA_LIBS OpenMaya Foundation OpenMayaAnim OpenMayaFX OpenMayaUI OpenMayaRender)
+
+add_compile_options(-D_LINUX)
 
 file(GLOB SRC *.cpp)
 
@@ -19,7 +24,10 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 add_library(${PLUGIN_NAME} SHARED ${SRC})
 set_target_properties(${PLUGIN_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PLUGIN_NAME} ${ARNOLD_LIBRARY} ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${MAYA_LIBS} tf gf sdf usd usdGeom usdMaya)
+target_link_libraries(${PLUGIN_NAME}
+                      ${ARNOLD_LIBRARY} ${Boost_LIBRARIES}
+                      ${PYTHON_LIBRARIES} ${MAYA_LIBS}
+                      ${MTOA_mtoa_api_LIBRARY} tf gf sdf usd usdGeom usdMaya)
 
 install(TARGETS ${PLUGIN_NAME}
         DESTINATION plug-ins)
