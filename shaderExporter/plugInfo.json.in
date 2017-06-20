@@ -1,0 +1,14 @@
+{
+    "Plugins": [
+        {
+            "Info" : {
+                "UsdMaya" : {
+                    "ShaderExport" : "arnold"
+                }
+            },
+            "LibraryPath": "plug-ins/@PLUGIN_NAME@.so",
+            "Name": "@PLUGIN_NAME@",
+            "Type": "library"
+        }
+    ]
+}
