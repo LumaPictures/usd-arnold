@@ -3,7 +3,9 @@
         {
             "Info" : {
                 "UsdMaya" : {
-                    "ShaderExport" : "arnold"
+                    "ShadingModePlugin" : {
+                        "mayaPlugin" : "@PLUGIN_NAME@"
+                    }
                 }
             },
             "LibraryPath": "plug-ins/@PLUGIN_NAME@.so",

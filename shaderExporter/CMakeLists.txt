@@ -13,6 +13,9 @@ include_directories(${ARNOLD_INCLUDE_DIR})
 find_package(MtoA REQUIRED)
 include_directories(${MTOA_INCLUDE_DIR})
 
+find_package(USDArnold REQUIRED)
+include_directories(${USD_ARNOLD_INCLUDE_DIR})
+
 set(MAYA_LIBS OpenMaya Foundation OpenMayaAnim OpenMayaFX OpenMayaUI OpenMayaRender)
 
 add_compile_options(-D_LINUX)
@@ -27,7 +30,8 @@ set_target_properties(${PLUGIN_NAME} PROPERTIES PREFIX "")
 target_link_libraries(${PLUGIN_NAME}
                       ${ARNOLD_LIBRARY} ${Boost_LIBRARIES}
                       ${PYTHON_LIBRARIES} ${MAYA_LIBS}
-                      ${MTOA_mtoa_api_LIBRARY} tf gf sdf usd usdGeom usdMaya)
+                      ${MTOA_mtoa_api_LIBRARY} tf gf sdf usd usdGeom ${USD_ARNOLD_LIBRARY} usdMaya)
+set_target_properties(${PLUGIN_NAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH ON)
 
 install(TARGETS ${PLUGIN_NAME}
         DESTINATION plug-ins)
