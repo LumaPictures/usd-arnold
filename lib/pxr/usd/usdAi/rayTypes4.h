@@ -15,12 +15,6 @@ namespace arnold4 {
     static constexpr uint8_t AI_RAY_GLOSSY = 0x40;
     static constexpr uint8_t AI_RAY_ALL = 0xFF;
     static constexpr uint8_t AI_RAY_GENERIC = AI_RAY_ALL;
-
-    static constexpr uint8_t AI_RAY_ALL_DIFFUSE = (AI_RAY_DIFFUSE_TRANSMIT | AI_RAY_DIFFUSE_REFLECT);
-    static constexpr uint8_t AI_RAY_ALL_SPECULAR = (AI_RAY_SPECULAR_TRANSMIT| AI_RAY_SPECULAR_REFLECT);
-    static constexpr uint8_t AI_RAY_ALL_REFLECT = (AI_RAY_DIFFUSE_REFLECT  | AI_RAY_SPECULAR_REFLECT);
-    static constexpr uint8_t AI_RAY_ALL_TRANSMIT = (AI_RAY_DIFFUSE_TRANSMIT | AI_RAY_SPECULAR_TRANSMIT);
-    static constexpr uint8_t AI_RAY_ALL = uint8_t(-1);
 }
 
 #define USD_ARNOLD_IMPORT_ARNOLD4 using namespace arnold4;
