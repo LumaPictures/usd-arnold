@@ -71,7 +71,7 @@ namespace {
     };
 
     template <typename T, typename R = T> inline
-    void export_array(UsdShadeParameter& param, const AtArray* arr, R (*f) (const AtArray*, uint32_t, const char*, int32_t)) {
+    void export_array(UsdShadeInput& param, const AtArray* arr, R (*f) (const AtArray*, uint32_t, const char*, int32_t)) {
         // we already check the validity of the array before this call
         VtArray<T> out_arr(arr->nelements);
         for (auto i = 0u; i < arr->nelements; ++i) {
@@ -125,35 +125,35 @@ namespace {
 
     struct array_type {
         const SdfValueTypeName& type;
-        std::function<void(UsdShadeParameter&, const AtArray*)> f;
+        std::function<void(UsdShadeInput&, const AtArray*)> f;
 
-        array_type(const SdfValueTypeName& _type, std::function<void(UsdShadeParameter&, const AtArray*)> _f) :
+        array_type(const SdfValueTypeName& _type, std::function<void(UsdShadeInput&, const AtArray*)> _f) :
             type(_type), f(_f) { }
     };
 
     const std::map<uint8_t, array_type> array_type_map = {
-        {AI_TYPE_BYTE, {SdfValueTypeNames->UCharArray, [](UsdShadeParameter& p, const AtArray* a) { export_array<uint8_t>(p, a, AiArrayGetByteFunc); }}},
-        {AI_TYPE_INT, {SdfValueTypeNames->IntArray, [](UsdShadeParameter& p, const AtArray* a) { export_array<int32_t>(p, a, AiArrayGetIntFunc); }}},
-        {AI_TYPE_UINT, {SdfValueTypeNames->UIntArray, [](UsdShadeParameter& p, const AtArray* a) { export_array<uint32_t>(p, a, AiArrayGetUIntFunc); }}},
-        {AI_TYPE_BOOLEAN, {SdfValueTypeNames->BoolArray, [](UsdShadeParameter& p, const AtArray* a) { export_array<bool>(p, a, AiArrayGetBoolFunc); }}},
-        {AI_TYPE_FLOAT, {SdfValueTypeNames->FloatArray, [](UsdShadeParameter& p, const AtArray* a) { export_array<float>(p, a, AiArrayGetFltFunc); }}},
-        {AI_TYPE_RGB, {SdfValueTypeNames->Color3fArray, [](UsdShadeParameter& p, const AtArray* a) { export_array<GfVec3f, AtRGB>(p, a, AiArrayGetRGBFunc); }}},
-        {AI_TYPE_RGBA, {SdfValueTypeNames->Color4fArray, [](UsdShadeParameter& p, const AtArray* a) { export_array<GfVec4f, AtRGBA>(p, a, AiArrayGetRGBAFunc); }}},
-        {AI_TYPE_VECTOR, {SdfValueTypeNames->Vector3fArray, [](UsdShadeParameter& p, const AtArray* a) { export_array<GfVec3f, AtVector>(p, a, AiArrayGetVecFunc); }}},
-        {AI_TYPE_POINT, {SdfValueTypeNames->Vector3fArray, [](UsdShadeParameter& p, const AtArray* a) { export_array<GfVec3f, AtPoint>(p, a, AiArrayGetPntFunc); }}},
-        {AI_TYPE_POINT2, {SdfValueTypeNames->Float2Array, [](UsdShadeParameter& p, const AtArray* a) { export_array<GfVec2f, AtPoint2>(p, a, AiArrayGetPnt2Func); }}},
-        {AI_TYPE_STRING, {SdfValueTypeNames->StringArray, [](UsdShadeParameter& p, const AtArray* a) { export_array<std::string, const char*>(p, a, AiArrayGetStrFunc); }}},
+        {AI_TYPE_BYTE, {SdfValueTypeNames->UCharArray, [](UsdShadeInput& p, const AtArray* a) { export_array<uint8_t>(p, a, AiArrayGetByteFunc); }}},
+        {AI_TYPE_INT, {SdfValueTypeNames->IntArray, [](UsdShadeInput& p, const AtArray* a) { export_array<int32_t>(p, a, AiArrayGetIntFunc); }}},
+        {AI_TYPE_UINT, {SdfValueTypeNames->UIntArray, [](UsdShadeInput& p, const AtArray* a) { export_array<uint32_t>(p, a, AiArrayGetUIntFunc); }}},
+        {AI_TYPE_BOOLEAN, {SdfValueTypeNames->BoolArray, [](UsdShadeInput& p, const AtArray* a) { export_array<bool>(p, a, AiArrayGetBoolFunc); }}},
+        {AI_TYPE_FLOAT, {SdfValueTypeNames->FloatArray, [](UsdShadeInput& p, const AtArray* a) { export_array<float>(p, a, AiArrayGetFltFunc); }}},
+        {AI_TYPE_RGB, {SdfValueTypeNames->Color3fArray, [](UsdShadeInput& p, const AtArray* a) { export_array<GfVec3f, AtRGB>(p, a, AiArrayGetRGBFunc); }}},
+        {AI_TYPE_RGBA, {SdfValueTypeNames->Color4fArray, [](UsdShadeInput& p, const AtArray* a) { export_array<GfVec4f, AtRGBA>(p, a, AiArrayGetRGBAFunc); }}},
+        {AI_TYPE_VECTOR, {SdfValueTypeNames->Vector3fArray, [](UsdShadeInput& p, const AtArray* a) { export_array<GfVec3f, AtVector>(p, a, AiArrayGetVecFunc); }}},
+        {AI_TYPE_POINT, {SdfValueTypeNames->Vector3fArray, [](UsdShadeInput& p, const AtArray* a) { export_array<GfVec3f, AtPoint>(p, a, AiArrayGetPntFunc); }}},
+        {AI_TYPE_POINT2, {SdfValueTypeNames->Float2Array, [](UsdShadeInput& p, const AtArray* a) { export_array<GfVec2f, AtPoint2>(p, a, AiArrayGetPnt2Func); }}},
+        {AI_TYPE_STRING, {SdfValueTypeNames->StringArray, [](UsdShadeInput& p, const AtArray* a) { export_array<std::string, const char*>(p, a, AiArrayGetStrFunc); }}},
         {AI_TYPE_NODE, {SdfValueTypeNames->StringArray, nullptr}},
         {AI_TYPE_MATRIX,
             {SdfValueTypeNames->Matrix4dArray,
-                           [](UsdShadeParameter& p, const AtArray* a) {
+                           [](UsdShadeInput& p, const AtArray* a) {
                                VtArray<GfMatrix4d> arr(a->nelements);
                                for (auto i = 0u; i < a->nelements; ++i) {
                                    arr[i] = GfMatrix4d(ArrayGetMatrix(a, i, __FILE__, __LINE__));
                                }
                            }
                        }}, // TODO: implement
-        {AI_TYPE_ENUM, {SdfValueTypeNames->IntArray, [](UsdShadeParameter& p, const AtArray* a) { export_array<int32_t>(p, a, AiArrayGetIntFunc); }}},
+        {AI_TYPE_ENUM, {SdfValueTypeNames->IntArray, [](UsdShadeInput& p, const AtArray* a) { export_array<int32_t>(p, a, AiArrayGetIntFunc); }}},
     };
 
     const array_type*
@@ -276,7 +276,7 @@ ArnoldShaderExport::export_parameter(
         if (arr == nullptr || arr->nelements == 0 || arr->nkeys == 0 || arr->type == AI_TYPE_ARRAY) { return; }
         const auto iter_type = get_array_type(arr->type);
         if (iter_type == nullptr) { return; }
-        auto param = shader.CreateParameter(TfToken(arnold_param_name), iter_type->type);
+        auto param = shader.CreateInput(TfToken(arnold_param_name), iter_type->type);
         if (iter_type->f != nullptr) {
             iter_type->f(param, arr);
         }
@@ -320,7 +320,7 @@ ArnoldShaderExport::export_parameter(
                     UsdShadeConnectableAPI::ConnectToSource(shader.CreateInput(TfToken(arnold_param_name), iter_type->type), source_param);
                 } else {
                     if (iter_type->f != nullptr) {
-                        auto param = shader.CreateParameter(TfToken(arnold_param_name), iter_type->type);
+                        auto param = shader.CreateInput(TfToken(arnold_param_name), iter_type->type);
                         param.Set(iter_type->f(arnold_node, arnold_param_name));
                     }
                 }
@@ -338,7 +338,7 @@ ArnoldShaderExport::export_parameter(
                 }*/
             } else {
                 if (iter_type->f != nullptr) {
-                    auto param = shader.CreateParameter(TfToken(arnold_param_name), iter_type->type);
+                    auto param = shader.CreateInput(TfToken(arnold_param_name), iter_type->type);
                     param.Set(iter_type->f(arnold_node, arnold_param_name));
                 }
             }
