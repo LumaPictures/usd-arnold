@@ -5,6 +5,7 @@ set(Boost_USE_STATIC_LIBS OFF)
 find_package(Boost COMPONENTS python REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../)
 
 file(GLOB AI_SRC ai*.cpp)
 file(GLOB HDR *.h)

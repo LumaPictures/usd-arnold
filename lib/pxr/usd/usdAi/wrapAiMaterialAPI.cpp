@@ -21,12 +21,12 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/usd/usdAi/aiProcedural.h"
+#include "pxr/usd/usdAi/aiMaterialAPI.h"
 #include "pxr/usd/usd/schemaBase.h"
-#include "pxr/usd/usd/conversions.h"
 
 #include "pxr/usd/sdf/primSpec.h"
 
+#include "pxr/usd/usd/pyConversions.h"
 #include "pxr/base/tf/pyContainerConversions.h"
 #include "pxr/base/tf/pyResultConversions.h"
 #include "pxr/base/tf/pyUtils.h"
@@ -48,36 +48,15 @@ namespace {
 // fwd decl.
 WRAP_CUSTOM;
 
-        
-static UsdAttribute
-_CreateDsoAttr(UsdAiProcedural &self,
-                                      object defaultVal, bool writeSparsely) {
-    return self.CreateDsoAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->String), writeSparsely);
-}
-        
-static UsdAttribute
-_CreateDataAttr(UsdAiProcedural &self,
-                                      object defaultVal, bool writeSparsely) {
-    return self.CreateDataAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->String), writeSparsely);
-}
-        
-static UsdAttribute
-_CreateLoadAtInitAttr(UsdAiProcedural &self,
-                                      object defaultVal, bool writeSparsely) {
-    return self.CreateLoadAtInitAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
-}
 
 } // anonymous namespace
 
-void wrapUsdAiProcedural()
+void wrapUsdAiMaterialAPI()
 {
-    typedef UsdAiProcedural This;
+    typedef UsdAiMaterialAPI This;
 
-    class_<This, bases<UsdGeomBoundable> >
-        cls("AiProcedural");
+    class_<This, bases<UsdSchemaBase> >
+        cls("AiMaterialAPI");
 
     cls
         .def(init<UsdPrim>(arg("prim")))
@@ -87,8 +66,6 @@ void wrapUsdAiProcedural()
         .def("Get", &This::Get, (arg("stage"), arg("path")))
         .staticmethod("Get")
 
-        .def("Define", &This::Define, (arg("stage"), arg("path")))
-        .staticmethod("Define")
 
         .def("GetSchemaAttributeNames",
              &This::GetSchemaAttributeNames,
@@ -102,28 +79,17 @@ void wrapUsdAiProcedural()
 
         .def(!self)
 
-        
-        .def("GetDsoAttr",
-             &This::GetDsoAttr)
-        .def("CreateDsoAttr",
-             &_CreateDsoAttr,
-             (arg("defaultValue")=object(),
-              arg("writeSparsely")=false))
-        
-        .def("GetDataAttr",
-             &This::GetDataAttr)
-        .def("CreateDataAttr",
-             &_CreateDataAttr,
-             (arg("defaultValue")=object(),
-              arg("writeSparsely")=false))
-        
-        .def("GetLoadAtInitAttr",
-             &This::GetLoadAtInitAttr)
-        .def("CreateLoadAtInitAttr",
-             &_CreateLoadAtInitAttr,
-             (arg("defaultValue")=object(),
-              arg("writeSparsely")=false))
 
+        
+        .def("GetSurfaceRel",
+             &This::GetSurfaceRel)
+        .def("CreateSurfaceRel",
+             &This::CreateSurfaceRel)
+        
+        .def("GetDisplacementRel",
+             &This::GetDisplacementRel)
+        .def("CreateDisplacementRel",
+             &This::CreateDisplacementRel)
     ;
 
     _CustomWrapCode(cls);

@@ -22,7 +22,7 @@ include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
 include_directories(SYSTEM ${TBB_INCLUDE_DIRS})
 
 if (BUILD_USD_PLUGIN)
-    add_subdirectory(lib)
+    add_subdirectory(lib/pxr/usd/usdAi)
 endif ()
 
 if (BUILD_USD_MAYA_PLUGIN)

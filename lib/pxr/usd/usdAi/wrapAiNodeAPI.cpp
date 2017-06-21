@@ -21,12 +21,12 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/usd/usdAi/aiMaterialAPI.h"
+#include "pxr/usd/usdAi/aiNodeAPI.h"
 #include "pxr/usd/usd/schemaBase.h"
-#include "pxr/usd/usd/conversions.h"
 
 #include "pxr/usd/sdf/primSpec.h"
 
+#include "pxr/usd/usd/pyConversions.h"
 #include "pxr/base/tf/pyContainerConversions.h"
 #include "pxr/base/tf/pyResultConversions.h"
 #include "pxr/base/tf/pyUtils.h"
@@ -51,12 +51,12 @@ WRAP_CUSTOM;
 
 } // anonymous namespace
 
-void wrapUsdAiMaterialAPI()
+void wrapUsdAiNodeAPI()
 {
-    typedef UsdAiMaterialAPI This;
+    typedef UsdAiNodeAPI This;
 
     class_<This, bases<UsdSchemaBase> >
-        cls("AiMaterialAPI");
+        cls("AiNodeAPI");
 
     cls
         .def(init<UsdPrim>(arg("prim")))
@@ -80,16 +80,6 @@ void wrapUsdAiMaterialAPI()
         .def(!self)
 
 
-        
-        .def("GetSurfaceRel",
-             &This::GetSurfaceRel)
-        .def("CreateSurfaceRel",
-             &This::CreateSurfaceRel)
-        
-        .def("GetDisplacementRel",
-             &This::GetDisplacementRel)
-        .def("CreateDisplacementRel",
-             &This::CreateDisplacementRel)
     ;
 
     _CustomWrapCode(cls);
