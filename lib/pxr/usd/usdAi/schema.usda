@@ -2,9 +2,9 @@
 (
     "This file describes various Arnold USD schemata for code generation."
     subLayers = [
-        @${BUILTIN_SCHEMA_DIR}/usd/schema.usda@,
-        @${BUILTIN_SCHEMA_DIR}/usdGeom/schema.usda@,
-        @${BUILTIN_SCHEMA_DIR}/usdShade/schema.usda@
+        @usd/resources/schema.usda@,
+        @usdGeom/resources/schema.usda@,
+        @usdShade/resources/schema.usda@
     ]
 )
 

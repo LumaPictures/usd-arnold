@@ -15,18 +15,14 @@ set(PY_SRC
     moduleDeps.cpp
     ${WRAP_SRC})
 
-set(BUILTIN_SCHEMA_DIR ${USD_INCLUDE_DIR}/pxr/usd)
-set(CONFIGURED_SCHEMA ${CMAKE_CURRENT_BINARY_DIR}/schema.usda)
-configure_file(schema.usda.in ${CONFIGURED_SCHEMA})
-
 ######################################
 # Installing and building c++ library.
 
 # This is always going to run. TODO: try using add_custom_command differently.
 add_custom_target(schema_gen
-    COMMAND usdGenSchema ${CONFIGURED_SCHEMA} ${CMAKE_CURRENT_SOURCE_DIR}
+    COMMAND usdGenSchema ${CMAKE_CURRENT_SOURCE_DIR}/schema.usda ${CMAKE_CURRENT_SOURCE_DIR}
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    SOURCES schema.usda.in)
+    SOURCES schema.usda)
 
 add_library(${LIBRARY_NAME} SHARED ${AI_SRC} tokens.cpp ${HDR})
 target_link_libraries(${LIBRARY_NAME} ${Boost_LIBRARIES} tf vt sdf usd usdGeom usdShade)
