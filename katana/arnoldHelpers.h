@@ -13,11 +13,11 @@ PXR_NAMESPACE_OPEN_SCOPE
 class SdfValueTypeName;
 
 // Given an SDF value type, return a (possibly empty) type hint string for KtoA.
-std::string PxrUsdKatana_GetArnoldAttrTypeHint(const SdfValueTypeName& scalarType);
+std::string GetArnoldAttrTypeHint(const SdfValueTypeName& scalarType);
 
 // Given a prim, return a new GroupAttribute to apply as its `arnoldStatements`
 // attribute in Katana.
-FnKat::Attribute PxrUsdKatana_GetArnoldStatementsGroup(const UsdPrim& prim);
+FnKat::Attribute GetArnoldStatementsGroup(const UsdPrim& prim);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

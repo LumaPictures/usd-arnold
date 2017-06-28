@@ -5,16 +5,16 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-    class PxrUsdKatanaAttrMap;
-    class PxrUsdKatanaUsdInPrivateData;
-    class UsdAiProcedural;
+class PxrUsdKatanaAttrMap;
+class PxrUsdKatanaUsdInPrivateData;
+class UsdAiProcedural;
 
 /// \brief read \p procedural into \p attrs.
-    void
-    PxrUsdKatanaReadAiProcedural(
-        const UsdAiProcedural& procedural,
-        const PxrUsdKatanaUsdInPrivateData& data,
-        PxrUsdKatanaAttrMap& attrs);
+void
+ReadAiProcedural(
+    const UsdAiProcedural& procedural,
+    const PxrUsdKatanaUsdInPrivateData& data,
+    PxrUsdKatanaAttrMap& attrs);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

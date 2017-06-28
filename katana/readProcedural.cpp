@@ -17,10 +17,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-FnLogSetup("PxrUsdKatanaReadAiProcedural");
+FnLogSetup("ReadAiProcedural");
 
 void
-PxrUsdKatanaReadAiProcedural(
+ReadAiProcedural(
     const UsdAiProcedural& procedural,
     const PxrUsdKatanaUsdInPrivateData& data,
     PxrUsdKatanaAttrMap& attrs)
@@ -30,7 +30,7 @@ PxrUsdKatanaReadAiProcedural(
 
     // Ready in Arnold visibility attributes, etc.
     FnKat::GroupAttribute arnoldStatements =
-        PxrUsdKatana_GetArnoldStatementsGroup(procedural.GetPrim());
+        GetArnoldStatementsGroup(procedural.GetPrim());
     if (arnoldStatements.isValid()) {
         attrs.set("arnoldStatements", arnoldStatements);
     }
@@ -94,7 +94,7 @@ PxrUsdKatanaReadAiProcedural(
             attrHints.push_back("true");
         }
 
-        std::string typeHint = PxrUsdKatana_GetArnoldAttrTypeHint(
+        std::string typeHint = GetArnoldAttrTypeHint(
             userAttr.GetTypeName().GetScalarType());
         if (!typeHint.empty()) {
             attrHints.push_back("type");

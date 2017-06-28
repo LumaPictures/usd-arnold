@@ -8,7 +8,7 @@ using namespace arnold4;
 PXR_NAMESPACE_OPEN_SCOPE
 
 std::string
-PxrUsdKatana_GetArnoldAttrTypeHint(const SdfValueTypeName& scalarType)
+GetArnoldAttrTypeHint(const SdfValueTypeName& scalarType)
 {
     std::string hint;
     if (scalarType == SdfValueTypeNames->Bool) {
@@ -60,7 +60,7 @@ PxrUsdKatana_GetArnoldAttrTypeHint(const SdfValueTypeName& scalarType)
 
 
 FnKat::Attribute
-PxrUsdKatana_GetArnoldStatementsGroup(const UsdPrim& prim) {
+GetArnoldStatementsGroup(const UsdPrim& prim) {
     FnKat::GroupBuilder builder;
 
     UsdAiShapeAPI shapeAPI(prim);

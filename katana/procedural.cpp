@@ -17,7 +17,7 @@ PXRUSDKATANA_USDIN_PLUGIN_DEFINE(AiProceduralOp, privateData, interface)
 {
     PxrUsdKatanaAttrMap attrs;
 
-    PxrUsdKatanaReadAiProcedural(
+    ReadAiProcedural(
         UsdAiProcedural(privateData.GetUsdPrim()), privateData, attrs);
 
     attrs.toInterface(interface);
