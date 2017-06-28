@@ -2,8 +2,8 @@ project(usdai)
 
 option(BUILD_USD_PLUGIN "Building the usd plugin." OFF)
 option(BUILD_USD_MAYA_PLUGIN "Building the usd maya plugin." OFF)
+option(BUILD_USD_KATANA_PLUGIN "Building the usd katana plugin." OFF)
 
-# Multiline strings are only available in 3.0+
 cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -27,6 +27,10 @@ endif ()
 
 if (BUILD_USD_MAYA_PLUGIN)
     add_subdirectory(shaderExporter)
+endif ()
+
+if (BUILD_USD_KATANA_PLUGIN)
+    add_subdirectory(katana)
 endif ()
 
 install(FILES README.md DESTINATION .)
