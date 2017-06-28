@@ -17,6 +17,18 @@ find_file(USD_GENSCHEMA
           PATHS ${USD_ROOT}/bin
           DOC "USD Gen schema application")
 
+# USD Maya components
+
+find_path(USD_KATANA_INCLUDE_DIR usdKatana/api.h
+          PATHS ${USD_ROOT}/third_party/katana/include
+          DOC "USD Katana Include directory")
+
+find_path(USD_KATANA_LIBRARY_DIR libusdKatana.so
+          PATHS ${USD_ROOT}/third_party/katana/lib
+          DOC "USD Katana Library directory")
+
+# USD Katana components
+
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(
