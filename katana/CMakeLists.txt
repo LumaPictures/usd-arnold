@@ -20,6 +20,7 @@ file(GLOB FNGEOLIBUTIL_SRC ${KATANA_API_SOURCE_DIR}/FnGeolib/util/*.cpp)
 file(GLOB FNGEOLIBSERVICES_SRC ${KATANA_API_SOURCE_DIR}/FnGeolibServices/client/*.cpp)
 file(GLOB FNPLUGINMANAGER_SRC ${KATANA_API_SOURCE_DIR}/FnPluginManager/client/*.cpp)
 file(GLOB FNPLUGINSYSTEM_SRC ${KATANA_API_SOURCE_DIR}/FnPluginSystem/*.cpp)
+file(GLOB FNLOGGING_SRC ${KATANA_API_SOURCE_DIR}/FnLogging/client/*.cpp)
 file(GLOB PYSTRING_SRC ${KATANA_API_SOURCE_DIR}/pystring/*.cpp)
 
 link_directories(${KATANA_API_BASE_DIR}/bin/Geolib3/internal/CEL)
@@ -31,11 +32,12 @@ set(API_SRC
     ${FNGEOLIBUTIL_SRC}
     ${FNGEOLIBSERVICES_SRC}
     ${FNPLUGINMANAGER_SRC}
-    ${PYSTRING_SRC}
-    ${FNPLUGINSYSTEM_SRC})
+    ${FNPLUGINSYSTEM_SRC}
+    ${FNLOGGING_SRC}
+    ${PYSTRING_SRC})
 add_library(${PLUGIN_NAME} MODULE ${SRC} ${API_SRC})
 set_target_properties(${PLUGIN_NAME} PROPERTIES PREFIX "")
-target_link_libraries(${PLUGIN_NAME} CEL ${OPENEXR_LIBRARIES} dl tf gf sdf usd usdGeom ${USD_ARNOLD_LIBRARY})
+target_link_libraries(${PLUGIN_NAME} CEL ${OPENEXR_LIBRARIES} dl tf gf sdf usd usdGeom ${USD_ARNOLD_LIBRARY} usdKatana)
 
 set_target_properties(${PLUGIN_NAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH ON)
 
