@@ -33,6 +33,16 @@ target_link_libraries(${PLUGIN_NAME}
                       ${MTOA_mtoa_api_LIBRARY} tf gf sdf usd usdGeom ${USD_ARNOLD_LIBRARY} usdMaya)
 set_target_properties(${PLUGIN_NAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH ON)
 
+if ("${MTOA_ARCH_VERSION_NUM}" MATCHES "1")
+    if ("${MTOA_MAJOR_VERSION_NUM}" MATCHES "2")
+        target_compile_options(${PLUGIN_NAME} PRIVATE -DMTOA12)
+    elseif ("${MTOA_MAJOR_VERSION_NUM}" MATCHES "4")
+        target_compile_options(${PLUGIN_NAME} PRIVATE -DMTOA14)
+    else ()
+        message(FATAL_ERROR "Unsupported MtoA 1.x version: ${MTOA_VERSION)")
+    endif ()
+endif ()
+
 install(TARGETS ${PLUGIN_NAME}
         DESTINATION plug-ins)
 

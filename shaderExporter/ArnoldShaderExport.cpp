@@ -33,7 +33,11 @@ namespace {
         auto* arnoldSession = CMayaScene::GetArnoldSession();
         if (arnoldSession == nullptr) { return nullptr; }
         auto* trans = arnoldSession->ExportNode(node.findPlug(plugName));
+#if MTOA12
         return trans == nullptr ? nullptr : trans->GetArnoldRootNode();
+#elif MTOA14
+        return trans == nullptr ? nullptr : trans->GetArnoldNode();
+#endif
     }
 
     inline GfMatrix4f NodeGetMatrix(const AtNode* node, const char* param) {
