@@ -242,6 +242,7 @@ namespace {
         std::replace(name.begin(), name.end(), '@', '_');
         std::replace(name.begin(), name.end(), '.', '_');
         std::replace(name.begin(), name.end(), '|', '_');
+        std::replace(name.begin(), name.end(), ':', '_');
     }
 
     const TfToken ai_surface_token("ai:surface");
