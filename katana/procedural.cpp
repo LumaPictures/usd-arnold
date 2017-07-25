@@ -29,6 +29,6 @@ void registerPlugins()
 {
     REGISTER_PLUGIN(AiProceduralOp, "AiProceduralOp", 0, 1);
 
-    PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiProcedural>("PxrUsdInCore_AiProceduralOp");
-    PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiVolume>("PxrUsdInCore_AiProceduralOp");
+    PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiProcedural>("AiProceduralOp");
+    PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiVolume>("AiProceduralOp");
 }
