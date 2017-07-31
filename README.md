@@ -47,6 +47,7 @@ You'll also need to add a few lines of code to usdKatana's readMaterial.cpp sour
 We use and test with the following library versions.
 
 | Name    | Version          |
+| ------- | ---------------- |
 | GCC     | 4.8.5            |
 | Boost   | 1.61.0           |
 | TBB     | 4.4.6            |
