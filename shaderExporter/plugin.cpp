@@ -22,8 +22,9 @@ public:
                   const PxrUsdMayaUtil::ShapeSet& bindableRoots,
                   bool mergeTransformAndShape,
                   const SdfPath& overrideRootPath,
+                  const std::string& parentScope,
                   PxrUsdMayaUtil::MDagPathMap<SdfPath>::Type& dagPathToUsdMap) {
-        ArnoldShaderExport ai(stage, UsdTimeCode::Default(), "", dagPathToUsdMap);
+        ArnoldShaderExport ai(stage, UsdTimeCode::Default(), parentScope, dagPathToUsdMap);
         if (bindableRoots.empty()) {
             for (MItDependencyNodes iter(MFn::kShadingEngine); !iter.isDone(); iter.next()) {
                 MObject obj = iter.thisNode();
