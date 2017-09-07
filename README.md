@@ -36,8 +36,6 @@ Building Luma Pictures' flavor of USD is the easiest option, we provide a set of
 Clone the latest dev version of USD, and apply the following PRs.
 * [228](https://github.com/PixarAnimationStudios/USD/pull/228)
 * [226](https://github.com/PixarAnimationStudios/USD/pull/226)
-* [232](https://github.com/PixarAnimationStudios/USD/pull/232)
-* [231](https://github.com/PixarAnimationStudios/USD/pull/231)
 
 You'll also need to add a few lines of code to usdKatana's readMaterial.cpp source file. Just replace the file of origin with our [own version](https://github.com/LumaPictures/USD/blob/tg/luma/luma/third_party/katana/lib/usdKatana/readMaterial.cpp), it does not contain any additional changes. We are working on standardizing material reads with Pixar and hoping to remove this requirement shortly.
 
