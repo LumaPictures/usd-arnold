@@ -1,19 +1,17 @@
 set(LIBRARY_NAME usdAi)
-set(PYTHON_LIBRARY_NAME _${LIBRARY_NAME})
 
 set(Boost_USE_STATIC_LIBS OFF)
-find_package(Boost COMPONENTS python REQUIRED)
+if (ENABLE_PYTHON_SUPPORT)
+    find_package(Boost COMPONENTS python REQUIRED)
+else ()
+    find_package(Boost REQUIRED)
+endif ()
 
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../)
 
 file(GLOB AI_SRC ai*.cpp)
 file(GLOB HDR *.h)
-file(GLOB WRAP_SRC wrap*.cpp)
-set(PY_SRC 
-    module.cpp
-    moduleDeps.cpp
-    ${WRAP_SRC})
 
 ######################################
 # Installing and building c++ library.
@@ -60,64 +58,74 @@ install(FILES ${HDR}
 ##########################################
 # Installing and building python bindings.
 
-# So the python lib links against the right one.
-set_target_properties(${LIBRARY_NAME} PROPERTIES LIBRARY_LOCATION2 ${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${LIBRARY_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
+if (ENABLE_PYTHON_SUPPORT)
+    set(PYTHON_LIBRARY_NAME _${LIBRARY_NAME})
 
-add_library(${PYTHON_LIBRARY_NAME} SHARED ${PY_SRC})
-set_target_properties(${PYTHON_LIBRARY_NAME} PROPERTIES PREFIX "")
-set_target_properties(${PYTHON_LIBRARY_NAME}
-    PROPERTIES COMPILE_DEFINITIONS 
-        "MFB_PACKAGE_NAME=${LIBRARY_NAME};MFB_ALT_PACKAGE_NAME=${LIBRARY_NAME};MFB_PACKAGE_MODULE=${LIBRARY_NAME}"
-)
-set_target_properties(${PYTHON_LIBRARY_NAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH ON)
+    file(GLOB WRAP_SRC wrap*.cpp)
+    set(PY_SRC 
+        module.cpp
+        moduleDeps.cpp
+        ${WRAP_SRC})
 
-target_link_libraries(${PYTHON_LIBRARY_NAME} ${LIBRARY_NAME} tf sdf usd vt ${Boost_LIBRARIES})
-install(TARGETS ${PYTHON_LIBRARY_NAME}
-    DESTINATION lib/python/pxr/usd/${LIBRARY_NAME})
+    # So the python lib links against the right one.
+    set_target_properties(${LIBRARY_NAME} PROPERTIES LIBRARY_LOCATION2 ${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}${LIBRARY_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
 
-install(CODE
-"file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/__init__.py\"
-\"try:
-    __import__('pkg_resources').declare_namespace(__name__)
-except:
-    from pkgutil import extend_path
-    __path__ = extend_path(__path__, __name__)
-\")"
-)
+    add_library(${PYTHON_LIBRARY_NAME} SHARED ${PY_SRC})
+    set_target_properties(${PYTHON_LIBRARY_NAME} PROPERTIES PREFIX "")
+    set_target_properties(${PYTHON_LIBRARY_NAME}
+        PROPERTIES COMPILE_DEFINITIONS 
+            "MFB_PACKAGE_NAME=${LIBRARY_NAME};MFB_ALT_PACKAGE_NAME=${LIBRARY_NAME};MFB_PACKAGE_MODULE=${LIBRARY_NAME}"
+    )
+    set_target_properties(${PYTHON_LIBRARY_NAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH ON)
 
-install(CODE
-"file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/usd/__init__.py\"
-\"try:
-    __import__('pkg_resources').declare_namespace(__name__)
-except:
-    from pkgutil import extend_path
-    __path__ = extend_path(__path__, __name__)
-\")"
-)
+    target_link_libraries(${PYTHON_LIBRARY_NAME} ${LIBRARY_NAME} tf sdf usd vt ${Boost_LIBRARIES})
+    install(TARGETS ${PYTHON_LIBRARY_NAME}
+        DESTINATION lib/python/pxr/usd/${LIBRARY_NAME})
 
-install(CODE
-    "file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/usd/${LIBRARY_NAME}/__init__.py\"
-\"import ${PYTHON_LIBRARY_NAME}
-from pxr import Tf
-Tf.PrepareModule(${PYTHON_LIBRARY_NAME}, locals())
-del Tf
-
-try:
-    __import__('pkg_resources').declare_namespace(__name__)
-except:
-    from pkgutil import extend_path
-    __path__ = extend_path(__path__, __name__)
-
-try:
-    import __DOC
-    __DOC.Execute(locals())
-    del __DOC
-except Exception:
-    try:
-        import __tmpDoc
-        __tmpDoc.Execute(locals())
-        del __tmpDoc
+    install(CODE
+    "file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/__init__.py\"
+    \"try:
+        __import__('pkg_resources').declare_namespace(__name__)
     except:
-        pass
-\")"
-)
+        from pkgutil import extend_path
+        __path__ = extend_path(__path__, __name__)
+    \")"
+    )
+
+    install(CODE
+    "file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/usd/__init__.py\"
+    \"try:
+        __import__('pkg_resources').declare_namespace(__name__)
+    except:
+        from pkgutil import extend_path
+        __path__ = extend_path(__path__, __name__)
+    \")"
+    )
+
+    install(CODE
+        "file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/usd/${LIBRARY_NAME}/__init__.py\"
+    \"import ${PYTHON_LIBRARY_NAME}
+    from pxr import Tf
+    Tf.PrepareModule(${PYTHON_LIBRARY_NAME}, locals())
+    del Tf
+
+    try:
+        __import__('pkg_resources').declare_namespace(__name__)
+    except:
+        from pkgutil import extend_path
+        __path__ = extend_path(__path__, __name__)
+
+    try:
+        import __DOC
+        __DOC.Execute(locals())
+        del __DOC
+    except Exception:
+        try:
+            import __tmpDoc
+            __tmpDoc.Execute(locals())
+            del __tmpDoc
+        except:
+            pass
+    \")"
+    )
+endif (ENABLE_PYTHON_SUPPORT)
