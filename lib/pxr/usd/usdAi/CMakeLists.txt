@@ -84,48 +84,48 @@ if (ENABLE_PYTHON_SUPPORT)
 
     install(CODE
     "file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/__init__.py\"
-    \"try:
-        __import__('pkg_resources').declare_namespace(__name__)
-    except:
-        from pkgutil import extend_path
-        __path__ = extend_path(__path__, __name__)
-    \")"
+\"try:
+    __import__('pkg_resources').declare_namespace(__name__)
+except:
+    from pkgutil import extend_path
+    __path__ = extend_path(__path__, __name__)
+\")"
     )
 
     install(CODE
     "file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/usd/__init__.py\"
-    \"try:
-        __import__('pkg_resources').declare_namespace(__name__)
-    except:
-        from pkgutil import extend_path
-        __path__ = extend_path(__path__, __name__)
-    \")"
+\"try:
+    __import__('pkg_resources').declare_namespace(__name__)
+except:
+    from pkgutil import extend_path
+    __path__ = extend_path(__path__, __name__)
+\")"
     )
 
     install(CODE
         "file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/usd/${LIBRARY_NAME}/__init__.py\"
-    \"import ${PYTHON_LIBRARY_NAME}
-    from pxr import Tf
-    Tf.PrepareModule(${PYTHON_LIBRARY_NAME}, locals())
-    del Tf
+\"import ${PYTHON_LIBRARY_NAME}
+from pxr import Tf
+Tf.PrepareModule(${PYTHON_LIBRARY_NAME}, locals())
+del Tf
 
+try:
+    __import__('pkg_resources').declare_namespace(__name__)
+except:
+    from pkgutil import extend_path
+    __path__ = extend_path(__path__, __name__)
+
+try:
+    import __DOC
+    __DOC.Execute(locals())
+    del __DOC
+except Exception:
     try:
-        __import__('pkg_resources').declare_namespace(__name__)
+        import __tmpDoc
+        __tmpDoc.Execute(locals())
+        del __tmpDoc
     except:
-        from pkgutil import extend_path
-        __path__ = extend_path(__path__, __name__)
-
-    try:
-        import __DOC
-        __DOC.Execute(locals())
-        del __DOC
-    except Exception:
-        try:
-            import __tmpDoc
-            __tmpDoc.Execute(locals())
-            del __tmpDoc
-        except:
-            pass
-    \")"
+        pass
+\")"
     )
 endif (ENABLE_PYTHON_SUPPORT)
