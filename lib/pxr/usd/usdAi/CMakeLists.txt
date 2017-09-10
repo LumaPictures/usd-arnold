@@ -1,4 +1,5 @@
 set(LIBRARY_NAME usdAi)
+set(PYTHON_LIBRARY_FOLDER UsdAi)
 
 set(Boost_USE_STATIC_LIBS OFF)
 if (ENABLE_PYTHON_SUPPORT)
@@ -80,7 +81,7 @@ if (ENABLE_PYTHON_SUPPORT)
 
     target_link_libraries(${PYTHON_LIBRARY_NAME} ${LIBRARY_NAME} tf sdf usd vt ${Boost_LIBRARIES})
     install(TARGETS ${PYTHON_LIBRARY_NAME}
-        DESTINATION lib/python/pxr/usd/${LIBRARY_NAME})
+        DESTINATION lib/python/pxr/${PYTHON_LIBRARY_FOLDER})
 
     install(CODE
     "file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/__init__.py\"
@@ -93,17 +94,7 @@ except:
     )
 
     install(CODE
-    "file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/usd/__init__.py\"
-\"try:
-    __import__('pkg_resources').declare_namespace(__name__)
-except:
-    from pkgutil import extend_path
-    __path__ = extend_path(__path__, __name__)
-\")"
-    )
-
-    install(CODE
-        "file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/usd/${LIBRARY_NAME}/__init__.py\"
+        "file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/${PYTHON_LIBRARY_FOLDER}/__init__.py\"
 \"import ${PYTHON_LIBRARY_NAME}
 from pxr import Tf
 Tf.PrepareModule(${PYTHON_LIBRARY_NAME}, locals())
