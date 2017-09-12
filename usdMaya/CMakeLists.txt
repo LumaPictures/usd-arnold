@@ -1,4 +1,4 @@
-set(PLUGIN_NAME arnoldShaderExporter)
+set(PLUGIN_NAME arnoldForUsdMaya)
 
 include_directories(${USD_ROOT}/third_party/maya/include)
 link_directories(${USD_ROOT}/third_party/maya/lib)

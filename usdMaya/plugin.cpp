@@ -3,6 +3,7 @@
 
 #include <usdMaya/shadingModeExporter.h>
 #include <usdMaya/shadingModeRegistry.h>
+#include <usdMaya/userAttributeWriterRegistry.h>
 
 #include "ArnoldShaderExport.h"
 
@@ -35,11 +36,21 @@ public:
     }
 };
 
-TF_REGISTRY_FUNCTION_WITH_TAG(PxrUsdMayaShadingModeExportContext, pxrRis)
-{
+TF_REGISTRY_FUNCTION_WITH_TAG(PxrUsdMayaShadingModeExportContext, arnold) {
     PxrUsdMayaShadingModeRegistry::GetInstance().RegisterExporter("arnold", []() -> PxrUsdMayaShadingModeExporterPtr {
         return PxrUsdMayaShadingModeExporterPtr(
             static_cast<PxrUsdMayaShadingModeExporter*>(new ArnoldShadingModeExporter()));
+    });
+}
+
+TF_REGISTRY_FUNCTION_WITH_TAG(PxrUsdMayaUserAttributeWriterRegistry, usdAi) {
+    PxrUsdMayaUserAttributeWriterRegistry::RegisterWriter("usdAi", [](
+        const MPlug& attrPlug,
+        const UsdPrim& usdPrim,
+        const std::string& attrName,
+        const std::string& nameSpace,
+        const bool translateMayaDoubleToUsdSinglePrecision) -> UsdAttribute {
+        return UsdAttribute();
     });
 }
 

@@ -5,6 +5,9 @@
                 "UsdMaya" : {
                     "ShadingModePlugin" : {
                         "mayaPlugin" : "@PLUGIN_NAME@"
+                    },
+                    "UserAttributeWriterPlugin" : {
+                        "mayaPlugin" : "@PLUGIN_NAME@"
                     }
                 }
             },
