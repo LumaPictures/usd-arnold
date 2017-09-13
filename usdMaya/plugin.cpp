@@ -24,7 +24,7 @@ public:
                   bool mergeTransformAndShape,
                   const SdfPath& overrideRootPath,
                   const std::string& parentScope,
-                  PxrUsdMayaUtil::MDagPathMap<SdfPath>::Type& dagPathToUsdMap) {
+                  const PxrUsdMayaUtil::MDagPathMap<SdfPath>::Type& dagPathToUsdMap) override {
         ArnoldShaderExport ai(stage, UsdTimeCode::Default(), parentScope, dagPathToUsdMap);
         if (bindableRoots.empty()) {
             for (MItDependencyNodes iter(MFn::kShadingEngine); !iter.isDone(); iter.next()) {
