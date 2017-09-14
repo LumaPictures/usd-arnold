@@ -29,7 +29,7 @@ public:
         if (bindableRoots.empty()) {
             for (MItDependencyNodes iter(MFn::kShadingEngine); !iter.isDone(); iter.next()) {
                 MObject obj = iter.thisNode();
-                const auto exportedShader = ai.export_shader(obj);
+                const auto exportedShader = ai.export_shading_engine(obj);
             }
         }
         ai.setup_shaders();

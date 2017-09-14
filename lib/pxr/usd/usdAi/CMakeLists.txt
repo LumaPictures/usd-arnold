@@ -24,7 +24,7 @@ add_custom_target(schema_gen
     SOURCES schema.usda)
 
 add_library(${LIBRARY_NAME} SHARED ${AI_SRC} tokens.cpp ${HDR})
-target_link_libraries(${LIBRARY_NAME} ${Boost_LIBRARIES} tf vt sdf usd usdGeom usdShade)
+target_link_libraries(${LIBRARY_NAME} ${ARNOLD_LIBRARY} ${Boost_LIBRARIES} tf vt sdf usd usdGeom usdShade)
 set_target_properties(${LIBRARY_NAME}
     PROPERTIES COMPILE_DEFINITIONS 
         "MFB_PACKAGE_NAME=${LIBRARY_NAME};MFB_ALT_PACKAGE_NAME=${LIBRARY_NAME};MFB_PACKAGE_MODULE=${LIBRARY_NAME}"

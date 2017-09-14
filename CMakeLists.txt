@@ -14,9 +14,11 @@ set(CMAKE_CXX_STANDARD 11)
 
 find_package(USD REQUIRED)
 find_package(TBB REQUIRED)
+find_package(Arnold REQUIRED)
 
 include_directories(${USD_INCLUDE_DIR})
 link_directories(${USD_LIBRARY_DIR})
+include_directories(${ARNOLD_INCLUDE_DIR})
 
 include_directories(SYSTEM ${TBB_INCLUDE_DIRS})
 
