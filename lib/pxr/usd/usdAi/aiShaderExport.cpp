@@ -237,6 +237,76 @@ void AiShaderExport::clean_arnold_name(std::string& name) {
     std::replace(name.begin(), name.end(), ':', '_');
 }
 
+
+bool
+AiShaderExport::get_output_parameter(const AtNode* arnold_node,
+                                     uint8_t arnold_param_type, int32_t comp_index, UsdShadeOutput& out) {
+    const auto linked_path = export_arnold_node(arnold_node, m_shaders_scope);
+    if (linked_path.IsEmpty()) {
+        return false;
+    }
+    auto linked_prim = m_stage->GetPrimAtPath(linked_path);
+    if (!linked_prim.IsValid()) {
+        return false;
+    }
+
+    UsdShadeShader linked_shader(linked_prim);
+    UsdShadeConnectableAPI linked_API(linked_shader);
+    const auto linked_output_type = arnold_param_type == AI_TYPE_NODE ?
+                                    AI_TYPE_NODE :
+                                    AiNodeEntryGetOutputType(AiNodeGetNodeEntry(arnold_node));
+    const auto& out_comp = out_comp_name(linked_output_type, comp_index);
+    out = linked_API.GetOutput(out_comp.n);
+    if (!out) {
+        out = linked_API.CreateOutput(out_comp.n, out_comp.t);
+    }
+
+    return true;
+}
+
+void
+AiShaderExport::export_connection(const AtNode* arnold_node, UsdAiShader& shader,
+                                  const char* arnold_param_name, uint8_t arnold_param_type) {
+    const auto iter_type = get_simple_type(arnold_param_type);
+    if (iter_type == nullptr) {
+        return;
+    }
+    auto _get_output_parameter = [this, arnold_node, arnold_param_type] (const char* param_name, UsdShadeOutput& out) -> bool {
+        int32_t comp = -1;
+        const auto linked_node = arnold_param_type == AI_TYPE_NODE ?
+                                 reinterpret_cast<AtNode*>(AiNodeGetPtr(arnold_node, param_name)) :
+                                 AiNodeGetLink(arnold_node, param_name, &comp);
+        if (linked_node != nullptr) {
+            return this->get_output_parameter(linked_node, arnold_param_type, comp, out);
+        } else {
+            return false;
+        }
+    };
+
+    UsdShadeConnectableAPI connectable_API(shader);
+    UsdShadeOutput source_param;
+    if (_get_output_parameter(arnold_param_name, source_param)) {
+        UsdShadeConnectableAPI::ConnectToSource(shader.CreateInput(TfToken(arnold_param_name), iter_type->type), source_param);
+    } else {
+        if (iter_type->f != nullptr) {
+            auto param = shader.CreateInput(TfToken(arnold_param_name), iter_type->type);
+            param.Set(iter_type->f(arnold_node, arnold_param_name));
+        }
+    }
+
+    /*for (const auto& comps : in_comp_names(arnold_param_type)) {
+        const auto arnold_comp_name = std::string(arnold_param_name) + "." + comps;
+        const auto usd_comp_name = std::string(arnold_param_name) + ":" + comps;
+        if (_get_output_parameter(arnold_comp_name.c_str(), source_param)) {
+            auto param_comp = connectable_API.CreateInput(TfToken(usd_comp_name),
+                                                          SdfValueTypeNames->Float);
+            if (param_comp) {
+                connectable_API.ConnectToSource(param_comp, source_param);
+            }
+        }
+    }*/
+}
+
 void
 AiShaderExport::export_parameter(
     const AtNode* arnold_node, UsdAiShader& shader, const char* arnold_param_name, uint8_t arnold_param_type, bool user) {
@@ -250,73 +320,32 @@ AiShaderExport::export_parameter(
             iter_type->f(param, arr);
         }
     } else {
-        const auto iter_type = get_simple_type(arnold_param_type);
-        if (iter_type == nullptr) { return; }
         if (user) {
+            const auto iter_type = get_simple_type(arnold_param_type);
+            if (iter_type == nullptr) {
+                return;
+            }
             UsdAiNodeAPI api(shader.GetPrim());
             auto param = api.CreateUserAttribute(TfToken(arnold_param_name), iter_type->type);
             param.Set(iter_type->f(arnold_node, arnold_param_name));
         } else {
-            auto get_output_parameter = [this, arnold_node, arnold_param_type] (const char* param_name, UsdShadeOutput& out) -> bool {
-                int32_t comp = -1;
-                const auto linked_node = arnold_param_type == AI_TYPE_NODE ?
-                                         reinterpret_cast<AtNode*>(AiNodeGetPtr(arnold_node, param_name)) :
-                                         AiNodeGetLink(arnold_node, param_name, &comp);
-                if (linked_node != nullptr) {
-                    const auto linked_path = this->write_arnold_node(linked_node, this->m_shaders_scope);
-                    if (linked_path.IsEmpty()) { return false; }
-                    auto linked_prim = this->m_stage->GetPrimAtPath(linked_path);
-                    if (!linked_prim.IsValid()) { return false; }
-                    UsdShadeShader linked_shader(linked_prim);
-                    UsdShadeConnectableAPI linked_API(linked_shader);
-                    const auto linked_output_type = arnold_param_type == AI_TYPE_NODE ?
-                                                    AI_TYPE_NODE :
-                                                    AiNodeEntryGetOutputType(AiNodeGetNodeEntry(linked_node));
-                    const auto& out_comp = out_comp_name(linked_output_type, comp);
-                    out = linked_API.GetOutput(out_comp.n);
-                    if (!out) {
-                        out = linked_API.CreateOutput(out_comp.n, out_comp.t);
-                    }
-
-                    return true;
-                } else { return false; }
-            };
 
             if (AiNodeIsLinked(arnold_node, arnold_param_name)) {
-                UsdShadeConnectableAPI connectable_API(shader);
-                UsdShadeOutput source_param;
-                if (get_output_parameter(arnold_param_name, source_param)) {
-                    UsdShadeConnectableAPI::ConnectToSource(shader.CreateInput(TfToken(arnold_param_name), iter_type->type), source_param);
-                } else {
-                    if (iter_type->f != nullptr) {
-                        auto param = shader.CreateInput(TfToken(arnold_param_name), iter_type->type);
-                        param.Set(iter_type->f(arnold_node, arnold_param_name));
-                    }
-                }
-
-                /*for (const auto& comps : in_comp_names(arnold_param_type)) {
-                    const auto arnold_comp_name = std::string(arnold_param_name) + "." + comps;
-                    const auto usd_comp_name = std::string(arnold_param_name) + ":" + comps;
-                    if (get_output_parameter(arnold_comp_name.c_str(), source_param)) {
-                        auto param_comp = connectable_API.CreateInput(TfToken(usd_comp_name),
-                                                                      SdfValueTypeNames->Float);
-                        if (param_comp) {
-                            connectable_API.ConnectToSource(param_comp, source_param);
-                        }
-                    }
-                }*/
+                export_connection(arnold_node, shader, arnold_param_name, arnold_param_type);
             } else {
-                if (iter_type->f != nullptr) {
-                    auto param = shader.CreateInput(TfToken(arnold_param_name), iter_type->type);
-                    param.Set(iter_type->f(arnold_node, arnold_param_name));
+                const auto iter_type = get_simple_type(arnold_param_type);
+                if (iter_type == nullptr  || iter_type->f == nullptr) {
+                    return;
                 }
+                auto param = shader.CreateInput(TfToken(arnold_param_name), iter_type->type);
+                param.Set(iter_type->f(arnold_node, arnold_param_name));
             }
         }
     }
 }
 
 SdfPath
-AiShaderExport::write_arnold_node(const AtNode* arnold_node, SdfPath parent_path) {
+AiShaderExport::export_arnold_node(const AtNode* arnold_node, SdfPath parent_path) {
     if (arnold_node == nullptr) {
         return SdfPath();
     }
@@ -395,7 +424,7 @@ AiShaderExport::export_material(const char* material_name, AtNode* surf_shader, 
     auto material = UsdAiMaterialAPI(UsdShadeMaterial::Define(m_stage, material_path));
 
     if (surf_shader != nullptr) {
-        auto surf_path = write_arnold_node(surf_shader, material_path);
+        auto surf_path = export_arnold_node(surf_shader, material_path);
         if (!surf_path.IsEmpty()) {
             auto rel = material.CreateSurfaceRel();
             rel.AppendTarget(surf_path);
@@ -404,7 +433,7 @@ AiShaderExport::export_material(const char* material_name, AtNode* surf_shader, 
 
     if (disp_shader != nullptr) {
         // FIXME: it's unclear why disp uses m_shaders_scope and surf uses material_path...
-        auto disp_path = write_arnold_node(disp_shader, m_shaders_scope);
+        auto disp_path = export_arnold_node(disp_shader, m_shaders_scope);
         if (!disp_path.IsEmpty()) {
             auto rel = material.CreateDisplacementRel();
             rel.AppendTarget(disp_path);

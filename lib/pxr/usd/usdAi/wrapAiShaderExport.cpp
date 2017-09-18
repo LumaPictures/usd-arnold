@@ -44,20 +44,27 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
+AtNode* to_arnold_node(const object& ctypes_node) {
+    static object ctypes_addressof = import("ctypes").attr("addressof");
+    if (ctypes_node.is_none()) {
+        return nullptr;
+    } else {
+        return *reinterpret_cast<AtNode**>(uintptr_t(extract<uintptr_t>(ctypes_addressof(ctypes_node))));
+    }
+}
+
 static SdfPath
 _export_material(AiShaderExport &self, const char* material_name,
                  const object& surf_shader, const object& disp_shader)
 {
-    static object ctypes_addressof = import("ctypes").attr("addressof");
-    AtNode* surf_node = nullptr;
-    if (!surf_shader.is_none()) {
-        surf_node = *reinterpret_cast<AtNode**>(uintptr_t(extract<uintptr_t>(ctypes_addressof(surf_shader))));
-    }
-    AtNode* disp_node = nullptr;
-    if (!disp_shader.is_none()) {
-        disp_node = *reinterpret_cast<AtNode**>(uintptr_t(extract<uintptr_t>(ctypes_addressof(disp_shader))));
-    }
-    return self.export_material(material_name, surf_node, disp_node);
+    return self.export_material(material_name, to_arnold_node(surf_shader), to_arnold_node(disp_shader));
+}
+
+static SdfPath
+_export_arnold_node(AiShaderExport &self, const object& arnold_node,
+                    SdfPath parent_path)
+{
+    return self.export_arnold_node(to_arnold_node(arnold_node), parent_path);
 }
 
 } // anonymous namespace 
@@ -82,5 +89,7 @@ void wrapAiShaderExport()
              (arg("shader_path"), arg("shape_path"))) 
         .def("export_material", &_export_material,
              (arg("material_name"), arg("surf_shader"), arg("disp_shader")))
+        .def("export_arnold_node", &_export_arnold_node,
+             (arg("material_name"), arg("arnold_node"), arg("parent_path")))
         ;
 }

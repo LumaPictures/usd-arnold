@@ -16,16 +16,19 @@ public:
     void bind_material(const SdfPath& shader_path, const SdfPath& shape_path);
     SdfPath export_material(const char* material_name,
                             AtNode* surf_shader, AtNode* disp_shader=nullptr);
-
-protected:
+    SdfPath export_arnold_node(const AtNode* arnold_node,
+                               SdfPath parent_path);
     static void clean_arnold_name(std::string& name);
+    bool get_output_parameter(const AtNode* arnold_node,
+                              uint8_t arnold_param_type, int32_t comp_index, UsdShadeOutput& out);
+    void export_connection(const AtNode* arnold_node, UsdAiShader& shader,
+                           const char* arnold_param_name, uint8_t arnold_param_type);
     void export_parameter(const AtNode* arnold_node, UsdAiShader& shader,
                           const char* arnold_param_name,
                           uint8_t arnold_param_type, bool user);
-    SdfPath write_arnold_node(const AtNode* arnold_node,
-                              SdfPath parent_path);
     void collapse_shaders();
 
+protected:
     const UsdStagePtr m_stage;
     SdfPath m_shaders_scope;
     UsdTimeCode m_time_code;
