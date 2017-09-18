@@ -41,16 +41,14 @@ ArnoldShaderExport::ArnoldShaderExport(const UsdStageRefPtr& _stage, const UsdTi
     } else {
         m_transform_assignment = TRANSFORM_ASSIGNMENT_DISABLE;
     }
-}
-
-ArnoldShaderExport::~ArnoldShaderExport() {}
-
-void ArnoldShaderExport::begin() {
-    CMayaScene::Begin(MTOA_SESSION_ASS);
-}
-
-void ArnoldShaderExport::end() {
     CMayaScene::End();
+    AiMsgSetConsoleFlags(AI_LOG_NONE);
+    CMayaScene::Begin(MTOA_SESSION_ASS);
+    AiMsgSetConsoleFlags(AI_LOG_NONE);
+}
+
+ArnoldShaderExport::~ArnoldShaderExport() {
+    MayaScene::End();
 }
 
 SdfPath

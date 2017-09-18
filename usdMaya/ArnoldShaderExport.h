@@ -27,8 +27,6 @@ private:
     TransformAssignment m_transform_assignment;
     const PxrUsdMayaUtil::MDagPathMap<SdfPath>::Type& m_dag_to_usd;
 
-    void begin();
-    void end();
     void setup_shader(const MDagPath& dg, const SdfPath& path);
 public:
     SdfPath export_shading_engine(MObject obj);

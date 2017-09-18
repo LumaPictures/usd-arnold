@@ -219,29 +219,16 @@ namespace {
     }
 }
 
-AiShaderExport::AiShaderExport(const UsdStageRefPtr& _stage, const UsdTimeCode& _time_code,
+AiShaderExport::AiShaderExport(const UsdStagePtr& _stage, const UsdTimeCode& _time_code,
                                const std::string& parent_scope) :
     m_stage(_stage),
-    m_shaders_scope(parent_scope.empty() ? "/Looks" : (parent_scope + "/Looks")), m_time_code(_time_code) {
-    UsdGeomScope::Define(m_stage, m_shaders_scope);
-
-    end();
-    AiMsgSetConsoleFlags(AI_LOG_NONE);
-    begin();
-    AiMsgSetConsoleFlags(AI_LOG_NONE);
+    m_shaders_scope(parent_scope.empty() ? "/Looks" : (parent_scope + "/Looks")),
+    m_time_code(_time_code)
+{
+    auto scope = UsdGeomScope::Define(m_stage, m_shaders_scope);
 }
 
-AiShaderExport::~AiShaderExport() {
-    end();
-}
-
-void AiShaderExport::begin() {
-    AiBegin();
-}
-
-void AiShaderExport::end() {
-    AiEnd();
-}
+AiShaderExport::~AiShaderExport() {}
 
 void AiShaderExport::clean_arnold_name(std::string& name) {
     std::replace(name.begin(), name.end(), '@', '_');
@@ -330,7 +317,9 @@ AiShaderExport::export_parameter(
 
 SdfPath
 AiShaderExport::write_arnold_node(const AtNode* arnold_node, SdfPath parent_path) {
-    if (arnold_node == nullptr) { return SdfPath(); }
+    if (arnold_node == nullptr) {
+        return SdfPath();
+    }
     const auto nentry = AiNodeGetNodeEntry(arnold_node);
     if (AiNodeEntryGetType(nentry) != AI_NODE_SHADER) {
         return SdfPath();
@@ -339,11 +328,15 @@ AiShaderExport::write_arnold_node(const AtNode* arnold_node, SdfPath parent_path
         if (it != m_shader_to_usd_path.end()) {
             return it->second;
         } else {
-            std::string arnold_name_cleanup(AiNodeGetName(arnold_node));
+            std::string node_name(AiNodeGetName(arnold_node));
+            if (node_name == "") {
+                // TODO: raise error
+                return SdfPath();
+            }
             // MtoA exports sub shaders with @ prefix, which is used for something else in USD
             // TODO: implement a proper cleanup using boost::regex
-            clean_arnold_name(arnold_name_cleanup);
-            auto shader_path = parent_path.AppendPath(SdfPath(arnold_name_cleanup));
+            clean_arnold_name(node_name);
+            auto shader_path = parent_path.AppendPath(SdfPath(node_name));
             auto shader = UsdAiShader::Define(m_stage, shader_path);
             m_shader_to_usd_path.insert(std::make_pair(arnold_node, shader_path));
 
@@ -400,6 +393,7 @@ AiShaderExport::export_material(const char* material_name, AtNode* surf_shader, 
         return material_path;
     }
     auto material = UsdAiMaterialAPI(UsdShadeMaterial::Define(m_stage, material_path));
+
     if (surf_shader != nullptr) {
         auto surf_path = write_arnold_node(surf_shader, material_path);
         if (!surf_path.IsEmpty()) {
