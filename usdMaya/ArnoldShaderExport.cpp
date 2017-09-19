@@ -408,7 +408,7 @@ ArnoldShaderExport::export_shader(MObject obj) {
     auto shading_engine_path = write_arnold_node(arnold_node, material_path);
     if (!shading_engine_path.IsEmpty()) {
         auto rel = material_prim.CreateRelationship(ai_surface_token);
-        rel.AppendTarget(shading_engine_path);
+        rel.AddTarget(shading_engine_path);
     }
     auto disp_plug = node.findPlug("displacementShader");
     MPlugArray conns;
@@ -421,7 +421,7 @@ ArnoldShaderExport::export_shader(MObject obj) {
                          m_shaders_scope);
     if (!disp_path.IsEmpty()) {
         auto rel = material_prim.CreateRelationship(ai_displacement_token);
-        rel.AppendTarget(disp_path);
+        rel.AddTarget(disp_path);
     }
     return material_path;
 }
@@ -439,10 +439,10 @@ ArnoldShaderExport::setup_shader(const MDagPath& dg, const SdfPath& path) {
         if (shape_prim.HasRelationship(UsdShadeTokens->materialBinding)) {
             auto rel = shape_prim.GetRelationship(UsdShadeTokens->materialBinding);
             rel.ClearTargets(true);
-            rel.AppendTarget(shader_path);
+            rel.AddTarget(shader_path);
         } else {
             auto rel = shape_prim.CreateRelationship(UsdShadeTokens->materialBinding);
-            rel.AppendTarget(shader_path);
+            rel.AddTarget(shader_path);
         }
     };
 
@@ -468,10 +468,10 @@ ArnoldShaderExport::setup_shader(const MDagPath& dg, const SdfPath& path) {
             auto rel = material_prim.GetRelationship(ai_surface_token);
             if (rel) {
                 rel.ClearTargets(true);
-                rel.AppendTarget(linked_path);
+                rel.AddTarget(linked_path);
             } else {
                 rel = material_prim.CreateRelationship(ai_surface_token);
-                rel.AppendTarget(linked_path);
+                rel.AddTarget(linked_path);
             }
             return;
         }
