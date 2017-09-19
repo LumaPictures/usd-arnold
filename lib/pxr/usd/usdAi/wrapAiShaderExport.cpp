@@ -63,9 +63,9 @@ export_material(AiShaderExport &self, const char* material_name,
 
 static SdfPath
 export_arnold_node(AiShaderExport &self, const object& arnold_node,
-                    SdfPath parent_path)
+                    SdfPath& parent_path, const std::set<std::string>& exportable_params)
 {
-    return self.export_arnold_node(to_arnold_node(arnold_node), parent_path);
+    return self.export_arnold_node(to_arnold_node(arnold_node), parent_path, &exportable_params);
 }
 
 
@@ -116,7 +116,8 @@ void wrapUsdAiShaderExport()
         .def("export_arnold_node", &export_arnold_node,
              (arg("material_name"),
               arg("arnold_node"),
-              arg("parent_path")))
+              arg("parent_path"),
+              arg("exportable_params")))
         // .def("get_output", &get_output,
         //      (arg("src_arnold_node"),
         //       arg("src_shader"),
@@ -128,6 +129,6 @@ void wrapUsdAiShaderExport()
               arg("dest_param_name"),
               arg("src_arnold_node"),
               arg("src_shader"),
-              arg("src_comp_index")=-1))
+              arg("src_comp_index") = -1))
         ;
 }

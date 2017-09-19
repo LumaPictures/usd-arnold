@@ -326,7 +326,6 @@ AiShaderExport::export_connection(const AtNode* dest_arnold_node, UsdAiShader& d
                                   int32_t src_comp_index) {
     const auto iter_type = get_simple_type(arnold_param_type);
     if (iter_type == nullptr) {
-        std::cout << "unsupported type " << arnold_param_type << std::endl;
         return false;
     }
 
@@ -378,7 +377,8 @@ AiShaderExport::export_parameter(
 }
 
 SdfPath
-AiShaderExport::export_arnold_node(const AtNode* arnold_node, SdfPath parent_path) {
+AiShaderExport::export_arnold_node(const AtNode* arnold_node, SdfPath& parent_path,
+                                   const std::set<std::string>* exportable_params) {
     if (arnold_node == nullptr) {
         return SdfPath();
     }
@@ -407,7 +407,11 @@ AiShaderExport::export_arnold_node(const AtNode* arnold_node, SdfPath parent_pat
             while (!AiParamIteratorFinished(piter)) {
                 const auto pentry = AiParamIteratorGetNext(piter);
                 auto pname = AiParamGetName(pentry);
+
                 if (strcmp(pname, "name") == 0) {
+                    continue;
+                }
+                if (exportable_params != nullptr && exportable_params->find(pname) == exportable_params->end()) {
                     continue;
                 }
                 const auto ptype = static_cast<uint8_t>(AiParamGetType(pentry));
@@ -428,14 +432,17 @@ AiShaderExport::export_arnold_node(const AtNode* arnold_node, SdfPath parent_pat
 }
 
 void AiShaderExport::bind_material(const SdfPath& material_path, const SdfPath& shape_path) {
+
     auto shape_prim = m_stage->GetPrimAtPath(shape_path);
     if (!shape_prim.IsValid()) {
         return;
     }
+    // FIXME: why not use UsdShadeMaterial::Get(m_stage, material_path).Bind(shape_prim) ???
     auto material_prim = m_stage->GetPrimAtPath(material_path);
     if (!material_prim.IsValid()) {
         return;
     }
+
     if (shape_prim.HasRelationship(UsdShadeTokens->materialBinding)) {
         auto rel = shape_prim.GetRelationship(UsdShadeTokens->materialBinding);
         rel.ClearTargets(true);
