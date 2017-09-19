@@ -9,6 +9,6 @@ TF_WRAP_MODULE
     TF_WRAP(UsdAiNodeAPI);
     TF_WRAP(UsdAiProcedural);
     TF_WRAP(UsdAiShader);
-    TF_WRAP(UsdAiVolume);
     TF_WRAP(UsdAiShaderExport);
+    TF_WRAP(UsdAiVolume);
 }

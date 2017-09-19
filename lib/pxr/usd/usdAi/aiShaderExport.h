@@ -19,10 +19,18 @@ public:
     SdfPath export_arnold_node(const AtNode* arnold_node,
                                SdfPath parent_path);
     static void clean_arnold_name(std::string& name);
-    bool get_output_parameter(const AtNode* arnold_node,
-                              uint8_t arnold_param_type, int32_t comp_index, UsdShadeOutput& out);
-    void export_connection(const AtNode* arnold_node, UsdAiShader& shader,
-                           const char* arnold_param_name, uint8_t arnold_param_type);
+    bool get_output(const AtNode* src_arnold_node, UsdAiShader& src_shader, UsdShadeOutput& out,
+                    bool is_node_type=false, int32_t comp_index=-1);
+    bool export_connection(const AtNode* dest_arnold_node, UsdAiShader& dest_shader,
+                           const char* dest_param_name, uint8_t arnold_param_type);
+    bool export_connection(const AtNode* dest_arnold_node, UsdAiShader& dest_shader,
+                           const char* dest_param_name,
+                           const AtNode* src_arnold_node, UsdAiShader& src_shader,
+                           int32_t src_comp_index=-1);
+    bool export_connection(const AtNode* dest_arnold_node, UsdAiShader& dest_shader,
+                           const char* dest_param_name, uint8_t arnold_param_type,
+                           const AtNode* src_arnold_node, UsdAiShader& src_shader,
+                           int32_t src_comp_index=-1);
     void export_parameter(const AtNode* arnold_node, UsdAiShader& shader,
                           const char* arnold_param_name,
                           uint8_t arnold_param_type, bool user);

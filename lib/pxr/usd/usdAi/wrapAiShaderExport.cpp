@@ -44,6 +44,7 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
 
+// TODO: register a converter for AtNode* type?
 AtNode* to_arnold_node(const object& ctypes_node) {
     static object ctypes_addressof = import("ctypes").attr("addressof");
     if (ctypes_node.is_none()) {
@@ -54,22 +55,42 @@ AtNode* to_arnold_node(const object& ctypes_node) {
 }
 
 static SdfPath
-_export_material(AiShaderExport &self, const char* material_name,
+export_material(AiShaderExport &self, const char* material_name,
                  const object& surf_shader, const object& disp_shader)
 {
     return self.export_material(material_name, to_arnold_node(surf_shader), to_arnold_node(disp_shader));
 }
 
 static SdfPath
-_export_arnold_node(AiShaderExport &self, const object& arnold_node,
+export_arnold_node(AiShaderExport &self, const object& arnold_node,
                     SdfPath parent_path)
 {
     return self.export_arnold_node(to_arnold_node(arnold_node), parent_path);
 }
 
+
+// static UsdShadeOutput
+// get_output(AiShaderExport &self, const object& src_arnold_node, UsdShadeShader& src_shader, bool is_node_type=false, int32_t comp_index=-1)
+// {
+//     UsdShadeOutput out;
+//     self.get_output(to_arnold_node(src_arnold_node), src_shader, out, is_node_type, comp_index);
+//     return out;
+// }
+
+static bool
+export_connection(AiShaderExport &self, const object& dest_arnold_node, UsdAiShader& dest_shader, const char* dest_param_name,
+                  const object& src_arnold_node, UsdAiShader& src_shader, int32_t src_comp_index=-1)
+{
+    return self.export_connection(
+        to_arnold_node(dest_arnold_node), dest_shader, dest_param_name,
+        to_arnold_node(src_arnold_node), src_shader, src_comp_index);
+
+}
+
+
 } // anonymous namespace 
 
-void wrapAiShaderExport()
+void wrapUsdAiShaderExport()
 {
     typedef AiShaderExport This;
 
@@ -86,10 +107,27 @@ void wrapAiShaderExport()
         //       arg("_time_code") = UsdTimeCode::Default(),
         //       arg("parent_scope") = string()))
         .def("bind_material", &This::bind_material,
-             (arg("shader_path"), arg("shape_path"))) 
-        .def("export_material", &_export_material,
-             (arg("material_name"), arg("surf_shader"), arg("disp_shader")))
-        .def("export_arnold_node", &_export_arnold_node,
-             (arg("material_name"), arg("arnold_node"), arg("parent_path")))
+             (arg("shader_path"),
+              arg("shape_path"))) 
+        .def("export_material", &export_material,
+             (arg("material_name"),
+              arg("surf_shader"),
+              arg("disp_shader")))
+        .def("export_arnold_node", &export_arnold_node,
+             (arg("material_name"),
+              arg("arnold_node"),
+              arg("parent_path")))
+        // .def("get_output", &get_output,
+        //      (arg("src_arnold_node"),
+        //       arg("src_shader"),
+        //       arg("is_node_type")=false,
+        //       arg("comp_index")=-1))
+        .def("export_connection", &export_connection,
+             (arg("dest_arnold_node"),
+              arg("dest_shader"),
+              arg("dest_param_name"),
+              arg("src_arnold_node"),
+              arg("src_shader"),
+              arg("src_comp_index")=-1))
         ;
 }
