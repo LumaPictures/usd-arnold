@@ -45,7 +45,6 @@ pxr_shared_library(usdAi
         wrapAiNodeAPI.cpp
         wrapAiProcedural.cpp
         wrapAiShader.cpp
-        wrapAiShaderExport.cpp
         wrapAiShapeAPI.cpp
         wrapAiVolume.cpp
         wrapTokens.cpp
