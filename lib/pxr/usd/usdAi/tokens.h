@@ -43,16 +43,34 @@ PXR_NAMESPACE_OPEN_SCOPE
 #define USDAI_TOKENS \
     ((aiDisplacement, "ai:displacement")) \
     ((aiSurface, "ai:surface")) \
+    ((aRRAY, "ARRAY")) \
+    ((bOOL, "BOOL")) \
+    ((bYTE, "BYTE")) \
     (data) \
+    (dataType) \
+    (driver) \
     (dso) \
+    (filter) \
+    ((fLOAT, "FLOAT")) \
+    ((iNT, "INT")) \
     (loat_at_init) \
+    ((mATRIX, "MATRIX")) \
     (matte) \
+    (name) \
+    ((nODE, "NODE")) \
     (opaque) \
+    ((pOINT, "POINT")) \
+    ((pOINT2, "POINT2")) \
+    ((pOINTER, "POINTER")) \
     (receive_shadows) \
+    ((rGB, "RGB")) \
+    ((rGBA, "RGBA")) \
     (self_shadows) \
     (sidedness) \
     (step_size) \
+    ((uINT, "UINT")) \
     ((userPrefix, "user:")) \
+    ((vECTOR, "VECTOR")) \
     (visibility)
 
 /// \anchor UsdAiTokens
@@ -77,16 +95,34 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// The tokens are:
 /// \li <b>aiDisplacement</b> - UsdAiMaterialAPI
 /// \li <b>aiSurface</b> - UsdAiMaterialAPI
+/// \li <b>aRRAY</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
+/// \li <b>bOOL</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
+/// \li <b>bYTE</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>data</b> - UsdAiProcedural
+/// \li <b>dataType</b> - UsdAiAOV
+/// \li <b>driver</b> - UsdAiAOV
 /// \li <b>dso</b> - UsdAiProcedural
+/// \li <b>filter</b> - UsdAiAOV
+/// \li <b>fLOAT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
+/// \li <b>iNT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>loat_at_init</b> - UsdAiProcedural
+/// \li <b>mATRIX</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>matte</b> - UsdAiShapeAPI
+/// \li <b>name</b> - UsdAiAOV
+/// \li <b>nODE</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>opaque</b> - UsdAiShapeAPI
+/// \li <b>pOINT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
+/// \li <b>pOINT2</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
+/// \li <b>pOINTER</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>receive_shadows</b> - UsdAiShapeAPI
+/// \li <b>rGB</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
+/// \li <b>rGBA</b> - Possible value for UsdAiAOV::GetDataTypeAttr(), Default value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>self_shadows</b> - UsdAiShapeAPI
 /// \li <b>sidedness</b> - UsdAiShapeAPI
 /// \li <b>step_size</b> - UsdAiVolume
+/// \li <b>uINT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>userPrefix</b> - The attribute prefix used to qualify user parameters on nodes using the AiNodeAPI.
+/// \li <b>vECTOR</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>visibility</b> - UsdAiShapeAPI
 TF_DECLARE_PUBLIC_TOKENS(UsdAiTokens, USDAI_API, USDAI_TOKENS);
 

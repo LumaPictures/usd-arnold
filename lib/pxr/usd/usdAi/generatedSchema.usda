@@ -360,3 +360,19 @@ class AiVolume "AiVolume" (
     )
 }
 
+class "AiAOV" (
+    doc = """Represents an Arnold output target. 
+
+             Defined by a name, a data type, a driver, and a filter."""
+)
+{
+    token dataType = "RGBA" (
+        allowedTokens = ["BYTE", "INT", "UINT", "BOOL", "FLOAT", "RGB", "RGBA", "VECTOR", "POINT", "POINT2", "POINTER", "NODE", "ARRAY", "MATRIX"]
+    )
+    rel driver
+    rel filter
+    uniform string name (
+        doc = "The name of the AOV."
+    )
+}
+
