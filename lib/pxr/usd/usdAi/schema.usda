@@ -206,11 +206,11 @@ class AiVolume "AiVolume" (
     )
 }
 
-class "AiAOV" (
+class AiAOV "AiAOV" (
+    inherits = </Typed>
     doc = """Represents an Arnold output target. 
 
              Defined by a name, a data type, a driver, and a filter."""
-    inherits = </Typed>
 ) {
     uniform string name (
         doc = """The name of the AOV."""

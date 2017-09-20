@@ -36,6 +36,12 @@ TF_REGISTRY_FUNCTION(TfType)
     TfType::Define<UsdAiAOV,
         TfType::Bases< UsdTyped > >();
     
+    // Register the usd prim typename as an alias under UsdSchemaBase. This
+    // enables one to call
+    // TfType::Find<UsdSchemaBase>().FindDerivedByName("AiAOV")
+    // to find TfType<UsdAiAOV>, which is how IsA queries are
+    // answered.
+    TfType::AddAlias<UsdSchemaBase, UsdAiAOV>("AiAOV");
 }
 
 /* virtual */
@@ -54,6 +60,19 @@ UsdAiAOV::Get(const UsdStagePtr &stage, const SdfPath &path)
     return UsdAiAOV(stage->GetPrimAtPath(path));
 }
 
+/* static */
+UsdAiAOV
+UsdAiAOV::Define(
+    const UsdStagePtr &stage, const SdfPath &path)
+{
+    static TfToken usdPrimTypeName("AiAOV");
+    if (!stage) {
+        TF_CODING_ERROR("Invalid stage");
+        return UsdAiAOV();
+    }
+    return UsdAiAOV(
+        stage->DefinePrim(path, usdPrimTypeName));
+}
 
 /* static */
 const TfType &

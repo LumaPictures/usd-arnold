@@ -360,7 +360,7 @@ class AiVolume "AiVolume" (
     )
 }
 
-class "AiAOV" (
+class AiAOV "AiAOV" (
     doc = """Represents an Arnold output target. 
 
              Defined by a name, a data type, a driver, and a filter."""
