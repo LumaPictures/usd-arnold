@@ -383,52 +383,51 @@ AiShaderExport::export_arnold_node(const AtNode* arnold_node, SdfPath& parent_pa
         return SdfPath();
     }
     const auto nentry = AiNodeGetNodeEntry(arnold_node);
-    if (AiNodeEntryGetType(nentry) != AI_NODE_SHADER) {
+    const auto entry_type = AiNodeEntryGetType(nentry);
+    if (entry_type != AI_NODE_SHADER && entry_type != AI_NODE_DRIVER && entry_type != AI_NODE_FILTER) {
         return SdfPath();
-    } else {
-        const auto it = m_shader_to_usd_path.find(arnold_node);
-        if (it != m_shader_to_usd_path.end()) {
-            return it->second;
-        } else {
-            std::string node_name(AiNodeGetName(arnold_node));
-            if (node_name == "") {
-                // TODO: raise error
-                return SdfPath();
-            }
-            // MtoA exports sub shaders with @ prefix, which is used for something else in USD
-            // TODO: implement a proper cleanup using boost::regex
-            clean_arnold_name(node_name);
-            auto shader_path = parent_path.AppendPath(SdfPath(node_name));
-            auto shader = UsdAiShader::Define(m_stage, shader_path);
-            m_shader_to_usd_path.insert(std::make_pair(arnold_node, shader_path));
-
-            shader.CreateIdAttr(VtValue(TfToken(AiNodeEntryGetName(nentry))));
-            auto piter = AiNodeEntryGetParamIterator(nentry);
-            while (!AiParamIteratorFinished(piter)) {
-                const auto pentry = AiParamIteratorGetNext(piter);
-                auto pname = AiParamGetName(pentry);
-
-                if (strcmp(pname, "name") == 0) {
-                    continue;
-                }
-                if (exportable_params != nullptr && exportable_params->find(pname) == exportable_params->end()) {
-                    continue;
-                }
-                const auto ptype = static_cast<uint8_t>(AiParamGetType(pentry));
-                export_parameter(arnold_node, shader, pname, ptype, false);
-            }
-            AiParamIteratorDestroy(piter);
-            auto puiter = AiNodeGetUserParamIterator(arnold_node);
-            while (!AiUserParamIteratorFinished(puiter)) {
-                const auto pentry = AiUserParamIteratorGetNext(puiter);
-                auto pname = AiUserParamGetName(pentry);
-                const auto ptype = static_cast<uint8_t>(AiUserParamGetType(pentry));
-                export_parameter(arnold_node, shader, pname, ptype, true);
-            }
-            AiUserParamIteratorDestroy(puiter);
-            return shader_path;
-        }
     }
+    const auto it = m_shader_to_usd_path.find(arnold_node);
+    if (it != m_shader_to_usd_path.end()) {
+        return it->second;
+    }
+    std::string node_name(AiNodeGetName(arnold_node));
+    if (node_name == "") {
+        // TODO: raise error
+        return SdfPath();
+    }
+    // MtoA exports sub shaders with @ prefix, which is used for something else in USD
+    // TODO: implement a proper cleanup using boost::regex
+    clean_arnold_name(node_name);
+    auto shader_path = parent_path.AppendPath(SdfPath(node_name));
+    auto shader = UsdAiShader::Define(m_stage, shader_path);
+    m_shader_to_usd_path.insert(std::make_pair(arnold_node, shader_path));
+
+    shader.CreateIdAttr(VtValue(TfToken(AiNodeEntryGetName(nentry))));
+    auto piter = AiNodeEntryGetParamIterator(nentry);
+    while (!AiParamIteratorFinished(piter)) {
+        const auto pentry = AiParamIteratorGetNext(piter);
+        auto pname = AiParamGetName(pentry);
+
+        if (strcmp(pname, "name") == 0) {
+            continue;
+        }
+        if (exportable_params != nullptr && exportable_params->find(pname) == exportable_params->end()) {
+            continue;
+        }
+        const auto ptype = static_cast<uint8_t>(AiParamGetType(pentry));
+        export_parameter(arnold_node, shader, pname, ptype, false);
+    }
+    AiParamIteratorDestroy(piter);
+    auto puiter = AiNodeGetUserParamIterator(arnold_node);
+    while (!AiUserParamIteratorFinished(puiter)) {
+        const auto pentry = AiUserParamIteratorGetNext(puiter);
+        auto pname = AiUserParamGetName(pentry);
+        const auto ptype = static_cast<uint8_t>(AiUserParamGetType(pentry));
+        export_parameter(arnold_node, shader, pname, ptype, true);
+    }
+    AiUserParamIteratorDestroy(puiter);
+    return shader_path;
 }
 
 void AiShaderExport::bind_material(const SdfPath& material_path, const SdfPath& shape_path) {
