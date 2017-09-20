@@ -85,13 +85,18 @@ class "AiShapeAPI" (
 """
     }
 ) {
-    uniform bool opaque = true (
+    # --- shape properties --- #
+
+    uniform bool ai:opaque = true (
         doc = """Whether the object should be considered fully opaque. By
                  default all objects are marked as opaque, because it speeds up
                  rendering considerably."""
+        customData = {
+            string apiName = "aiOpaque"
+        }
     )
 
-    uniform bool matte = false (
+    uniform bool ai:matte = false (
         doc = """This attribute, when enabled, turns an object or group into a
                  holdout matte. This affects primary rays only.
 
@@ -101,39 +106,200 @@ class "AiShapeAPI" (
                  flag is off, in which case shaders will be run to compute the
                  opacity only. Note that even AOVs output by its shaders in this
                  case will be black."""
+        customData = {
+            string apiName = "aiMatte"
+        }
     )
 
-    uniform bool receive_shadows = true (
+    uniform bool ai:receive_shadows = true (
         doc = """Whether the object picks up shadows from other objects."""
         customData = {
-            string apiName = "receiveShadows"
+            string apiName = "aiReceiveShadows"
         }
     )
 
-    uniform bool self_shadows = true (
+    # visibility
+
+    uniform bool ai:self_shadows = true (
         doc = """Whether the object casts shadows on itself."""
         customData = {
-            string apiName = "selfShadows"
+            string apiName = "aiSelfShadows"
         }
     )
 
-    uniform uchar visibility = 255 (
-        doc = """The visibility of the object for each Arnold ray type, as a
-                 bitmask.
-
-                 You can selectively disable an object's visibility for the
-                 various types of rays in the renderer. By default, objects are
-                 visible to all types of rays."""
+    uniform bool ai:visibility:camera = true (
+        doc = """Whether the object is visible to camera rays."""
+        customData = {
+            string apiName = "aiVisibleToCamera"
+        }
+    )
+    uniform bool ai:visibility:shadow = true (
+        doc = """Whether the object is visible to shadow rays."""
+        customData = {
+            string apiName = "aiVisibleToShadow"
+        }
+    )
+    uniform bool ai:visibility:reflected = true (
+        doc = """Whether the object is visible to the reflected rays."""
+        customData = {
+            string apiName = "aiVisibleToReflection"
+        }
+    )
+    uniform bool ai:visibility:refracted = true (
+        doc = """Whether the object is visible to the refracted rays."""
+        customData = {
+            string apiName = "aiVisibleToRefraction"
+        }
+    )
+    uniform bool ai:visibility:subsurface = true (
+        doc = """Whether the object is visible to the SSS rays."""
+        customData = {
+            string apiName = "aiVisibleToSubsurface"
+        }
+    )
+    uniform bool ai:visibility:diffuse = true (
+        doc = """Whether the object is visible to the diffuse rays."""
+        customData = {
+            string apiName = "aiVisibleToDiffuse"
+        }
+    )
+    uniform bool ai:visibility:glossy = true (
+        doc = """Whether the object is visible to the glossy rays."""
+        customData = {
+            string apiName = "aiVisibleToGossy"
+        }
     )
 
-    uniform uchar sidedness = 255 (
-        doc = """The double-sidedness of the object for each Arnold ray type, as
-                 a bitmask.
+#    (
+#        doc = """The visibility of the object for each Arnold ray type, as a
+#                 bitmask.
+#
+#                 You can selectively disable an object's visibility for the
+#                 various types of rays in the renderer. By default, objects are
+#                 visible to all types of rays."""
+#    )
 
-                 Just as you can disable an object's visibility for specific ray
-                 types, you can also change its sidedness. By default, objects
-                 are double-sided for all rays."""
+    uniform bool ai:sidedness:camera = true (
+        doc = """Whether the object is double-sided to camera rays."""
+        customData = {
+            string apiName = "aiDoubleSidedToCamera"
+        }
     )
+    uniform bool ai:sidedness:shadow = true (
+        doc = """Whether the object is double-sided to shadow rays."""
+        customData = {
+            string apiName = "aiDoubleSidedToShadow"
+        }
+    )
+    uniform bool ai:sidedness:reflected = true (
+        doc = """Whether the object is double-sided to the reflected rays."""
+        customData = {
+            string apiName = "aiDoubleSidedToReflection"
+        }
+    )
+    uniform bool ai:sidedness:refracted = true (
+        doc = """Whether the object is double-sided to the refracted rays."""
+        customData = {
+            string apiName = "aiDoubleSidedToRefraction"
+        }
+    )
+    uniform bool ai:sidedness:subsurface = true (
+        doc = """Whether the object is double-sided to the SSS rays."""
+        customData = {
+            string apiName = "aiDoubleSidedToSubsurface"
+        }
+    )
+    uniform bool ai:sidedness:diffuse = true (
+        doc = """Whether the object is double-sided to the diffuse rays."""
+        customData = {
+            string apiName = "aiDoubleSidedToDiffuse"
+        }
+    )
+    uniform bool ai:sidedness:glossy = true (
+        doc = """Whether the object is double-sided to the glossy rays."""
+        customData = {
+            string apiName = "aiDoubleSidedToGossy"
+        }
+    )
+
+#    (
+#        doc = """The double-sidedness of the object for each Arnold ray type, as
+#                 a bitmask.
+#
+#                 Just as you can disable an object's visibility for specific ray
+#                 types, you can also change its sidedness. By default, objects
+#                 are double-sided for all rays."""
+#    )
+
+    # --- polymesh properties --- #
+    uniform bool ai:smoothing = false (
+        customData = {
+            string apiName = "aiSmoothing"
+        }
+    )
+    uniform token ai:subdiv_type = "none" (
+        customData = {
+            string apiName = "aiSubdivType"
+        }
+        allowedTokens = ["none", "catclark", "linear"]
+    )
+    uniform uint ai:subdiv_iterations = 1 (
+        customData = {
+            string apiName = "aiSubdivIterations"
+        }
+    )
+    uniform float ai:subdiv_adaptive_error = 0 (
+        customData = {
+            string apiName = "aiSubdivAdaptiveError"
+        }
+    )
+    uniform token ai:subdiv_adaptive_metric = "auto_" (
+        customData = {
+            string apiName = "aiSubdivAdaptiveMetric"
+        }
+        # FIXME: auto -> auto_ (is there a way to specify the API name of a token?)
+        allowedTokens = ["auto_", "edge_length", "flatness"]
+    )
+    uniform token ai:subdiv_adaptive_space = "raster" (
+        customData = {
+            string apiName = "aiSubdivAdaptiveSpace"
+        }
+        allowedTokens = ["raster", "object"]
+    )
+    uniform token ai:subdiv_uv_smoothing = "pin_corners" (
+        customData = {
+            string apiName = "aiSubdivUVSmoothing"
+        }
+        allowedTokens = ["pin_corners", "pin_borders", "linear", "smooth"]
+    )
+    uniform bool ai:subdiv_smooth_derivs = false (
+        customData = {
+            string apiName = "aiSubdivSmoothDerivs"
+        }
+    )
+    uniform float ai:disp_padding = 0 (
+        customData = {
+            string apiName = "aiDispPadding"
+        }
+    )
+    uniform float ai:disp_height = 1 (
+        customData = {
+            string apiName = "aiDispHeight"
+        }
+    )
+    uniform float ai:disp_zero_value = 0 (
+        customData = {
+            string apiName = "aiDispZeroValue"
+        }
+    )
+    uniform bool ai:disp_autobump = false (
+        customData = {
+            string apiName = "aiDispAutobump"
+        }
+    )
+    # uniform ai:autobump_visibility = 159
+    rel ai:subdiv_dicing_camera
+
 }
 
 class "AiMaterialAPI" (

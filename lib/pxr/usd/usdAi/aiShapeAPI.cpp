@@ -79,15 +79,15 @@ UsdAiShapeAPI::_GetTfType() const
 }
 
 UsdAttribute
-UsdAiShapeAPI::GetOpaqueAttr() const
+UsdAiShapeAPI::GetAiOpaqueAttr() const
 {
-    return GetPrim().GetAttribute(UsdAiTokens->opaque);
+    return GetPrim().GetAttribute(UsdAiTokens->aiOpaque);
 }
 
 UsdAttribute
-UsdAiShapeAPI::CreateOpaqueAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiShapeAPI::CreateAiOpaqueAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->opaque,
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiOpaque,
                        SdfValueTypeNames->Bool,
                        /* custom = */ false,
                        SdfVariabilityUniform,
@@ -96,15 +96,15 @@ UsdAiShapeAPI::CreateOpaqueAttr(VtValue const &defaultValue, bool writeSparsely)
 }
 
 UsdAttribute
-UsdAiShapeAPI::GetMatteAttr() const
+UsdAiShapeAPI::GetAiMatteAttr() const
 {
-    return GetPrim().GetAttribute(UsdAiTokens->matte);
+    return GetPrim().GetAttribute(UsdAiTokens->aiMatte);
 }
 
 UsdAttribute
-UsdAiShapeAPI::CreateMatteAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiShapeAPI::CreateAiMatteAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->matte,
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiMatte,
                        SdfValueTypeNames->Bool,
                        /* custom = */ false,
                        SdfVariabilityUniform,
@@ -113,15 +113,15 @@ UsdAiShapeAPI::CreateMatteAttr(VtValue const &defaultValue, bool writeSparsely) 
 }
 
 UsdAttribute
-UsdAiShapeAPI::GetReceiveShadowsAttr() const
+UsdAiShapeAPI::GetAiReceiveShadowsAttr() const
 {
-    return GetPrim().GetAttribute(UsdAiTokens->receive_shadows);
+    return GetPrim().GetAttribute(UsdAiTokens->aiReceive_shadows);
 }
 
 UsdAttribute
-UsdAiShapeAPI::CreateReceiveShadowsAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiShapeAPI::CreateAiReceiveShadowsAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->receive_shadows,
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiReceive_shadows,
                        SdfValueTypeNames->Bool,
                        /* custom = */ false,
                        SdfVariabilityUniform,
@@ -130,15 +130,15 @@ UsdAiShapeAPI::CreateReceiveShadowsAttr(VtValue const &defaultValue, bool writeS
 }
 
 UsdAttribute
-UsdAiShapeAPI::GetSelfShadowsAttr() const
+UsdAiShapeAPI::GetAiSelfShadowsAttr() const
 {
-    return GetPrim().GetAttribute(UsdAiTokens->self_shadows);
+    return GetPrim().GetAttribute(UsdAiTokens->aiSelf_shadows);
 }
 
 UsdAttribute
-UsdAiShapeAPI::CreateSelfShadowsAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiShapeAPI::CreateAiSelfShadowsAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->self_shadows,
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSelf_shadows,
                        SdfValueTypeNames->Bool,
                        /* custom = */ false,
                        SdfVariabilityUniform,
@@ -147,16 +147,16 @@ UsdAiShapeAPI::CreateSelfShadowsAttr(VtValue const &defaultValue, bool writeSpar
 }
 
 UsdAttribute
-UsdAiShapeAPI::GetVisibilityAttr() const
+UsdAiShapeAPI::GetAiVisibleToCameraAttr() const
 {
-    return GetPrim().GetAttribute(UsdAiTokens->visibility);
+    return GetPrim().GetAttribute(UsdAiTokens->aiVisibilityCamera);
 }
 
 UsdAttribute
-UsdAiShapeAPI::CreateVisibilityAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiShapeAPI::CreateAiVisibleToCameraAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->visibility,
-                       SdfValueTypeNames->UChar,
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilityCamera,
+                       SdfValueTypeNames->Bool,
                        /* custom = */ false,
                        SdfVariabilityUniform,
                        defaultValue,
@@ -164,20 +164,441 @@ UsdAiShapeAPI::CreateVisibilityAttr(VtValue const &defaultValue, bool writeSpars
 }
 
 UsdAttribute
-UsdAiShapeAPI::GetSidednessAttr() const
+UsdAiShapeAPI::GetAiVisibleToShadowAttr() const
 {
-    return GetPrim().GetAttribute(UsdAiTokens->sidedness);
+    return GetPrim().GetAttribute(UsdAiTokens->aiVisibilityShadow);
 }
 
 UsdAttribute
-UsdAiShapeAPI::CreateSidednessAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiShapeAPI::CreateAiVisibleToShadowAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->sidedness,
-                       SdfValueTypeNames->UChar,
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilityShadow,
+                       SdfValueTypeNames->Bool,
                        /* custom = */ false,
                        SdfVariabilityUniform,
                        defaultValue,
                        writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiVisibleToReflectionAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiVisibilityReflected);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiVisibleToReflectionAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilityReflected,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiVisibleToRefractionAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiVisibilityRefracted);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiVisibleToRefractionAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilityRefracted,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiVisibleToSubsurfaceAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiVisibilitySubsurface);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiVisibleToSubsurfaceAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilitySubsurface,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiVisibleToDiffuseAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiVisibilityDiffuse);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiVisibleToDiffuseAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilityDiffuse,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiVisibleToGossyAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiVisibilityGlossy);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiVisibleToGossyAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilityGlossy,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiDoubleSidedToCameraAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSidednessCamera);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiDoubleSidedToCameraAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessCamera,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiDoubleSidedToShadowAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSidednessShadow);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiDoubleSidedToShadowAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessShadow,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiDoubleSidedToReflectionAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSidednessReflected);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiDoubleSidedToReflectionAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessReflected,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiDoubleSidedToRefractionAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSidednessRefracted);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiDoubleSidedToRefractionAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessRefracted,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiDoubleSidedToSubsurfaceAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSidednessSubsurface);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiDoubleSidedToSubsurfaceAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessSubsurface,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiDoubleSidedToDiffuseAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSidednessDiffuse);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiDoubleSidedToDiffuseAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessDiffuse,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiDoubleSidedToGossyAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSidednessGlossy);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiDoubleSidedToGossyAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessGlossy,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiSmoothingAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSmoothing);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiSmoothingAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSmoothing,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiSubdivTypeAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSubdiv_type);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiSubdivTypeAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSubdiv_type,
+                       SdfValueTypeNames->Token,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiSubdivIterationsAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSubdiv_iterations);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiSubdivIterationsAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSubdiv_iterations,
+                       SdfValueTypeNames->UInt,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiSubdivAdaptiveErrorAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSubdiv_adaptive_error);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiSubdivAdaptiveErrorAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSubdiv_adaptive_error,
+                       SdfValueTypeNames->Float,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiSubdivAdaptiveMetricAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSubdiv_adaptive_metric);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiSubdivAdaptiveMetricAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSubdiv_adaptive_metric,
+                       SdfValueTypeNames->Token,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiSubdivAdaptiveSpaceAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSubdiv_adaptive_space);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiSubdivAdaptiveSpaceAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSubdiv_adaptive_space,
+                       SdfValueTypeNames->Token,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiSubdivUVSmoothingAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSubdiv_uv_smoothing);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiSubdivUVSmoothingAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSubdiv_uv_smoothing,
+                       SdfValueTypeNames->Token,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiSubdivSmoothDerivsAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSubdiv_smooth_derivs);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiSubdivSmoothDerivsAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSubdiv_smooth_derivs,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiDispPaddingAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiDisp_padding);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiDispPaddingAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiDisp_padding,
+                       SdfValueTypeNames->Float,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiDispHeightAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiDisp_height);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiDispHeightAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiDisp_height,
+                       SdfValueTypeNames->Float,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiDispZeroValueAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiDisp_zero_value);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiDispZeroValueAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiDisp_zero_value,
+                       SdfValueTypeNames->Float,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiDispAutobumpAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiDisp_autobump);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiDispAutobumpAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiDisp_autobump,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdRelationship
+UsdAiShapeAPI::GetAiSubdiv_dicing_cameraRel() const
+{
+    return GetPrim().GetRelationship(UsdAiTokens->aiSubdiv_dicing_camera);
+}
+
+UsdRelationship
+UsdAiShapeAPI::CreateAiSubdiv_dicing_cameraRel() const
+{
+    return GetPrim().CreateRelationship(UsdAiTokens->aiSubdiv_dicing_camera,
+                       /* custom = */ false);
 }
 
 namespace {
@@ -197,12 +618,36 @@ const TfTokenVector&
 UsdAiShapeAPI::GetSchemaAttributeNames(bool includeInherited)
 {
     static TfTokenVector localNames = {
-        UsdAiTokens->opaque,
-        UsdAiTokens->matte,
-        UsdAiTokens->receive_shadows,
-        UsdAiTokens->self_shadows,
-        UsdAiTokens->visibility,
-        UsdAiTokens->sidedness,
+        UsdAiTokens->aiOpaque,
+        UsdAiTokens->aiMatte,
+        UsdAiTokens->aiReceive_shadows,
+        UsdAiTokens->aiSelf_shadows,
+        UsdAiTokens->aiVisibilityCamera,
+        UsdAiTokens->aiVisibilityShadow,
+        UsdAiTokens->aiVisibilityReflected,
+        UsdAiTokens->aiVisibilityRefracted,
+        UsdAiTokens->aiVisibilitySubsurface,
+        UsdAiTokens->aiVisibilityDiffuse,
+        UsdAiTokens->aiVisibilityGlossy,
+        UsdAiTokens->aiSidednessCamera,
+        UsdAiTokens->aiSidednessShadow,
+        UsdAiTokens->aiSidednessReflected,
+        UsdAiTokens->aiSidednessRefracted,
+        UsdAiTokens->aiSidednessSubsurface,
+        UsdAiTokens->aiSidednessDiffuse,
+        UsdAiTokens->aiSidednessGlossy,
+        UsdAiTokens->aiSmoothing,
+        UsdAiTokens->aiSubdiv_type,
+        UsdAiTokens->aiSubdiv_iterations,
+        UsdAiTokens->aiSubdiv_adaptive_error,
+        UsdAiTokens->aiSubdiv_adaptive_metric,
+        UsdAiTokens->aiSubdiv_adaptive_space,
+        UsdAiTokens->aiSubdiv_uv_smoothing,
+        UsdAiTokens->aiSubdiv_smooth_derivs,
+        UsdAiTokens->aiDisp_padding,
+        UsdAiTokens->aiDisp_height,
+        UsdAiTokens->aiDisp_zero_value,
+        UsdAiTokens->aiDisp_autobump,
     };
     static TfTokenVector allNames =
         _ConcatenateAttributeNames(

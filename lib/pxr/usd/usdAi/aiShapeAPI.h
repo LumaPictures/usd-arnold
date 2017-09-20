@@ -98,6 +98,11 @@ class SdfAssetPath;
 /// AI_RAY_ALL_TRANSMIT all transmission specular ray types
 /// AI_RAY_ALL          mask for all ray types
 ///
+/// For any described attribute \em Fallback \em Value or \em Allowed \em Values below
+/// that are text/tokens, the actual token is published and defined in \ref UsdAiTokens.
+/// So to set an attribute to the value "rightHanded", use UsdAiTokens->rightHanded
+/// as the value.
+///
 class UsdAiShapeAPI : public UsdSchemaBase
 {
 public:
@@ -163,7 +168,7 @@ private:
 
 public:
     // --------------------------------------------------------------------- //
-    // OPAQUE 
+    // AIOPAQUE 
     // --------------------------------------------------------------------- //
     /// Whether the object should be considered fully opaque. By
     /// default all objects are marked as opaque, because it speeds up
@@ -174,19 +179,19 @@ public:
     /// \n  Variability: SdfVariabilityUniform
     /// \n  Fallback Value: True
     USDAI_API
-    UsdAttribute GetOpaqueAttr() const;
+    UsdAttribute GetAiOpaqueAttr() const;
 
-    /// See GetOpaqueAttr(), and also 
+    /// See GetAiOpaqueAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateOpaqueAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAiOpaqueAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // MATTE 
+    // AIMATTE 
     // --------------------------------------------------------------------- //
     /// This attribute, when enabled, turns an object or group into a
     /// holdout matte. This affects primary rays only.
@@ -203,19 +208,19 @@ public:
     /// \n  Variability: SdfVariabilityUniform
     /// \n  Fallback Value: False
     USDAI_API
-    UsdAttribute GetMatteAttr() const;
+    UsdAttribute GetAiMatteAttr() const;
 
-    /// See GetMatteAttr(), and also 
+    /// See GetAiMatteAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateMatteAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAiMatteAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // RECEIVESHADOWS 
+    // AIRECEIVESHADOWS 
     // --------------------------------------------------------------------- //
     /// Whether the object picks up shadows from other objects.
     ///
@@ -224,19 +229,19 @@ public:
     /// \n  Variability: SdfVariabilityUniform
     /// \n  Fallback Value: True
     USDAI_API
-    UsdAttribute GetReceiveShadowsAttr() const;
+    UsdAttribute GetAiReceiveShadowsAttr() const;
 
-    /// See GetReceiveShadowsAttr(), and also 
+    /// See GetAiReceiveShadowsAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateReceiveShadowsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAiReceiveShadowsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // SELFSHADOWS 
+    // AISELFSHADOWS 
     // --------------------------------------------------------------------- //
     /// Whether the object casts shadows on itself.
     ///
@@ -245,67 +250,579 @@ public:
     /// \n  Variability: SdfVariabilityUniform
     /// \n  Fallback Value: True
     USDAI_API
-    UsdAttribute GetSelfShadowsAttr() const;
+    UsdAttribute GetAiSelfShadowsAttr() const;
 
-    /// See GetSelfShadowsAttr(), and also 
+    /// See GetAiSelfShadowsAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateSelfShadowsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAiSelfShadowsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // VISIBILITY 
+    // AIVISIBLETOCAMERA 
     // --------------------------------------------------------------------- //
-    /// The visibility of the object for each Arnold ray type, as a
-    /// bitmask.
-    /// 
-    /// You can selectively disable an object's visibility for the
-    /// various types of rays in the renderer. By default, objects are
-    /// visible to all types of rays.
+    /// Whether the object is visible to camera rays.
     ///
-    /// \n  C++ Type: unsigned char
-    /// \n  Usd Type: SdfValueTypeNames->UChar
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
     /// \n  Variability: SdfVariabilityUniform
-    /// \n  Fallback Value: 255
+    /// \n  Fallback Value: True
     USDAI_API
-    UsdAttribute GetVisibilityAttr() const;
+    UsdAttribute GetAiVisibleToCameraAttr() const;
 
-    /// See GetVisibilityAttr(), and also 
+    /// See GetAiVisibleToCameraAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateVisibilityAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAiVisibleToCameraAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // SIDEDNESS 
+    // AIVISIBLETOSHADOW 
     // --------------------------------------------------------------------- //
-    /// The double-sidedness of the object for each Arnold ray type, as
-    /// a bitmask.
-    /// 
-    /// Just as you can disable an object's visibility for specific ray
-    /// types, you can also change its sidedness. By default, objects
-    /// are double-sided for all rays.
+    /// Whether the object is visible to shadow rays.
     ///
-    /// \n  C++ Type: unsigned char
-    /// \n  Usd Type: SdfValueTypeNames->UChar
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
     /// \n  Variability: SdfVariabilityUniform
-    /// \n  Fallback Value: 255
+    /// \n  Fallback Value: True
     USDAI_API
-    UsdAttribute GetSidednessAttr() const;
+    UsdAttribute GetAiVisibleToShadowAttr() const;
 
-    /// See GetSidednessAttr(), and also 
+    /// See GetAiVisibleToShadowAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateSidednessAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAiVisibleToShadowAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIVISIBLETOREFLECTION 
+    // --------------------------------------------------------------------- //
+    /// Whether the object is visible to the reflected rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiVisibleToReflectionAttr() const;
+
+    /// See GetAiVisibleToReflectionAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiVisibleToReflectionAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIVISIBLETOREFRACTION 
+    // --------------------------------------------------------------------- //
+    /// Whether the object is visible to the refracted rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiVisibleToRefractionAttr() const;
+
+    /// See GetAiVisibleToRefractionAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiVisibleToRefractionAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIVISIBLETOSUBSURFACE 
+    // --------------------------------------------------------------------- //
+    /// Whether the object is visible to the SSS rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiVisibleToSubsurfaceAttr() const;
+
+    /// See GetAiVisibleToSubsurfaceAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiVisibleToSubsurfaceAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIVISIBLETODIFFUSE 
+    // --------------------------------------------------------------------- //
+    /// Whether the object is visible to the diffuse rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiVisibleToDiffuseAttr() const;
+
+    /// See GetAiVisibleToDiffuseAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiVisibleToDiffuseAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIVISIBLETOGOSSY 
+    // --------------------------------------------------------------------- //
+    /// Whether the object is visible to the glossy rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiVisibleToGossyAttr() const;
+
+    /// See GetAiVisibleToGossyAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiVisibleToGossyAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIDOUBLESIDEDTOCAMERA 
+    // --------------------------------------------------------------------- //
+    /// Whether the object is double-sided to camera rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiDoubleSidedToCameraAttr() const;
+
+    /// See GetAiDoubleSidedToCameraAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiDoubleSidedToCameraAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIDOUBLESIDEDTOSHADOW 
+    // --------------------------------------------------------------------- //
+    /// Whether the object is double-sided to shadow rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiDoubleSidedToShadowAttr() const;
+
+    /// See GetAiDoubleSidedToShadowAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiDoubleSidedToShadowAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIDOUBLESIDEDTOREFLECTION 
+    // --------------------------------------------------------------------- //
+    /// Whether the object is double-sided to the reflected rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiDoubleSidedToReflectionAttr() const;
+
+    /// See GetAiDoubleSidedToReflectionAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiDoubleSidedToReflectionAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIDOUBLESIDEDTOREFRACTION 
+    // --------------------------------------------------------------------- //
+    /// Whether the object is double-sided to the refracted rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiDoubleSidedToRefractionAttr() const;
+
+    /// See GetAiDoubleSidedToRefractionAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiDoubleSidedToRefractionAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIDOUBLESIDEDTOSUBSURFACE 
+    // --------------------------------------------------------------------- //
+    /// Whether the object is double-sided to the SSS rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiDoubleSidedToSubsurfaceAttr() const;
+
+    /// See GetAiDoubleSidedToSubsurfaceAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiDoubleSidedToSubsurfaceAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIDOUBLESIDEDTODIFFUSE 
+    // --------------------------------------------------------------------- //
+    /// Whether the object is double-sided to the diffuse rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiDoubleSidedToDiffuseAttr() const;
+
+    /// See GetAiDoubleSidedToDiffuseAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiDoubleSidedToDiffuseAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIDOUBLESIDEDTOGOSSY 
+    // --------------------------------------------------------------------- //
+    /// Whether the object is double-sided to the glossy rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiDoubleSidedToGossyAttr() const;
+
+    /// See GetAiDoubleSidedToGossyAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiDoubleSidedToGossyAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AISMOOTHING 
+    // --------------------------------------------------------------------- //
+    /// 
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: False
+    USDAI_API
+    UsdAttribute GetAiSmoothingAttr() const;
+
+    /// See GetAiSmoothingAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiSmoothingAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AISUBDIVTYPE 
+    // --------------------------------------------------------------------- //
+    /// 
+    ///
+    /// \n  C++ Type: TfToken
+    /// \n  Usd Type: SdfValueTypeNames->Token
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: none
+    /// \n  \ref UsdAiTokens "Allowed Values": [none, catclark, linear]
+    USDAI_API
+    UsdAttribute GetAiSubdivTypeAttr() const;
+
+    /// See GetAiSubdivTypeAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiSubdivTypeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AISUBDIVITERATIONS 
+    // --------------------------------------------------------------------- //
+    /// 
+    ///
+    /// \n  C++ Type: unsigned int
+    /// \n  Usd Type: SdfValueTypeNames->UInt
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: 1
+    USDAI_API
+    UsdAttribute GetAiSubdivIterationsAttr() const;
+
+    /// See GetAiSubdivIterationsAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiSubdivIterationsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AISUBDIVADAPTIVEERROR 
+    // --------------------------------------------------------------------- //
+    /// 
+    ///
+    /// \n  C++ Type: float
+    /// \n  Usd Type: SdfValueTypeNames->Float
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: 0.0
+    USDAI_API
+    UsdAttribute GetAiSubdivAdaptiveErrorAttr() const;
+
+    /// See GetAiSubdivAdaptiveErrorAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiSubdivAdaptiveErrorAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AISUBDIVADAPTIVEMETRIC 
+    // --------------------------------------------------------------------- //
+    /// 
+    ///
+    /// \n  C++ Type: TfToken
+    /// \n  Usd Type: SdfValueTypeNames->Token
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: auto_
+    /// \n  \ref UsdAiTokens "Allowed Values": [auto_, edge_length, flatness]
+    USDAI_API
+    UsdAttribute GetAiSubdivAdaptiveMetricAttr() const;
+
+    /// See GetAiSubdivAdaptiveMetricAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiSubdivAdaptiveMetricAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AISUBDIVADAPTIVESPACE 
+    // --------------------------------------------------------------------- //
+    /// 
+    ///
+    /// \n  C++ Type: TfToken
+    /// \n  Usd Type: SdfValueTypeNames->Token
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: raster
+    /// \n  \ref UsdAiTokens "Allowed Values": [raster, object]
+    USDAI_API
+    UsdAttribute GetAiSubdivAdaptiveSpaceAttr() const;
+
+    /// See GetAiSubdivAdaptiveSpaceAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiSubdivAdaptiveSpaceAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AISUBDIVUVSMOOTHING 
+    // --------------------------------------------------------------------- //
+    /// 
+    ///
+    /// \n  C++ Type: TfToken
+    /// \n  Usd Type: SdfValueTypeNames->Token
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: pin_corners
+    /// \n  \ref UsdAiTokens "Allowed Values": [pin_corners, pin_borders, linear, smooth]
+    USDAI_API
+    UsdAttribute GetAiSubdivUVSmoothingAttr() const;
+
+    /// See GetAiSubdivUVSmoothingAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiSubdivUVSmoothingAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AISUBDIVSMOOTHDERIVS 
+    // --------------------------------------------------------------------- //
+    /// 
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: False
+    USDAI_API
+    UsdAttribute GetAiSubdivSmoothDerivsAttr() const;
+
+    /// See GetAiSubdivSmoothDerivsAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiSubdivSmoothDerivsAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIDISPPADDING 
+    // --------------------------------------------------------------------- //
+    /// 
+    ///
+    /// \n  C++ Type: float
+    /// \n  Usd Type: SdfValueTypeNames->Float
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: 0.0
+    USDAI_API
+    UsdAttribute GetAiDispPaddingAttr() const;
+
+    /// See GetAiDispPaddingAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiDispPaddingAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIDISPHEIGHT 
+    // --------------------------------------------------------------------- //
+    /// 
+    ///
+    /// \n  C++ Type: float
+    /// \n  Usd Type: SdfValueTypeNames->Float
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: 1.0
+    USDAI_API
+    UsdAttribute GetAiDispHeightAttr() const;
+
+    /// See GetAiDispHeightAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiDispHeightAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIDISPZEROVALUE 
+    // --------------------------------------------------------------------- //
+    /// 
+    ///
+    /// \n  C++ Type: float
+    /// \n  Usd Type: SdfValueTypeNames->Float
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: 0.0
+    USDAI_API
+    UsdAttribute GetAiDispZeroValueAttr() const;
+
+    /// See GetAiDispZeroValueAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiDispZeroValueAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIDISPAUTOBUMP 
+    // --------------------------------------------------------------------- //
+    /// 
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: False
+    USDAI_API
+    UsdAttribute GetAiDispAutobumpAttr() const;
+
+    /// See GetAiDispAutobumpAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiDispAutobumpAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AISUBDIV_DICING_CAMERA 
+    // --------------------------------------------------------------------- //
+    /// 
+    ///
+    USDAI_API
+    UsdRelationship GetAiSubdiv_dicing_cameraRel() const;
+
+    /// See GetAiSubdiv_dicing_cameraRel(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create
+    USDAI_API
+    UsdRelationship CreateAiSubdiv_dicing_cameraRel() const;
 
 public:
     // ===================================================================== //

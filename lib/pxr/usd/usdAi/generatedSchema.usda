@@ -54,7 +54,11 @@ class "AiShapeAPI" (
                 AI_RAY_ALL          mask for all ray types"""
 )
 {
-    uniform bool matte = 0 (
+    uniform bool ai:disp_autobump = 0
+    uniform float ai:disp_height = 1
+    uniform float ai:disp_padding = 0
+    uniform float ai:disp_zero_value = 0
+    uniform bool ai:matte = 0 (
         doc = """This attribute, when enabled, turns an object or group into a
                  holdout matte. This affects primary rays only.
 
@@ -65,32 +69,75 @@ class "AiShapeAPI" (
                  opacity only. Note that even AOVs output by its shaders in this
                  case will be black."""
     )
-    uniform bool opaque = 1 (
+    uniform bool ai:opaque = 1 (
         doc = """Whether the object should be considered fully opaque. By
                  default all objects are marked as opaque, because it speeds up
                  rendering considerably."""
     )
-    uniform bool receive_shadows = 1 (
+    uniform bool ai:receive_shadows = 1 (
         doc = "Whether the object picks up shadows from other objects."
     )
-    uniform bool self_shadows = 1 (
+    uniform bool ai:self_shadows = 1 (
         doc = "Whether the object casts shadows on itself."
     )
-    uniform uchar sidedness = 255 (
-        doc = """The double-sidedness of the object for each Arnold ray type, as
-                 a bitmask.
-
-                 Just as you can disable an object's visibility for specific ray
-                 types, you can also change its sidedness. By default, objects
-                 are double-sided for all rays."""
+    uniform bool ai:sidedness:camera = 1 (
+        doc = "Whether the object is double-sided to camera rays."
     )
-    uniform uchar visibility = 255 (
-        doc = """The visibility of the object for each Arnold ray type, as a
-                 bitmask.
-
-                 You can selectively disable an object's visibility for the
-                 various types of rays in the renderer. By default, objects are
-                 visible to all types of rays."""
+    uniform bool ai:sidedness:diffuse = 1 (
+        doc = "Whether the object is double-sided to the diffuse rays."
+    )
+    uniform bool ai:sidedness:glossy = 1 (
+        doc = "Whether the object is double-sided to the glossy rays."
+    )
+    uniform bool ai:sidedness:reflected = 1 (
+        doc = "Whether the object is double-sided to the reflected rays."
+    )
+    uniform bool ai:sidedness:refracted = 1 (
+        doc = "Whether the object is double-sided to the refracted rays."
+    )
+    uniform bool ai:sidedness:shadow = 1 (
+        doc = "Whether the object is double-sided to shadow rays."
+    )
+    uniform bool ai:sidedness:subsurface = 1 (
+        doc = "Whether the object is double-sided to the SSS rays."
+    )
+    uniform bool ai:smoothing = 0
+    uniform float ai:subdiv_adaptive_error = 0
+    uniform token ai:subdiv_adaptive_metric = "auto_" (
+        allowedTokens = ["auto_", "edge_length", "flatness"]
+    )
+    uniform token ai:subdiv_adaptive_space = "raster" (
+        allowedTokens = ["raster", "object"]
+    )
+    rel ai:subdiv_dicing_camera
+    uniform uint ai:subdiv_iterations = 1
+    uniform bool ai:subdiv_smooth_derivs = 0
+    uniform token ai:subdiv_type = "none" (
+        allowedTokens = ["none", "catclark", "linear"]
+    )
+    uniform token ai:subdiv_uv_smoothing = "pin_corners" (
+        allowedTokens = ["pin_corners", "pin_borders", "linear", "smooth"]
+    )
+    uniform bool ai:visibility:camera = 1 (
+        doc = "Whether the object is visible to camera rays."
+    )
+    uniform bool ai:visibility:diffuse = 1 (
+        doc = "Whether the object is visible to the diffuse rays."
+    )
+    uniform bool ai:visibility:glossy = 1 (
+        doc = "Whether the object is visible to the glossy rays."
+    )
+    uniform bool ai:visibility:reflected = 1 (
+        doc = "Whether the object is visible to the reflected rays."
+    )
+    uniform bool ai:visibility:refracted = 1 (
+        doc = "Whether the object is visible to the refracted rays."
+    )
+    uniform bool ai:visibility:shadow = 1 (
+        doc = "Whether the object is visible to shadow rays."
+    )
+    uniform bool ai:visibility:subsurface = 1 (
+        doc = "Whether the object is visible to the SSS rays."
     )
 }
 
