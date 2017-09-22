@@ -10,8 +10,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 class AiShaderExport {
 public:
     AiShaderExport(const UsdStagePtr& _stage,
-                   const UsdTimeCode& _time_code = UsdTimeCode::Default(),
-                   const std::string& parent_scope = std::string());
+                   const std::string& parent_scope = std::string(),
+                   const UsdTimeCode& _time_code = UsdTimeCode::Default());
     ~AiShaderExport();
     void bind_material(const SdfPath& shader_path, const SdfPath& shape_path);
     SdfPath export_material(const char* material_name,
@@ -27,10 +27,10 @@ public:
                            const char* dest_param_name,
                            const AtNode* src_arnold_node, UsdAiShader& src_shader,
                            int32_t src_comp_index=-1);
-    bool export_connection(const AtNode* dest_arnold_node, UsdAiShader& dest_shader,
-                           const char* dest_param_name, uint8_t arnold_param_type,
-                           const AtNode* src_arnold_node, UsdAiShader& src_shader,
-                           int32_t src_comp_index=-1);
+    // bool export_connection(const AtNode* dest_arnold_node, UsdAiShader& dest_shader,
+    //                        const char* dest_param_name, uint8_t arnold_param_type,
+    //                        const AtNode* src_arnold_node, UsdAiShader& src_shader,
+    //                        int32_t src_comp_index=-1);
     void export_parameter(const AtNode* arnold_node, UsdAiShader& shader,
                           const char* arnold_param_name,
                           uint8_t arnold_param_type, bool user);

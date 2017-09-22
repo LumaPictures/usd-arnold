@@ -219,8 +219,8 @@ namespace {
     }
 }
 
-AiShaderExport::AiShaderExport(const UsdStagePtr& _stage, const UsdTimeCode& _time_code,
-                               const std::string& parent_scope) :
+AiShaderExport::AiShaderExport(const UsdStagePtr& _stage, const std::string& parent_scope,
+                               const UsdTimeCode& _time_code) :
     m_stage(_stage),
     m_shaders_scope(parent_scope.empty() ? "/Looks" : parent_scope),
     m_time_code(_time_code)
@@ -307,34 +307,34 @@ AiShaderExport::export_connection(const AtNode* dest_arnold_node, UsdAiShader& d
 }
 
 
+// bool
+// AiShaderExport::export_connection(const AtNode* dest_arnold_node, UsdAiShader& dest_shader,
+//                                   const char* dest_param_name,
+//                                   const AtNode* src_arnold_node, UsdAiShader& src_shader,
+//                                   int32_t src_comp_index) {
+//     const auto pentry = AiNodeEntryLookUpParameter(AiNodeGetNodeEntry(dest_arnold_node), dest_param_name);
+//     const auto ptype = static_cast<uint8_t>(AiParamGetType(pentry));
+//     return export_connection(dest_arnold_node, dest_shader,
+//                              dest_param_name, ptype,
+//                              src_arnold_node, src_shader, src_comp_index);
+// }
+
 bool
 AiShaderExport::export_connection(const AtNode* dest_arnold_node, UsdAiShader& dest_shader,
                                   const char* dest_param_name,
                                   const AtNode* src_arnold_node, UsdAiShader& src_shader,
                                   int32_t src_comp_index) {
-    const auto pentry = AiNodeEntryLookUpParameter(AiNodeGetNodeEntry(dest_arnold_node), dest_param_name);
-    const auto ptype = static_cast<uint8_t>(AiParamGetType(pentry));
-    return export_connection(dest_arnold_node, dest_shader,
-                             dest_param_name, ptype,
-                             src_arnold_node, src_shader, src_comp_index);
-}
-
-bool
-AiShaderExport::export_connection(const AtNode* dest_arnold_node, UsdAiShader& dest_shader,
-                                  const char* dest_param_name, uint8_t arnold_param_type,
-                                  const AtNode* src_arnold_node, UsdAiShader& src_shader,
-                                  int32_t src_comp_index) {
-    const auto iter_type = get_simple_type(arnold_param_type);
-    if (iter_type == nullptr) {
-        return false;
-    }
+    // const auto iter_type = get_simple_type(arnold_param_type);
+    // if (iter_type == nullptr) {
+    //     return false;
+    // }
 
     UsdShadeOutput out;
     get_output(src_arnold_node, src_shader, out, false, src_comp_index);
 
     // we could assume the dest has the same type as source_param
     UsdShadeConnectableAPI::ConnectToSource(
-        dest_shader.CreateInput(TfToken(dest_param_name), iter_type->type), out);
+        dest_shader.CreateInput(TfToken(dest_param_name), out.GetTypeName()), out);
     return true;
 }
 
@@ -343,9 +343,13 @@ AiShaderExport::export_parameter(
     const AtNode* arnold_node, UsdAiShader& shader, const char* arnold_param_name, uint8_t arnold_param_type, bool user) {
     if (arnold_param_type == AI_TYPE_ARRAY) {
         const auto arr = AiNodeGetArray(arnold_node, arnold_param_name);
-        if (arr == nullptr || arr->nelements == 0 || arr->nkeys == 0 || arr->type == AI_TYPE_ARRAY) { return; }
+        if (arr == nullptr || arr->nelements == 0 || arr->nkeys == 0 || arr->type == AI_TYPE_ARRAY) {
+            return;
+        }
         const auto iter_type = get_array_type(arr->type);
-        if (iter_type == nullptr) { return; }
+        if (iter_type == nullptr) {
+            return;
+        }
         auto param = shader.CreateInput(TfToken(arnold_param_name), iter_type->type);
         if (iter_type->f != nullptr) {
             iter_type->f(param, arr);

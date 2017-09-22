@@ -98,10 +98,10 @@ void wrapUsdAiShaderExport()
         cls("AiShaderExport", no_init);
 
     cls
-        .def(init<const UsdStagePtr &, const UsdTimeCode &, const std::string &>(
+        .def(init<const UsdStagePtr &, const std::string &, const UsdTimeCode &>(
              (arg("_stage"),
-              arg("_time_code") = UsdTimeCode::Default(),
-              arg("parent_scope") = string())))
+              arg("parent_scope") = string(),
+              arg("_time_code") = UsdTimeCode::Default())))
         // .def("__init__", __init__,
         //      (arg("_stage"),
         //       arg("_time_code") = UsdTimeCode::Default(),

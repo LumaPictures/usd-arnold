@@ -25,7 +25,7 @@ public:
                   const SdfPath& overrideRootPath,
                   const std::string& parentScope,
                   const PxrUsdMayaUtil::MDagPathMap<SdfPath>::Type& dagPathToUsdMap) override {
-        ArnoldShaderExport ai(stage, UsdTimeCode::Default(), parentScope, dagPathToUsdMap);
+        ArnoldShaderExport ai(stage, parentScope, UsdTimeCode::Default(), dagPathToUsdMap);
         if (bindableRoots.empty()) {
             for (MItDependencyNodes iter(MFn::kShadingEngine); !iter.isDone(); iter.next()) {
                 MObject obj = iter.thisNode();
