@@ -222,7 +222,7 @@ namespace {
 AiShaderExport::AiShaderExport(const UsdStagePtr& _stage, const UsdTimeCode& _time_code,
                                const std::string& parent_scope) :
     m_stage(_stage),
-    m_shaders_scope(parent_scope.empty() ? "/Looks" : (parent_scope + "/Looks")),
+    m_shaders_scope(parent_scope.empty() ? "/Looks" : parent_scope),
     m_time_code(_time_code)
 {
     auto scope = UsdGeomScope::Define(m_stage, m_shaders_scope);
