@@ -98,9 +98,9 @@ void wrapUsdAiShaderExport()
         cls("AiShaderExport", no_init);
 
     cls
-        .def(init<const UsdStagePtr &, const std::string &, const UsdTimeCode &>(
+        .def(init<const UsdStagePtr &, const SdfPath &, const UsdTimeCode &>(
              (arg("_stage"),
-              arg("parent_scope") = string(),
+              arg("parent_scope") = SdfPath(),
               arg("_time_code") = UsdTimeCode::Default())))
         // .def("__init__", __init__,
         //      (arg("_stage"),
@@ -113,6 +113,7 @@ void wrapUsdAiShaderExport()
              (arg("material_name"),
               arg("surf_shader"),
               arg("disp_shader")))
+        // TODO: add an overload of export_arnold_node w/out exportable_params
         .def("export_arnold_node", &export_arnold_node,
              (arg("material_name"),
               arg("arnold_node"),

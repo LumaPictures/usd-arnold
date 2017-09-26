@@ -10,7 +10,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 class AiShaderExport {
 public:
     AiShaderExport(const UsdStagePtr& _stage,
-                   const std::string& parent_scope = std::string(),
+                   const SdfPath& parent_scope = SdfPath(),
                    const UsdTimeCode& _time_code = UsdTimeCode::Default());
     ~AiShaderExport();
     void bind_material(const SdfPath& shader_path, const SdfPath& shape_path);

@@ -219,10 +219,10 @@ namespace {
     }
 }
 
-AiShaderExport::AiShaderExport(const UsdStagePtr& _stage, const std::string& parent_scope,
+AiShaderExport::AiShaderExport(const UsdStagePtr& _stage, const SdfPath& parent_scope,
                                const UsdTimeCode& _time_code) :
     m_stage(_stage),
-    m_shaders_scope(parent_scope.empty() ? "/Looks" : parent_scope),
+    m_shaders_scope(parent_scope.IsEmpty() ? SdfPath("/Looks") : parent_scope),
     m_time_code(_time_code)
 {
     auto scope = UsdGeomScope::Define(m_stage, m_shaders_scope);
@@ -370,6 +370,7 @@ AiShaderExport::export_parameter(
                 export_connection(arnold_node, shader, arnold_param_name, arnold_param_type);
             } else {
                 const auto iter_type = get_simple_type(arnold_param_type);
+                // Note: iter_type for AI_TYPE_NODE is {String, nullptr}
                 if (iter_type == nullptr  || iter_type->f == nullptr) {
                     return;
                 }
