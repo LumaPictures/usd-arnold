@@ -111,10 +111,10 @@ ArnoldShaderExport::setup_shader(const MDagPath& dg, const SdfPath& path) {
                 auto rel = material.GetSurfaceRel();
                 if (rel) {
                     rel.ClearTargets(true);
-                    rel.AppendTarget(linked_path);
+                    rel.AddTarget(linked_path);
                 } else {
                     rel = material.CreateSurfaceRel();
-                    rel.AppendTarget(linked_path);
+                    rel.AddTarget(linked_path);
                 }
             }
             // end

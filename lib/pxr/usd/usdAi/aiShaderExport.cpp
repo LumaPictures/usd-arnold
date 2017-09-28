@@ -450,10 +450,10 @@ void AiShaderExport::bind_material(const SdfPath& material_path, const SdfPath& 
     if (shape_prim.HasRelationship(UsdShadeTokens->materialBinding)) {
         auto rel = shape_prim.GetRelationship(UsdShadeTokens->materialBinding);
         rel.ClearTargets(true);
-        rel.AppendTarget(material_path);
+        rel.AddTarget(material_path);
     } else {
         auto rel = shape_prim.CreateRelationship(UsdShadeTokens->materialBinding);
-        rel.AppendTarget(material_path);
+        rel.AddTarget(material_path);
     }
 }
 
@@ -471,7 +471,7 @@ AiShaderExport::export_material(const char* material_name, AtNode* surf_shader, 
         auto surf_path = export_arnold_node(surf_shader, material_path);
         if (!surf_path.IsEmpty()) {
             auto rel = material.CreateSurfaceRel();
-            rel.AppendTarget(surf_path);
+            rel.AddTarget(surf_path);
         }
     }
 
@@ -480,7 +480,7 @@ AiShaderExport::export_material(const char* material_name, AtNode* surf_shader, 
         auto disp_path = export_arnold_node(disp_shader, m_shaders_scope);
         if (!disp_path.IsEmpty()) {
             auto rel = material.CreateDisplacementRel();
-            rel.AppendTarget(disp_path);
+            rel.AddTarget(disp_path);
         }
     }
     return material_path;
