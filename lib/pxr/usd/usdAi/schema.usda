@@ -166,7 +166,7 @@ class "AiShapeAPI" (
     uniform bool ai:visibility:glossy = true (
         doc = """Whether the object is visible to the glossy rays."""
         customData = {
-            string apiName = "aiVisibleToGossy"
+            string apiName = "aiVisibleToGlossy"
         }
     )
 
@@ -218,7 +218,7 @@ class "AiShapeAPI" (
     uniform bool ai:sidedness:glossy = true (
         doc = """Whether the object is double-sided to the glossy rays."""
         customData = {
-            string apiName = "aiDoubleSidedToGossy"
+            string apiName = "aiDoubleSidedToGlossy"
         }
     )
 
