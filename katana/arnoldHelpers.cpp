@@ -65,75 +65,39 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
 
     UsdAiShapeAPI shapeAPI(prim);
 
-    // Visibility, by ray type
-    if (UsdAttribute visibilityAttr = shapeAPI.GetVisibilityAttr()) {
-        uint8_t visibilityMask = 255;
-        visibilityAttr.Get<uint8_t>(&visibilityMask);
+    // Sadly std::array needs the size passed as a parameter, so a static const
+    // std::vector will do the same in our case.
+    static const std::vector<std::pair<decltype(&UsdAiShapeAPI::GetAiVisibleToCameraAttr), const char*>> maskAttrs = { {
+        {&UsdAiShapeAPI::GetAiVisibleToCameraAttr, "visibility.AI_RAY_CAMERA"},
+        {&UsdAiShapeAPI::GetAiVisibleToShadowAttr, "visibility.AI_RAY_SHADOW"},
+        {&UsdAiShapeAPI::GetAiVisibleToReflectionAttr, "visibility.AI_RAY_REFLECTED"},
+        {&UsdAiShapeAPI::GetAiVisibleToRefractionAttr, "visibility.AI_RAY_REFRACTED"},
+        {&UsdAiShapeAPI::GetAiVisibleToSubsurfaceAttr, "visibility.AI_RAY_SUBSURFACE"},
+        {&UsdAiShapeAPI::GetAiVisibleToDiffuseAttr, "visibility.AI_RAY_DIFFUSE"},
+        {&UsdAiShapeAPI::GetAiVisibleToGlossyAttr, "visibility.AI_RAY_GLOSSY"},
+        // Note, the original code for this setup the visibility even when
+        // querying sidedness attributes. I asked Nathan if this was intentional.
+        // I changed the parameters to sidedness.<ray_type> for now.
+        {&UsdAiShapeAPI::GetAiDoubleSidedToCameraAttr, "sidedness.AI_RAY_CAMERA"},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToShadowAttr, "sidedness.AI_RAY_SHADOW"},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToReflectionAttr, "sidedness.AI_RAY_REFLECTED"},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToRefractionAttr, "sidedness.AI_RAY_REFRACTED"},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToSubsurfaceAttr, "sidedness.AI_RAY_SUBSURFACE"},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToDiffuseAttr, "sidedness.AI_RAY_DIFFUSE"},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToGlossyAttr, "sidedness.AI_RAY_GLOSSY"}
+    } };
 
-        if (!(visibilityMask & AI_RAY_CAMERA)) {
-            builder.set("visibility.AI_RAY_CAMERA", FnKat::IntAttribute(0));
-        }
-        if (!(visibilityMask & AI_RAY_SHADOW)) {
-            builder.set("visibility.AI_RAY_SHADOW", FnKat::IntAttribute(0));
-        }
-        if (!(visibilityMask & AI_RAY_REFLECTED)) {
-            builder.set("visibility.AI_RAY_REFLECTED", FnKat::IntAttribute(0));
-        }
-        if (!(visibilityMask & AI_RAY_REFRACTED)) {
-            builder.set("visibility.AI_RAY_REFRACTED", FnKat::IntAttribute(0));
-        }
-        if (!(visibilityMask & AI_RAY_SUBSURFACE)) {
-            builder.set("visibility.AI_RAY_SUBSURFACE", FnKat::IntAttribute(0));
-        }
-        if (!(visibilityMask & AI_RAY_DIFFUSE)) {
-            builder.set("visibility.AI_RAY_DIFFUSE", FnKat::IntAttribute(0));
-        }
-        if (!(visibilityMask & AI_RAY_GLOSSY)) {
-            builder.set("visibility.AI_RAY_GLOSSY", FnKat::IntAttribute(0));
+    for (const auto& each : maskAttrs) {
+        const auto attr = ((shapeAPI).*(each.first))();
+        if (!attr.IsValid()) { continue; }
+        bool v = true;
+        if (attr.Get(&v) && !v) {
+            builder.set(each.second, FnKat::IntAttribute(0));
         }
     }
-
-    // Sidedness, by ray type
-    if (UsdAttribute sidednessAttr = shapeAPI.GetSidednessAttr()) {
-        uint8_t sidednessMask = 255;
-        sidednessAttr.Get<uint8_t>(&sidednessMask);
-
-        if (!(sidednessMask & AI_RAY_CAMERA)) {
-            builder.set("visibility.AI_RAY_CAMERA", FnKat::IntAttribute(0));
-        }
-        if (!(sidednessMask & AI_RAY_SHADOW)) {
-            builder.set("visibility.AI_RAY_SHADOW", FnKat::IntAttribute(0));
-        }
-        if (!(sidednessMask & AI_RAY_REFLECTED)) {
-            builder.set("visibility.AI_RAY_REFLECTED", FnKat::IntAttribute(0));
-        }
-        if (!(sidednessMask & AI_RAY_REFRACTED)) {
-            builder.set("visibility.AI_RAY_REFRACTED", FnKat::IntAttribute(0));
-        }
-        if (!(sidednessMask & AI_RAY_SUBSURFACE)) {
-            builder.set("visibility.AI_RAY_SUBSURFACE", FnKat::IntAttribute(0));
-        }
-        if (!(sidednessMask & AI_RAY_DIFFUSE)) {
-            builder.set("visibility.AI_RAY_DIFFUSE", FnKat::IntAttribute(0));
-        }
-        if (!(sidednessMask & AI_RAY_GLOSSY)) {
-            builder.set("visibility.AI_RAY_GLOSSY", FnKat::IntAttribute(0));
-        }
-    }
-
-    // TODO(?)
-    // inline void
-    // _ApplyBooleanAttr(const char* name, const UsdAttribute& attr,
-    //                   const bool defaultState, FnKat::GroupBuilder& builder) {
-    //     bool value = defaultState;
-    //     attr.Get<bool>(&value);
-    //     if (value != defaultState) {
-    //         builder.set(name, FnKat::IntAttribute((int)value));
-    //     }
-    // }
 
     // Opaque
-    if (UsdAttribute opaqueAttr = shapeAPI.GetOpaqueAttr()) {
+    if (UsdAttribute opaqueAttr = shapeAPI.GetAiOpaqueAttr()) {
         bool opaque = true;
         opaqueAttr.Get<bool>(&opaque);
         if (!opaque) {
@@ -141,8 +105,10 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
         }
     }
 
+    // I'm leaving this outside the loop, because I don't want to
+    // add just one extra flag to handle things.
     // Matte
-    if (UsdAttribute matteAttr = shapeAPI.GetMatteAttr()) {
+    if (UsdAttribute matteAttr = shapeAPI.GetAiMatteAttr()) {
         bool matte = false;
         matteAttr.Get<bool>(&matte);
         if (matte) {
@@ -151,7 +117,7 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
     }
 
     // Receive Shadows
-    if (UsdAttribute receiveShadowsAttr = shapeAPI.GetReceiveShadowsAttr()) {
+    if (UsdAttribute receiveShadowsAttr = shapeAPI.GetAiReceiveShadowsAttr()) {
         bool receiveShadows = true;
         receiveShadowsAttr.Get<bool>(&receiveShadows);
         if (!receiveShadows) {
@@ -160,7 +126,7 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
     }
 
     // Self Shadows
-    if (UsdAttribute selfShadowsAttr = shapeAPI.GetSelfShadowsAttr()) {
+    if (UsdAttribute selfShadowsAttr = shapeAPI.GetAiSelfShadowsAttr()) {
         bool selfShadows = true;
         selfShadowsAttr.Get<bool>(&selfShadows);
         if (!selfShadows) {
