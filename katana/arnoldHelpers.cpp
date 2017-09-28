@@ -84,7 +84,11 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
         {&UsdAiShapeAPI::GetAiDoubleSidedToRefractionAttr, "sidedness.AI_RAY_REFRACTED"},
         {&UsdAiShapeAPI::GetAiDoubleSidedToSubsurfaceAttr, "sidedness.AI_RAY_SUBSURFACE"},
         {&UsdAiShapeAPI::GetAiDoubleSidedToDiffuseAttr, "sidedness.AI_RAY_DIFFUSE"},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToGlossyAttr, "sidedness.AI_RAY_GLOSSY"}
+        {&UsdAiShapeAPI::GetAiDoubleSidedToGlossyAttr, "sidedness.AI_RAY_GLOSSY"},
+        // Non visibility attributes where the pattern still applies.
+        {&UsdAiShapeAPI::GetAiOpaqueAttr, "opaque"},
+        {&UsdAiShapeAPI::GetAiReceiveShadowsAttr, "receive_shadows"},
+        {&UsdAiShapeAPI::GetAiSelfShadowsAttr, "self_shadows"}
     } };
 
     for (const auto& each : maskAttrs) {
@@ -96,15 +100,6 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
         }
     }
 
-    // Opaque
-    if (UsdAttribute opaqueAttr = shapeAPI.GetAiOpaqueAttr()) {
-        bool opaque = true;
-        opaqueAttr.Get<bool>(&opaque);
-        if (!opaque) {
-            builder.set("opaque", FnKat::IntAttribute(0));
-        }
-    }
-
     // I'm leaving this outside the loop, because I don't want to
     // add just one extra flag to handle things.
     // Matte
@@ -113,24 +108,6 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
         matteAttr.Get<bool>(&matte);
         if (matte) {
             builder.set("matte", FnKat::IntAttribute(1));
-        }
-    }
-
-    // Receive Shadows
-    if (UsdAttribute receiveShadowsAttr = shapeAPI.GetAiReceiveShadowsAttr()) {
-        bool receiveShadows = true;
-        receiveShadowsAttr.Get<bool>(&receiveShadows);
-        if (!receiveShadows) {
-            builder.set("receive_shadows", FnKat::IntAttribute(0));
-        }
-    }
-
-    // Self Shadows
-    if (UsdAttribute selfShadowsAttr = shapeAPI.GetAiSelfShadowsAttr()) {
-        bool selfShadows = true;
-        selfShadowsAttr.Get<bool>(&selfShadows);
-        if (!selfShadows) {
-            builder.set("self_shadows", FnKat::IntAttribute(0));
         }
     }
 
