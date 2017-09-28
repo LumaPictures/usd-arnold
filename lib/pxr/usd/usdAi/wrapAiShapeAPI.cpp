@@ -120,9 +120,9 @@ _CreateAiVisibleToDiffuseAttr(UsdAiShapeAPI &self,
 }
         
 static UsdAttribute
-_CreateAiVisibleToGossyAttr(UsdAiShapeAPI &self,
+_CreateAiVisibleToGlossyAttr(UsdAiShapeAPI &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateAiVisibleToGossyAttr(
+    return self.CreateAiVisibleToGlossyAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
 }
         
@@ -169,9 +169,9 @@ _CreateAiDoubleSidedToDiffuseAttr(UsdAiShapeAPI &self,
 }
         
 static UsdAttribute
-_CreateAiDoubleSidedToGossyAttr(UsdAiShapeAPI &self,
+_CreateAiDoubleSidedToGlossyAttr(UsdAiShapeAPI &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateAiDoubleSidedToGossyAttr(
+    return self.CreateAiDoubleSidedToGlossyAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
 }
         
@@ -360,10 +360,10 @@ void wrapUsdAiShapeAPI()
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
-        .def("GetAiVisibleToGossyAttr",
-             &This::GetAiVisibleToGossyAttr)
-        .def("CreateAiVisibleToGossyAttr",
-             &_CreateAiVisibleToGossyAttr,
+        .def("GetAiVisibleToGlossyAttr",
+             &This::GetAiVisibleToGlossyAttr)
+        .def("CreateAiVisibleToGlossyAttr",
+             &_CreateAiVisibleToGlossyAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
@@ -409,10 +409,10 @@ void wrapUsdAiShapeAPI()
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
-        .def("GetAiDoubleSidedToGossyAttr",
-             &This::GetAiDoubleSidedToGossyAttr)
-        .def("CreateAiDoubleSidedToGossyAttr",
-             &_CreateAiDoubleSidedToGossyAttr,
+        .def("GetAiDoubleSidedToGlossyAttr",
+             &This::GetAiDoubleSidedToGlossyAttr)
+        .def("CreateAiDoubleSidedToGlossyAttr",
+             &_CreateAiDoubleSidedToGlossyAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         

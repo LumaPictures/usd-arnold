@@ -388,7 +388,7 @@ public:
 
 public:
     // --------------------------------------------------------------------- //
-    // AIVISIBLETOGOSSY 
+    // AIVISIBLETOGLOSSY 
     // --------------------------------------------------------------------- //
     /// Whether the object is visible to the glossy rays.
     ///
@@ -397,15 +397,15 @@ public:
     /// \n  Variability: SdfVariabilityUniform
     /// \n  Fallback Value: True
     USDAI_API
-    UsdAttribute GetAiVisibleToGossyAttr() const;
+    UsdAttribute GetAiVisibleToGlossyAttr() const;
 
-    /// See GetAiVisibleToGossyAttr(), and also 
+    /// See GetAiVisibleToGlossyAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateAiVisibleToGossyAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAiVisibleToGlossyAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // --------------------------------------------------------------------- //
@@ -535,7 +535,7 @@ public:
 
 public:
     // --------------------------------------------------------------------- //
-    // AIDOUBLESIDEDTOGOSSY 
+    // AIDOUBLESIDEDTOGLOSSY 
     // --------------------------------------------------------------------- //
     /// Whether the object is double-sided to the glossy rays.
     ///
@@ -544,15 +544,15 @@ public:
     /// \n  Variability: SdfVariabilityUniform
     /// \n  Fallback Value: True
     USDAI_API
-    UsdAttribute GetAiDoubleSidedToGossyAttr() const;
+    UsdAttribute GetAiDoubleSidedToGlossyAttr() const;
 
-    /// See GetAiDoubleSidedToGossyAttr(), and also 
+    /// See GetAiDoubleSidedToGlossyAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateAiDoubleSidedToGossyAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAiDoubleSidedToGlossyAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // --------------------------------------------------------------------- //

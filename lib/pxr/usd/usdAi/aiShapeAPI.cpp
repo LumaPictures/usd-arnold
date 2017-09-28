@@ -249,13 +249,13 @@ UsdAiShapeAPI::CreateAiVisibleToDiffuseAttr(VtValue const &defaultValue, bool wr
 }
 
 UsdAttribute
-UsdAiShapeAPI::GetAiVisibleToGossyAttr() const
+UsdAiShapeAPI::GetAiVisibleToGlossyAttr() const
 {
     return GetPrim().GetAttribute(UsdAiTokens->aiVisibilityGlossy);
 }
 
 UsdAttribute
-UsdAiShapeAPI::CreateAiVisibleToGossyAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiShapeAPI::CreateAiVisibleToGlossyAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
     return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilityGlossy,
                        SdfValueTypeNames->Bool,
@@ -368,13 +368,13 @@ UsdAiShapeAPI::CreateAiDoubleSidedToDiffuseAttr(VtValue const &defaultValue, boo
 }
 
 UsdAttribute
-UsdAiShapeAPI::GetAiDoubleSidedToGossyAttr() const
+UsdAiShapeAPI::GetAiDoubleSidedToGlossyAttr() const
 {
     return GetPrim().GetAttribute(UsdAiTokens->aiSidednessGlossy);
 }
 
 UsdAttribute
-UsdAiShapeAPI::CreateAiDoubleSidedToGossyAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiShapeAPI::CreateAiDoubleSidedToGlossyAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
     return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessGlossy,
                        SdfValueTypeNames->Bool,
