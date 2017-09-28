@@ -7,9 +7,6 @@ find_package(Maya)
 include_directories(${MAYA_INCLUDE_DIRS})
 link_directories(${MAYA_LIBRARY_DIR})
 
-find_package(Arnold REQUIRED)
-include_directories(${ARNOLD_INCLUDE_DIR})
-
 find_package(MtoA REQUIRED)
 include_directories(${MTOA_INCLUDE_DIR})
 
@@ -28,7 +25,7 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 add_library(${PLUGIN_NAME} SHARED ${SRC})
 set_target_properties(${PLUGIN_NAME} PROPERTIES PREFIX "")
 target_link_libraries(${PLUGIN_NAME}
-                      ${ARNOLD_LIBRARY} ${Boost_LIBRARIES}
+                      ${Boost_LIBRARIES}
                       ${PYTHON_LIBRARIES} ${MAYA_LIBS}
                       ${MTOA_mtoa_api_LIBRARY} tf gf sdf usd usdGeom ${USD_ARNOLD_LIBRARY} usdMaya)
 set_target_properties(${PLUGIN_NAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH ON)
