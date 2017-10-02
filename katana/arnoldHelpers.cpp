@@ -94,7 +94,7 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
     for (const auto& each : maskAttrs) {
         const auto attr = ((shapeAPI).*(each.first))();
         if (!attr.IsValid()) { continue; }
-        bool v = true;
+        auto v = true;
         if (attr.Get(&v) && !v) {
             builder.set(each.second, FnKat::IntAttribute(0));
         }
@@ -104,7 +104,7 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
     // add just one extra flag to handle things.
     // Matte
     if (UsdAttribute matteAttr = shapeAPI.GetAiMatteAttr()) {
-        bool matte = false;
+        auto matte = false;
         matteAttr.Get<bool>(&matte);
         if (matte) {
             builder.set("matte", FnKat::IntAttribute(1));

@@ -16,23 +16,24 @@ void readPrimLocation(
     const auto prim = privateData->GetUsdPrim();
     if (!prim.IsValid()) { return; }
 
-    UsdAiShapeAPI shapeAPI(prim);
-    if (shapeAPI) {
-        FnKat::GroupAttribute arnoldStatements = GetArnoldStatementsGroup(prim);
-        static constexpr auto statementsName = "arnoldStatements";
-        // This code is taken from PxrUsdKatanaAttrMap::toInterface
-        // so we don't have to build some dynamic lists just for this.
-        auto existingAttr = interface.getOutputAttr(statementsName);
-        if (existingAttr.isValid()) {
-            interface.setAttr(statementsName,
-                FnAttribute::GroupBuilder()
-                    .update(existingAttr)
-                    .deepUpdate(arnoldStatements)
-                    .build());
-        } else {
-            // if it's not a GroupAttr we need to call this
-            interface.setAttr(statementsName, arnoldStatements);
-        }
+    // TODO: We should avoid doing this all the time. Only when there is something to setup.
+    // And where it makes sense, like shapes, procedurals and lights.
+    // TODO: Remove the same call from readProcedural, because this function runs on the
+    // procedural locations too.
+    FnKat::GroupAttribute arnoldStatements = GetArnoldStatementsGroup(prim);
+    static constexpr auto statementsName = "arnoldStatements";
+    // This code is taken from PxrUsdKatanaAttrMap::toInterface
+    // so we don't have to build some dynamic lists just for this.
+    auto existingAttr = interface.getOutputAttr(statementsName);
+    if (existingAttr.isValid()) {
+        interface.setAttr(statementsName,
+            FnAttribute::GroupBuilder()
+                .update(existingAttr)
+                .deepUpdate(arnoldStatements)
+                .build());
+    } else {
+        // if it's not a GroupAttr we need to call this
+        interface.setAttr(statementsName, arnoldStatements);
     }
 }
 
