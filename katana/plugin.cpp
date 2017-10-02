@@ -8,6 +8,7 @@
 #include <pxr/usd/usdAi/aiVolume.h>
 
 #include "readProcedural.h"
+#include "readPrim.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
@@ -31,4 +32,6 @@ void registerPlugins()
 
     PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiProcedural>("AiProceduralOp");
     PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiVolume>("AiProceduralOp");
+
+    PxrUsdKatanaUsdInPluginRegistry::RegisterLocationDecoratorFnc(readPrimLocation);
 }
