@@ -7,6 +7,51 @@ using namespace arnold4;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+namespace {
+    template <typename T>
+    struct _attributeDefinition {
+        decltype(&UsdAiShapeAPI::GetAiVisibleToCameraAttr) queryFn;
+        const char* paramName;
+        T defaultValue;
+    };
+
+    template <typename T> inline
+    FnKat::Attribute _createAttribute(const T& v) {
+        return FnKat::IntAttribute(static_cast<int>(v));
+    }
+
+    template <> inline
+    FnKat::Attribute _createAttribute(const bool& v) {
+        return FnKat::IntAttribute(v ? 1 : 0);
+    }
+
+    template <> inline
+    FnKat::Attribute _createAttribute(const float& v) {
+        return FnKat::FloatAttribute(v);
+    }
+
+    template <typename T>
+    bool _handleAttributes(const std::vector<_attributeDefinition<T>>& attributes,
+                          const UsdAiShapeAPI& shapeAPI,
+                          FnKat::GroupBuilder& builder) {
+        auto attributeSet = false;
+        for (const auto& each : attributes) {
+            const auto attr = ((shapeAPI).*(each.queryFn))();
+            if (!attr.IsValid()) { continue; }
+            T v = each.defaultValue;
+            // TODO: Check if we need to filter the defaultValues.
+            // I think because of how Katana behaves we have to set these up,
+            // even if they are the default value, because the USD API handles
+            // the concept of an attribute not being set. Which doesn't work in Arnold.
+            if (attr.Get(&v) && v != each.defaultValue) {
+                builder.set(each.paramName, _createAttribute(v));
+                attributeSet = true;
+            }
+        }
+        return attributeSet;
+    }
+}
+
 std::string
 GetArnoldAttrTypeHint(const SdfValueTypeName& scalarType)
 {
@@ -67,51 +112,51 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
 
     // Sadly std::array needs the size passed as a parameter, so a static const
     // std::vector will do the same in our case.
-    static const std::vector<std::pair<decltype(&UsdAiShapeAPI::GetAiVisibleToCameraAttr), const char*>> maskAttrs = {
-        {&UsdAiShapeAPI::GetAiVisibleToCameraAttr, "visibility.AI_RAY_CAMERA"},
-        {&UsdAiShapeAPI::GetAiVisibleToShadowAttr, "visibility.AI_RAY_SHADOW"},
-        {&UsdAiShapeAPI::GetAiVisibleToReflectionAttr, "visibility.AI_RAY_REFLECTED"},
-        {&UsdAiShapeAPI::GetAiVisibleToRefractionAttr, "visibility.AI_RAY_REFRACTED"},
-        {&UsdAiShapeAPI::GetAiVisibleToSubsurfaceAttr, "visibility.AI_RAY_SUBSURFACE"},
-        {&UsdAiShapeAPI::GetAiVisibleToDiffuseAttr, "visibility.AI_RAY_DIFFUSE"},
-        {&UsdAiShapeAPI::GetAiVisibleToGlossyAttr, "visibility.AI_RAY_GLOSSY"},
+    static const std::vector<_attributeDefinition<bool>> boolAttrs = {
+        {&UsdAiShapeAPI::GetAiVisibleToCameraAttr, "visibility.AI_RAY_CAMERA", true},
+        {&UsdAiShapeAPI::GetAiVisibleToShadowAttr, "visibility.AI_RAY_SHADOW", true},
+        {&UsdAiShapeAPI::GetAiVisibleToReflectionAttr, "visibility.AI_RAY_REFLECTED", true},
+        {&UsdAiShapeAPI::GetAiVisibleToRefractionAttr, "visibility.AI_RAY_REFRACTED", true},
+        {&UsdAiShapeAPI::GetAiVisibleToSubsurfaceAttr, "visibility.AI_RAY_SUBSURFACE", true},
+        {&UsdAiShapeAPI::GetAiVisibleToDiffuseAttr, "visibility.AI_RAY_DIFFUSE", true},
+        {&UsdAiShapeAPI::GetAiVisibleToGlossyAttr, "visibility.AI_RAY_GLOSSY", true},
         // Note, the original code for this setup the visibility even when
         // querying sidedness attributes. I asked Nathan if this was intentional.
         // I changed the parameters to sidedness.<ray_type> for now.
-        {&UsdAiShapeAPI::GetAiDoubleSidedToCameraAttr, "sidedness.AI_RAY_CAMERA"},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToShadowAttr, "sidedness.AI_RAY_SHADOW"},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToReflectionAttr, "sidedness.AI_RAY_REFLECTED"},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToRefractionAttr, "sidedness.AI_RAY_REFRACTED"},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToSubsurfaceAttr, "sidedness.AI_RAY_SUBSURFACE"},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToDiffuseAttr, "sidedness.AI_RAY_DIFFUSE"},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToGlossyAttr, "sidedness.AI_RAY_GLOSSY"},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToCameraAttr, "sidedness.AI_RAY_CAMERA", true},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToShadowAttr, "sidedness.AI_RAY_SHADOW", true},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToReflectionAttr, "sidedness.AI_RAY_REFLECTED", true},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToRefractionAttr, "sidedness.AI_RAY_REFRACTED", true},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToSubsurfaceAttr, "sidedness.AI_RAY_SUBSURFACE", true},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToDiffuseAttr, "sidedness.AI_RAY_DIFFUSE", true},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToGlossyAttr, "sidedness.AI_RAY_GLOSSY", true},
         // Non visibility attributes where the pattern still applies.
-        {&UsdAiShapeAPI::GetAiOpaqueAttr, "opaque"},
-        {&UsdAiShapeAPI::GetAiReceiveShadowsAttr, "receive_shadows"},
-        {&UsdAiShapeAPI::GetAiSelfShadowsAttr, "self_shadows"}
+        {&UsdAiShapeAPI::GetAiOpaqueAttr, "opaque", true},
+        {&UsdAiShapeAPI::GetAiReceiveShadowsAttr, "receive_shadows", true},
+        {&UsdAiShapeAPI::GetAiSelfShadowsAttr, "self_shadows", true},
+        // Parameters with false as their default value.
+        {&UsdAiShapeAPI::GetAiMatteAttr, "matte", false},
+        {&UsdAiShapeAPI::GetAiSmoothingAttr, "smoothing", false},
+        {&UsdAiShapeAPI::GetAiSubdivSmoothDerivsAttr, "subdiv_smooth_derivs", false},
+        {&UsdAiShapeAPI::GetAiDispAutobumpAttr, "disp_autobump", false}
     };
 
-    for (const auto& each : maskAttrs) {
-        const auto attr = ((shapeAPI).*(each.first))();
-        if (!attr.IsValid()) { continue; }
-        auto v = true;
-        if (attr.Get(&v) && !v) {
-            builder.set(each.second, FnKat::IntAttribute(0));
-        }
-    }
+    static const std::vector<_attributeDefinition<float>> floatAttrs {
+        {&UsdAiShapeAPI::GetAiSubdivAdaptiveErrorAttr, "subdiv_adaptive_error", 0.0f},
+        {&UsdAiShapeAPI::GetAiDispPaddingAttr, "disp_padding", 0.0f},
+        {&UsdAiShapeAPI::GetAiDispHeightAttr, "disp_height", 1.0f},
+        {&UsdAiShapeAPI::GetAiDispZeroValueAttr, "disp_zero_value", 0.0f}
+    };
 
-    // I'm leaving this outside the loop, because I don't want to
-    // add just one extra flag to handle things.
-    // Matte
-    if (UsdAttribute matteAttr = shapeAPI.GetAiMatteAttr()) {
-        auto matte = false;
-        matteAttr.Get<bool>(&matte);
-        if (matte) {
-            builder.set("matte", FnKat::IntAttribute(1));
-        }
-    }
+    static const std::vector<_attributeDefinition<unsigned int>> uintAttrs {
+        {&UsdAiShapeAPI::GetAiSubdivIterationsAttr, "iterations", 1},
+    };
 
-    return builder.build();
+    auto needToBuild = _handleAttributes(boolAttrs, shapeAPI, builder);
+    needToBuild |= _handleAttributes(floatAttrs, shapeAPI, builder);
+    needToBuild |= _handleAttributes(uintAttrs, shapeAPI, builder);
+
+    return needToBuild ? builder.build() : FnKat::Attribute();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
