@@ -30,6 +30,11 @@ namespace {
         return FnKat::FloatAttribute(v);
     }
 
+    template <> inline
+    FnKat::Attribute _createAttribute(const TfToken& v) {
+        return FnKat::StringAttribute(v.GetString());
+    }
+
     template <typename T>
     bool _handleAttributes(const std::vector<_attributeDefinition<T>>& attributes,
                           const UsdAiShapeAPI& shapeAPI,
@@ -138,23 +143,37 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
         {&UsdAiShapeAPI::GetAiMatteAttr, "matte", false},
         {&UsdAiShapeAPI::GetAiSmoothingAttr, "smoothing", false},
         {&UsdAiShapeAPI::GetAiSubdivSmoothDerivsAttr, "subdiv_smooth_derivs", false},
-        {&UsdAiShapeAPI::GetAiDispAutobumpAttr, "disp_autobump", false}
+        {&UsdAiShapeAPI::GetAiDispAutobumpAttr, "disp_autobump", false},
     };
 
     static const std::vector<_attributeDefinition<float>> floatAttrs {
         {&UsdAiShapeAPI::GetAiSubdivAdaptiveErrorAttr, "subdiv_adaptive_error", 0.0f},
         {&UsdAiShapeAPI::GetAiDispPaddingAttr, "disp_padding", 0.0f},
         {&UsdAiShapeAPI::GetAiDispHeightAttr, "disp_height", 1.0f},
-        {&UsdAiShapeAPI::GetAiDispZeroValueAttr, "disp_zero_value", 0.0f}
+        {&UsdAiShapeAPI::GetAiDispZeroValueAttr, "disp_zero_value", 0.0f},
     };
 
     static const std::vector<_attributeDefinition<unsigned int>> uintAttrs {
         {&UsdAiShapeAPI::GetAiSubdivIterationsAttr, "iterations", 1},
     };
 
+    static const std::vector<_attributeDefinition<TfToken>> stringAttrs {
+        {&UsdAiShapeAPI::GetAiSubdivTypeAttr, "subdiv_type", TfToken("none")},
+        {&UsdAiShapeAPI::GetAiSubdivAdaptiveMetricAttr, "subdiv_adaptive_metric", TfToken("auto_")},
+        {&UsdAiShapeAPI::GetAiSubdivAdaptiveSpaceAttr, "subdiv_adaptive_space", TfToken("raster")},
+        {&UsdAiShapeAPI::GetAiSubdivUVSmoothingAttr, "subdiv_uv_smoothing", TfToken("pin_corners")},
+    };
+
     auto needToBuild = _handleAttributes(boolAttrs, shapeAPI, builder);
     needToBuild |= _handleAttributes(floatAttrs, shapeAPI, builder);
     needToBuild |= _handleAttributes(uintAttrs, shapeAPI, builder);
+    needToBuild |= _handleAttributes(stringAttrs, shapeAPI, builder);
+
+    // SubdivAdaptiveMetricAttr will require special handling,
+    // if we decide to setup parameters even with the
+    // default values. It requires special handling, because one of the values
+    // is named auto. The way USD generates tokens, it collides with the c++ auto
+    // keyword, so we had to name it auto_.
 
     return needToBuild ? builder.build() : FnKat::Attribute();
 }
