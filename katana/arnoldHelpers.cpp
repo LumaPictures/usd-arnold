@@ -67,7 +67,7 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
 
     // Sadly std::array needs the size passed as a parameter, so a static const
     // std::vector will do the same in our case.
-    static const std::vector<std::pair<decltype(&UsdAiShapeAPI::GetAiVisibleToCameraAttr), const char*>> maskAttrs = { {
+    static const std::vector<std::pair<decltype(&UsdAiShapeAPI::GetAiVisibleToCameraAttr), const char*>> maskAttrs = {
         {&UsdAiShapeAPI::GetAiVisibleToCameraAttr, "visibility.AI_RAY_CAMERA"},
         {&UsdAiShapeAPI::GetAiVisibleToShadowAttr, "visibility.AI_RAY_SHADOW"},
         {&UsdAiShapeAPI::GetAiVisibleToReflectionAttr, "visibility.AI_RAY_REFLECTED"},
@@ -89,7 +89,7 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
         {&UsdAiShapeAPI::GetAiOpaqueAttr, "opaque"},
         {&UsdAiShapeAPI::GetAiReceiveShadowsAttr, "receive_shadows"},
         {&UsdAiShapeAPI::GetAiSelfShadowsAttr, "self_shadows"}
-    } };
+    };
 
     for (const auto& each : maskAttrs) {
         const auto attr = ((shapeAPI).*(each.first))();
