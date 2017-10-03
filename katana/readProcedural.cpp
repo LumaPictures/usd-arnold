@@ -28,13 +28,6 @@ ReadAiProcedural(
     // Read in general attributes for a transformable prim.
     PxrUsdKatanaReadXformable(procedural, data, attrs);
 
-    // Ready in Arnold visibility attributes, etc.
-    FnKat::GroupAttribute arnoldStatements =
-        GetArnoldStatementsGroup(procedural.GetPrim());
-    if (arnoldStatements.isValid()) {
-        attrs.set("arnoldStatements", arnoldStatements);
-    }
-
     const double currentTime = data.GetUsdInArgs()->GetCurrentTime();
 
     // This plugin is registered for both AiProcedural and AiVolume, so check

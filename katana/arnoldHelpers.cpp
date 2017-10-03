@@ -114,6 +114,7 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
     FnKat::GroupBuilder builder;
 
     UsdAiShapeAPI shapeAPI(prim);
+    if (!shapeAPI) { return FnKat::Attribute(); }
 
     // Sadly std::array needs the size passed as a parameter, so a static const
     // std::vector will do the same in our case.
