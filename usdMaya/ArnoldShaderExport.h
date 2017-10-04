@@ -16,7 +16,7 @@ class ArnoldShaderExport : public AiShaderExport {
 public:
     ArnoldShaderExport(const UsdStageRefPtr& _stage, const UsdTimeCode& _time_code, const std::string& parent_scope,
                        const PxrUsdMayaUtil::MDagPathMap<SdfPath>::Type& dag_to_usd);
-    ~ArnoldShaderExport();
+    virtual ~ArnoldShaderExport();
 
 private:
     enum TransformAssignment{
