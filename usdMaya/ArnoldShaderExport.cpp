@@ -49,11 +49,7 @@ ArnoldShaderExport::ArnoldShaderExport(const UsdStageRefPtr& _stage,
 }
 
 ArnoldShaderExport::~ArnoldShaderExport() {
-#if MTOA12
-    MayaScene::End();
-#elif MTOA14
     CMayaScene::End();
-#endif
 }
 
 SdfPath
