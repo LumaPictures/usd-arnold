@@ -95,7 +95,8 @@ void readPrimLocation(
             targetSS << target.GetParentPath().GetName();
             builder.set(paramName, FnKat::StringAttribute(targetSS.str()));
 
-            // TODO: we shouldn't map this twice.
+            // TODO: we might traverse things twice because of this.
+            // Also, infinite recursion, beware!
             mapRelations(relationship, traverseShader);
         }
 
