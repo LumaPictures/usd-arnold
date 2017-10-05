@@ -56,11 +56,20 @@ void readPrimLocation(
         }
     };
 
+    // It's hard to decide the exact frequency of inserts
+    // and reads, but most likely it's the same magnitude.
+    // We could also try a vector here.
+    std::set<std::string> processedMaterials;
+
     // We can't use auto here, otherwise the lambda won't be able to capture itself.
     std::function<void(const UsdPrim&)> traverseShader
         = [&](const UsdPrim& shader) {
         // TODO: we can also use getInputs from the new API.
         const auto shadingNodeHandle = PxrUsdKatanaUtils::GenerateShadingNodeHandle(shader);
+        if (processedMaterials.find(shadingNodeHandle) != processedMaterials.end()) {
+            return;
+        }
+        processedMaterials.insert(shadingNodeHandle);
         static const std::string baseAttr("material.nodes.");
         std::stringstream ss; ss << baseAttr << shadingNodeHandle;
         if (!interface.getOutputAttr(ss.str()).isValid()) { return; }
@@ -71,27 +80,36 @@ void readPrimLocation(
             const auto relationshipName = relationship.GetName().GetString();
             if (relationshipName.compare(0, connectedSourceFor.length(), connectedSourceFor) != 0) { continue; }
 
+            auto paramName = relationshipName.substr(connectedSourceFor.length());
+            auto colonPos = paramName.find(':');
+            if (colonPos != paramName.npos) { // either array elem or component
+                auto comp = paramName.substr(colonPos + 1);
+                paramName = paramName.substr(0, colonPos);
+                if (comp.length() == 0) { continue; } // Just to make sure it's not a malformed
+                // variable, like one that ends with a :
+                if (comp[0] == 'i') { // array connection
+                    paramName += ":" + comp.substr(1);
+                } else {
+                    paramName += "." + comp;
+                }
+            } else {
+                continue; // The existing code already handles this!
+            }
+
             static __thread SdfPathVector targets;
             targets.clear();
             relationship.GetTargets(&targets);
             if (targets.size() != 1) { continue; }
 
-            auto paramName = relationshipName.substr(connectedSourceFor.length());
-            auto colonPos = paramName.find(':');
-            if (colonPos != paramName.npos) { // either array elem or component
-                auto comp = paramName.substr(colonPos + 1);
-                paramName = paramName.substr(0, colonPos + 1);
-                if (comp.length() == 0) { continue; }
-                if (comp[0] == 'i') { // array connection
-                    paramName += comp.substr(1);
-                }
-            }
-
             const auto& target = targets.front();
-            const auto& targetName = target.GetName();
-            colonPos = targetName.find(':');
-            if (colonPos == targetName.npos) { continue; }
-            std::stringstream targetSS; targetSS << targetName.substr(colonPos + 1) << '@';
+            auto targetName = target.GetName();
+            static const std::string outputs("outputs:");
+            if (targetName.compare(0, outputs.length(), outputs) != 0) { continue; }
+            targetName = targetName.substr(outputs.length());
+            if (targetName != "out") { // component connection
+                targetName = "out." + targetName;
+            }
+            std::stringstream targetSS; targetSS << targetName << '@';
             targetSS << target.GetParentPath().GetName();
             builder.set(paramName, FnKat::StringAttribute(targetSS.str()));
 
