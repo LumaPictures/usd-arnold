@@ -1,0 +1,405 @@
+#usda 1.0
+(
+    "WARNING: THIS FILE IS GENERATED.  DO NOT EDIT."
+)
+
+class "AiNodeAPI" (
+    doc = """API for handling prims as Arnold nodes. Provides a consistent
+             interface for getting and setting user parameters."""
+)
+{
+}
+
+class "AiShapeAPI" (
+    doc = """API for interacting with common Arnold shape parameters on prims.
+
+             Currently handles:
+             - The bitmasks `visibility` and `sidedness`
+             - The boolean flags `matte`, `opaque`, `self_shadows`, and
+               `receive_shadows`.
+            
+            To access the ray types without installing arnold,
+            include rayTypes.h and use the namespace arnold.
+
+            Arnold 4 ray types
+                AI_RAY_UNDEFINED   undefined type
+                AI_RAY_CAMERA      ray originating at the camera
+                AI_RAY_SHADOW      shadow ray towards a light source
+                AI_RAY_REFLECTED   mirror reflection ray
+                AI_RAY_REFRACTED   mirror refraction ray
+                AI_RAY_SUBSURFACE  subsurface scattering probe ray
+                AI_RAY_DIFFUSE     indirect diffuse (also known as diffuse GI) ray
+                AI_RAY_GLOSSY      glossy/blurred reflection ray
+                AI_RAY_ALL         mask for all ray types
+                AI_RAY_GENERIC     mask for all ray types"""
+)
+{
+    uniform bool ai:disp_autobump = 0
+    uniform float ai:disp_height = 1
+    uniform float ai:disp_padding = 0
+    uniform float ai:disp_zero_value = 0
+    uniform bool ai:matte = 0 (
+        doc = """This attribute, when enabled, turns an object or group into a
+                 holdout matte. This affects primary rays only.
+
+                 The matte color is always black, and the opacity of the object
+                 is preserved. Shaders will not run on the object, and it will
+                 output all black (including the alpha), except if the opaque
+                 flag is off, in which case shaders will be run to compute the
+                 opacity only. Note that even AOVs output by its shaders in this
+                 case will be black."""
+    )
+    uniform bool ai:opaque = 1 (
+        doc = """Whether the object should be considered fully opaque. By
+                 default all objects are marked as opaque, because it speeds up
+                 rendering considerably."""
+    )
+    uniform bool ai:receive_shadows = 1 (
+        doc = "Whether the object picks up shadows from other objects."
+    )
+    uniform bool ai:self_shadows = 1 (
+        doc = "Whether the object casts shadows on itself."
+    )
+    uniform bool ai:sidedness:camera = 1 (
+        doc = "Whether the object is double-sided to camera rays."
+    )
+    uniform bool ai:sidedness:diffuse = 1 (
+        doc = "Whether the object is double-sided to the diffuse rays."
+    )
+    uniform bool ai:sidedness:glossy = 1 (
+        doc = "Whether the object is double-sided to the glossy rays."
+    )
+    uniform bool ai:sidedness:reflected = 1 (
+        doc = "Whether the object is double-sided to the reflected rays."
+    )
+    uniform bool ai:sidedness:refracted = 1 (
+        doc = "Whether the object is double-sided to the refracted rays."
+    )
+    uniform bool ai:sidedness:shadow = 1 (
+        doc = "Whether the object is double-sided to shadow rays."
+    )
+    uniform bool ai:sidedness:subsurface = 1 (
+        doc = "Whether the object is double-sided to the SSS rays."
+    )
+    uniform bool ai:smoothing = 0
+    uniform float ai:subdiv_adaptive_error = 0
+    uniform token ai:subdiv_adaptive_metric = "auto_" (
+        allowedTokens = ["auto_", "edge_length", "flatness"]
+    )
+    uniform token ai:subdiv_adaptive_space = "raster" (
+        allowedTokens = ["raster", "object"]
+    )
+    rel ai:subdiv_dicing_camera
+    uniform uint ai:subdiv_iterations = 1
+    uniform bool ai:subdiv_smooth_derivs = 0
+    uniform token ai:subdiv_type = "none" (
+        allowedTokens = ["none", "catclark", "linear"]
+    )
+    uniform token ai:subdiv_uv_smoothing = "pin_corners" (
+        allowedTokens = ["pin_corners", "pin_borders", "linear", "smooth"]
+    )
+    uniform bool ai:visibility:camera = 1 (
+        doc = "Whether the object is visible to camera rays."
+    )
+    uniform bool ai:visibility:diffuse = 1 (
+        doc = "Whether the object is visible to the diffuse rays."
+    )
+    uniform bool ai:visibility:glossy = 1 (
+        doc = "Whether the object is visible to the glossy rays."
+    )
+    uniform bool ai:visibility:reflected = 1 (
+        doc = "Whether the object is visible to the reflected rays."
+    )
+    uniform bool ai:visibility:refracted = 1 (
+        doc = "Whether the object is visible to the refracted rays."
+    )
+    uniform bool ai:visibility:shadow = 1 (
+        doc = "Whether the object is visible to shadow rays."
+    )
+    uniform bool ai:visibility:subsurface = 1 (
+        doc = "Whether the object is visible to the SSS rays."
+    )
+}
+
+class "AiMaterialAPI" (
+    doc = "API for Material prims encapsulating Arnold shading networks."
+)
+{
+    rel ai:displacement
+    rel ai:surface
+}
+
+class AiShader "AiShader" (
+    doc = "Represents an Arnold shader node."
+)
+{
+    uniform token info:id (
+        doc = """The id is an identifier for the type or purpose of the 
+        shader. E.g.: Texture or FractalFloat. 
+        The use of this id will depend on the renderer: some will turn it
+        into an actual shader path, some will use it to generate dynamically
+        a shader source code.
+        """
+    )
+}
+
+class AiProcedural "AiProcedural" (
+    doc = "Represents an Arnold procedural shape node."
+)
+{
+    string data = "" (
+        doc = """This string parameter is used to pass parameters that are
+                 parsed by the procedural program and can be used for its
+                 creation/initialization.
+
+                 The format of this string is not standard and is dictated by
+                 the particular implementation of each procedural program. A
+                 better and more compact way of passing parameters and data to
+                 the procedural is through user data."""
+    )
+    uniform string dso (
+        doc = """A procedural can point to ass, obj, and ply filetypes, or to a
+                 dll or so, which will be recognized as a compiled procedural
+                 program."""
+    )
+    float3[] extent (
+        doc = """Extent is a three dimensional range measuring the geometric
+        extent of the authored gprim in its own local space (i.e. its own
+        transform not applied), without accounting for any shader-induced
+        displacement.  Whenever any geometry-affecting attribute is authored
+        for any gprim in a layer, extent must also be authored at the same
+        timesample; failure to do so will result in incorrect bounds-computation.
+        \\sa \\ref UsdGeom_Boundable_Extent.
+        
+        An authored extent on a prim which has children is expected to include
+        the extent of all children, as they will be pruned from BBox computation
+        during traversal."""
+    )
+    uniform bool loat_at_init = 0 (
+        doc = """Whether to force the loading of the procedural during the
+                 initialization process."""
+    )
+    rel proxyPrim (
+        doc = '''The proxyPrim relationship allows us to link a
+        prim whose purpose is "render" to its (single target)
+        purpose="proxy" prim.  This is entirely optional, but can be
+        useful in several scenarios:
+        
+        - In a pipeline that does pruning (for complexity management)
+        by deactivating prims composed from asset references, when we
+        deactivate a purpose="render" prim, we will be able to discover
+        and additionally deactivate its associated purpose="proxy" prim,
+        so that preview renders reflect the pruning accurately.
+        
+        - DCC importers may be able to make more aggressive optimizations
+        for interactive processing and display if they can discover the proxy
+        for a given render prim.
+        
+        - With a little more work, a Hydra-based application will be able
+        to map a picked proxy prim back to its render geometry for selection.
+
+        \\note It is only valid to author the proxyPrim relationship on
+        prims whose purpose is "render".'''
+    )
+    uniform token purpose = "default" (
+        allowedTokens = ["default", "render", "proxy", "guide"]
+        doc = '''Purpose is a concept we have found useful in our pipeline for 
+        classifying geometry into categories that can each be independently
+        included or excluded from traversals of prims on a stage, such as
+        rendering or bounding-box computation traversals.  The fallback
+        purpose, default indicates that a prim has "no special purpose"
+        and should generally be included in all traversals.  Subtrees rooted
+        at a prim with purpose render should generally only be included
+        when performing a "final quality" render.  Subtrees rooted at a prim
+        with purpose proxy should generally only be included when 
+        performing a lightweight proxy render (such as openGL).  Finally,
+        subtrees rooted at a prim with purpose guide should generally
+        only be included when an interactive application has been explicitly
+        asked to "show guides". 
+        
+        In the previous paragraph, when we say "subtrees rooted at a prim",
+        we mean the most ancestral or tallest subtree that has an authored,
+        non-default opinion.  If the purpose of </RootPrim> is set to 
+        "render", then the effective purpose of </RootPrim/ChildPrim> will
+        be "render" even if that prim has a different authored value for
+        purpose.  <b>See ComputePurpose() for details of how purpose 
+        inherits down namespace</b>.
+        
+        As demonstrated in UsdGeomBBoxCache, a traverser should be ready to 
+        accept combinations of included purposes as an input.
+        
+        Purpose render can be useful in creating "light blocker"
+        geometry for raytracing interior scenes.  Purposes render and
+        proxy can be used together to partition a complicated model
+        into a lightweight proxy representation for interactive use, and a
+        fully realized, potentially quite heavy, representation for rendering.
+        One can use UsdVariantSets to create proxy representations, but doing
+        so requires that we recompose parts of the UsdStage in order to change
+        to a different runtime level of detail, and that does not interact
+        well with the needs of multithreaded rendering. Purpose provides us with
+        a better tool for dynamic, interactive complexity management.'''
+    )
+    token visibility = "inherited" (
+        allowedTokens = ["inherited", "invisible"]
+        doc = '''Visibility is meant to be the simplest form of "pruning" 
+        visibility that is supported by most DCC apps.  Visibility is 
+        animatable, allowing a sub-tree of geometry to be present for some 
+        segment of a shot, and absent from others; unlike the action of 
+        deactivating geometry prims, invisible geometry is still 
+        available for inspection, for positioning, for defining volumes, etc.'''
+    )
+    uniform token[] xformOpOrder (
+        doc = """Encodes the sequence of transformation operations in the
+        order in which they should be pushed onto a transform stack while
+        visiting a UsdStage's prims in a graph traversal that will effect
+        the desired positioning for this prim and its descendant prims.
+        
+        You should rarely, if ever, need to manipulate this attribute directly.
+        It is managed by the AddXformOp(), SetResetXformStack(), and
+        SetXformOpOrder(), and consulted by GetOrderedXformOps() and
+        GetLocalTransformation()."""
+    )
+}
+
+class AiVolume "AiVolume" (
+    doc = """Represents an Arnold volume node.
+
+             This class inherits AiProcedural because Arnold's volume node has
+             essentially the same parameters as the procedural node, except for
+             a couple of slight variations."""
+)
+{
+    string data = "" (
+        doc = """This string parameter is used to pass parameters that are
+                 parsed by the procedural program and can be used for its
+                 creation/initialization.
+
+                 The format of this string is not standard and is dictated by
+                 the particular implementation of each procedural program. A
+                 better and more compact way of passing parameters and data to
+                 the procedural is through user data."""
+    )
+    uniform string dso (
+        doc = """A procedural can point to ass, obj, and ply filetypes, or to a
+                 dll or so, which will be recognized as a compiled procedural
+                 program."""
+    )
+    float3[] extent (
+        doc = """Extent is a three dimensional range measuring the geometric
+        extent of the authored gprim in its own local space (i.e. its own
+        transform not applied), without accounting for any shader-induced
+        displacement.  Whenever any geometry-affecting attribute is authored
+        for any gprim in a layer, extent must also be authored at the same
+        timesample; failure to do so will result in incorrect bounds-computation.
+        \\sa \\ref UsdGeom_Boundable_Extent.
+        
+        An authored extent on a prim which has children is expected to include
+        the extent of all children, as they will be pruned from BBox computation
+        during traversal."""
+    )
+    uniform bool loat_at_init = 0 (
+        doc = """Whether to force the loading of the procedural during the
+                 initialization process."""
+    )
+    rel proxyPrim (
+        doc = '''The proxyPrim relationship allows us to link a
+        prim whose purpose is "render" to its (single target)
+        purpose="proxy" prim.  This is entirely optional, but can be
+        useful in several scenarios:
+        
+        - In a pipeline that does pruning (for complexity management)
+        by deactivating prims composed from asset references, when we
+        deactivate a purpose="render" prim, we will be able to discover
+        and additionally deactivate its associated purpose="proxy" prim,
+        so that preview renders reflect the pruning accurately.
+        
+        - DCC importers may be able to make more aggressive optimizations
+        for interactive processing and display if they can discover the proxy
+        for a given render prim.
+        
+        - With a little more work, a Hydra-based application will be able
+        to map a picked proxy prim back to its render geometry for selection.
+
+        \\note It is only valid to author the proxyPrim relationship on
+        prims whose purpose is "render".'''
+    )
+    uniform token purpose = "default" (
+        allowedTokens = ["default", "render", "proxy", "guide"]
+        doc = '''Purpose is a concept we have found useful in our pipeline for 
+        classifying geometry into categories that can each be independently
+        included or excluded from traversals of prims on a stage, such as
+        rendering or bounding-box computation traversals.  The fallback
+        purpose, default indicates that a prim has "no special purpose"
+        and should generally be included in all traversals.  Subtrees rooted
+        at a prim with purpose render should generally only be included
+        when performing a "final quality" render.  Subtrees rooted at a prim
+        with purpose proxy should generally only be included when 
+        performing a lightweight proxy render (such as openGL).  Finally,
+        subtrees rooted at a prim with purpose guide should generally
+        only be included when an interactive application has been explicitly
+        asked to "show guides". 
+        
+        In the previous paragraph, when we say "subtrees rooted at a prim",
+        we mean the most ancestral or tallest subtree that has an authored,
+        non-default opinion.  If the purpose of </RootPrim> is set to 
+        "render", then the effective purpose of </RootPrim/ChildPrim> will
+        be "render" even if that prim has a different authored value for
+        purpose.  <b>See ComputePurpose() for details of how purpose 
+        inherits down namespace</b>.
+        
+        As demonstrated in UsdGeomBBoxCache, a traverser should be ready to 
+        accept combinations of included purposes as an input.
+        
+        Purpose render can be useful in creating "light blocker"
+        geometry for raytracing interior scenes.  Purposes render and
+        proxy can be used together to partition a complicated model
+        into a lightweight proxy representation for interactive use, and a
+        fully realized, potentially quite heavy, representation for rendering.
+        One can use UsdVariantSets to create proxy representations, but doing
+        so requires that we recompose parts of the UsdStage in order to change
+        to a different runtime level of detail, and that does not interact
+        well with the needs of multithreaded rendering. Purpose provides us with
+        a better tool for dynamic, interactive complexity management.'''
+    )
+    float step_size = 0 (
+        doc = """Sampling step size inside the volume.
+                 I think 0 means automatic."""
+    )
+    token visibility = "inherited" (
+        allowedTokens = ["inherited", "invisible"]
+        doc = '''Visibility is meant to be the simplest form of "pruning" 
+        visibility that is supported by most DCC apps.  Visibility is 
+        animatable, allowing a sub-tree of geometry to be present for some 
+        segment of a shot, and absent from others; unlike the action of 
+        deactivating geometry prims, invisible geometry is still 
+        available for inspection, for positioning, for defining volumes, etc.'''
+    )
+    uniform token[] xformOpOrder (
+        doc = """Encodes the sequence of transformation operations in the
+        order in which they should be pushed onto a transform stack while
+        visiting a UsdStage's prims in a graph traversal that will effect
+        the desired positioning for this prim and its descendant prims.
+        
+        You should rarely, if ever, need to manipulate this attribute directly.
+        It is managed by the AddXformOp(), SetResetXformStack(), and
+        SetXformOpOrder(), and consulted by GetOrderedXformOps() and
+        GetLocalTransformation()."""
+    )
+}
+
+class AiAOV "AiAOV" (
+    doc = """Represents an Arnold output target. 
+
+             Defined by a name, a data type, a driver, and a filter."""
+)
+{
+    token dataType = "RGBA" (
+        allowedTokens = ["BYTE", "INT", "UINT", "BOOL", "FLOAT", "RGB", "RGBA", "VECTOR", "POINT", "POINT2", "POINTER", "NODE", "ARRAY", "MATRIX"]
+    )
+    rel driver
+    rel filter
+    uniform string name (
+        doc = "The name of the AOV."
+    )
+}
+

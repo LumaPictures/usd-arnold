@@ -40,7 +40,12 @@ include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
 
 if (BUILD_USD_PLUGIN)
-    add_subdirectory(lib/pxr/usd/usdAi)
+    if (ARNOLD_VERSION_ARCH_NUM VERSION_GREATER "4")
+        # add_subdirectory(lib/pxr/usd/usdAi) TODO: !!!
+    else ()
+        add_subdirectory(lib4/pxr/usd/usdAi)
+    endif ()
+    
 endif ()
 
 if (BUILD_USD_MAYA_PLUGIN)
