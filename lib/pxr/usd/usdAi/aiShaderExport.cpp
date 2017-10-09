@@ -21,15 +21,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 namespace {
 
     inline GfMatrix4f NodeGetMatrix(const AtNode* node, const char* param) {
-        AtMatrix mat;
-        AiNodeGetMatrix(node, param, mat);
-        return GfMatrix4f(mat);
+        const auto mat = AiNodeGetMatrix(node, param);
+        return GfMatrix4f(mat.data);
     };
 
     inline GfMatrix4f ArrayGetMatrix(const AtArray* arr, uint32_t i, const char* file, uint32_t line) {
-        AtMatrix mat;
-        AiArrayGetMtxFunc(arr, i, mat, file, line);
-        return GfMatrix4f(mat);
+        const auto mat = AiArrayGetMtxFunc(arr, i, file, line);
+        return GfMatrix4f(mat.data);
     }
 
     inline const char* GetEnum(AtEnum en, int32_t id) {
@@ -54,11 +52,17 @@ namespace {
         l = r;
     };
 
+    template <> inline
+    void convert<std::string, AtString>(std::string& l, const AtString& r) {
+        l = r.c_str();
+    };
+
     template <typename T, typename R = T> inline
     void export_array(UsdShadeInput& param, const AtArray* arr, R (*f) (const AtArray*, uint32_t, const char*, int32_t)) {
         // we already check the validity of the array before this call
-        VtArray<T> out_arr(arr->nelements);
-        for (auto i = 0u; i < arr->nelements; ++i) {
+        const auto nelements = AiArrayGetNumElements(arr);
+        VtArray<T> out_arr(nelements);
+        for (auto i = 0u; i < nelements; ++i) {
             convert(out_arr[i], f(arr, i, __FILE__, __LINE__));
         }
         param.Set(VtValue(out_arr));
@@ -68,6 +72,7 @@ namespace {
         const SdfValueTypeName& type;
         std::function<VtValue(const AtNode*, const char*)> f;
 
+        // TODO: see if move works in this case.
         simple_type(const SdfValueTypeName& _type, std::function<VtValue(const AtNode*, const char*)> _f) :
             type(_type), f(_f) { }
     };
@@ -82,8 +87,7 @@ namespace {
         {AI_TYPE_RGB, {SdfValueTypeNames->Color3f, [](const AtNode* no, const char* na) -> VtValue { const auto v = AiNodeGetRGB(no, na); return VtValue(GfVec3f(v.r, v.g, v.b)); }}},
         {AI_TYPE_RGBA, {SdfValueTypeNames->Color4f, [](const AtNode* no, const char* na) -> VtValue { const auto v = AiNodeGetRGBA(no, na); return VtValue(GfVec4f(v.r, v.g, v.b, v.a)); }}},
         {AI_TYPE_VECTOR, {SdfValueTypeNames->Vector3f, [](const AtNode* no, const char* na) -> VtValue { const auto v = AiNodeGetVec(no, na); return VtValue(GfVec3f(v.x, v.y, v.z)); }}},
-        {AI_TYPE_POINT, {SdfValueTypeNames->Vector3f, [](const AtNode* no, const char* na) -> VtValue { const auto v = AiNodeGetPnt(no, na); return VtValue(GfVec3f(v.x, v.y, v.z)); }}},
-        {AI_TYPE_POINT2, {SdfValueTypeNames->Float2, [](const AtNode* no, const char* na) -> VtValue { const auto v = AiNodeGetPnt2(no, na); return VtValue(GfVec2f(v.x, v.y)); }}},
+        {AI_TYPE_VECTOR2, {SdfValueTypeNames->Float2, [](const AtNode* no, const char* na) -> VtValue { const auto v = AiNodeGetVec2(no, na); return VtValue(GfVec2f(v.x, v.y)); }}},
         {AI_TYPE_STRING, {SdfValueTypeNames->String, [](const AtNode* no, const char* na) -> VtValue { return VtValue(AiNodeGetStr(no, na)); }}},
         {AI_TYPE_NODE, {SdfValueTypeNames->String, nullptr}},
         {AI_TYPE_MATRIX, {SdfValueTypeNames->Matrix4d, [](const AtNode* no, const char* na) -> VtValue { return VtValue(NodeGetMatrix(no, na)); }}},
@@ -124,15 +128,15 @@ namespace {
         {AI_TYPE_RGB, {SdfValueTypeNames->Color3fArray, [](UsdShadeInput& p, const AtArray* a) { export_array<GfVec3f, AtRGB>(p, a, AiArrayGetRGBFunc); }}},
         {AI_TYPE_RGBA, {SdfValueTypeNames->Color4fArray, [](UsdShadeInput& p, const AtArray* a) { export_array<GfVec4f, AtRGBA>(p, a, AiArrayGetRGBAFunc); }}},
         {AI_TYPE_VECTOR, {SdfValueTypeNames->Vector3fArray, [](UsdShadeInput& p, const AtArray* a) { export_array<GfVec3f, AtVector>(p, a, AiArrayGetVecFunc); }}},
-        {AI_TYPE_POINT, {SdfValueTypeNames->Vector3fArray, [](UsdShadeInput& p, const AtArray* a) { export_array<GfVec3f, AtPoint>(p, a, AiArrayGetPntFunc); }}},
-        {AI_TYPE_POINT2, {SdfValueTypeNames->Float2Array, [](UsdShadeInput& p, const AtArray* a) { export_array<GfVec2f, AtPoint2>(p, a, AiArrayGetPnt2Func); }}},
-        {AI_TYPE_STRING, {SdfValueTypeNames->StringArray, [](UsdShadeInput& p, const AtArray* a) { export_array<std::string, const char*>(p, a, AiArrayGetStrFunc); }}},
+        {AI_TYPE_VECTOR2, {SdfValueTypeNames->Float2Array, [](UsdShadeInput& p, const AtArray* a) { export_array<GfVec2f, AtVector2>(p, a, AiArrayGetVec2Func); }}},
+        {AI_TYPE_STRING, {SdfValueTypeNames->StringArray, [](UsdShadeInput& p, const AtArray* a) { export_array<std::string, AtString>(p, a, AiArrayGetStrFunc); }}},
         {AI_TYPE_NODE, {SdfValueTypeNames->StringArray, nullptr}},
         {AI_TYPE_MATRIX,
             {SdfValueTypeNames->Matrix4dArray,
                            [](UsdShadeInput& p, const AtArray* a) {
-                               VtArray<GfMatrix4d> arr(a->nelements);
-                               for (auto i = 0u; i < a->nelements; ++i) {
+                               const auto nelements = AiArrayGetNumElements(a);
+                               VtArray<GfMatrix4d> arr(nelements);
+                               for (auto i = 0u; i < nelements; ++i) {
                                    arr[i] = GfMatrix4d(ArrayGetMatrix(a, i, __FILE__, __LINE__));
                                }
                            }
@@ -173,16 +177,12 @@ namespace {
         };
         if (index == -1) {
             auto itype = get_simple_type(static_cast<uint8_t>(output_type));
-            if (itype == nullptr) {
-                return node_comp_name;
-            } else {
-                return {"out", itype->type};
-            }
+            return itype == nullptr ? node_comp_name : out_comp_t {"out", itype->type};
         } else {
             if (output_type == AI_TYPE_RGBA || output_type == AI_TYPE_RGB) {
                 return rgba_comp_names[std::min(static_cast<size_t>(index), rgba_comp_names.size() - 1)];
-            } else if (output_type == AI_TYPE_VECTOR || output_type == AI_TYPE_POINT ||
-                       output_type == AI_TYPE_POINT2) {
+            } else if (output_type == AI_TYPE_VECTOR ||
+                       output_type == AI_TYPE_VECTOR2) {
                 return vec_comp_names[std::min(static_cast<size_t>(index), vec_comp_names.size() - 1)];
             } else {
                 return node_comp_name;
@@ -209,9 +209,9 @@ namespace {
             return rgb_names;
         } else if (input_type == AI_TYPE_RGBA) {
             return rgba_names;
-        } else if (input_type == AI_TYPE_POINT || input_type == AI_TYPE_VECTOR) {
+        } else if (input_type == AI_TYPE_VECTOR) {
             return vec_names;
-        } else if (input_type == AI_TYPE_POINT2) {
+        } else if (input_type == AI_TYPE_VECTOR2) {
             return vec2_names;
         } else {
             return empty;
@@ -227,8 +227,6 @@ AiShaderExport::AiShaderExport(const UsdStagePtr& _stage, const SdfPath& parent_
 {
     auto scope = UsdGeomScope::Define(m_stage, m_shaders_scope);
 }
-
-AiShaderExport::~AiShaderExport() {}
 
 void AiShaderExport::clean_arnold_name(std::string& name) {
     std::replace(name.begin(), name.end(), '@', '_');
@@ -343,10 +341,14 @@ AiShaderExport::export_parameter(
     const AtNode* arnold_node, UsdAiShader& shader, const char* arnold_param_name, uint8_t arnold_param_type, bool user) {
     if (arnold_param_type == AI_TYPE_ARRAY) {
         const auto arr = AiNodeGetArray(arnold_node, arnold_param_name);
-        if (arr == nullptr || arr->nelements == 0 || arr->nkeys == 0 || arr->type == AI_TYPE_ARRAY) {
+        const auto atype = AiArrayGetType(arr);
+        if (arr == nullptr ||
+            AiArrayGetNumElements(arr) == 0 ||
+            AiArrayGetNumKeys(arr) == 0 ||
+            atype == AI_TYPE_ARRAY) {
             return;
         }
-        const auto iter_type = get_array_type(arr->type);
+        const auto iter_type = get_array_type(atype);
         if (iter_type == nullptr) {
             return;
         }
@@ -397,7 +399,7 @@ AiShaderExport::export_arnold_node(const AtNode* arnold_node, SdfPath& parent_pa
         return it->second;
     }
     std::string node_name(AiNodeGetName(arnold_node));
-    if (node_name == "") {
+    if (node_name.empty()) {
         // TODO: raise error
         return SdfPath();
     }
@@ -417,7 +419,8 @@ AiShaderExport::export_arnold_node(const AtNode* arnold_node, SdfPath& parent_pa
         if (strcmp(pname, "name") == 0) {
             continue;
         }
-        if (exportable_params != nullptr && exportable_params->find(pname) == exportable_params->end()) {
+        if (exportable_params != nullptr &&
+            exportable_params->find(pname.c_str()) == exportable_params->end()) {
             continue;
         }
         const auto ptype = static_cast<uint8_t>(AiParamGetType(pentry));

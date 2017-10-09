@@ -41,7 +41,7 @@ include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
 if (BUILD_USD_PLUGIN)
     if (ARNOLD_VERSION_ARCH_NUM VERSION_GREATER "4")
-        # add_subdirectory(lib/pxr/usd/usdAi) TODO: !!!
+        add_subdirectory(lib/pxr/usd/usdAi)
     else ()
         add_subdirectory(lib4/pxr/usd/usdAi)
     endif ()

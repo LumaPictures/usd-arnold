@@ -18,25 +18,10 @@ class "AiShapeAPI" (
              - The boolean flags `matte`, `opaque`, `self_shadows`, and
                `receive_shadows`.
             
-            In case of ray types, there is a difference between the 4th
-            and 5th major release of Arnold. We provide both in their
-            respective namespace. In case arnold headers are not present
-            just use the provided macros.
-            USD_ARNOLD_IMPORT_ARNOLD4 pr USD_ARNOLD_IMPORT_ARNOLD5
-    
-            For Arnold 4
-                AI_RAY_UNDEFINED   undefined type
-                AI_RAY_CAMERA      ray originating at the camera
-                AI_RAY_SHADOW      shadow ray towards a light source
-                AI_RAY_REFLECTED   mirror reflection ray
-                AI_RAY_REFRACTED   mirror refraction ray
-                AI_RAY_SUBSURFACE  subsurface scattering probe ray
-                AI_RAY_DIFFUSE     indirect diffuse (also known as diffuse GI) ray
-                AI_RAY_GLOSSY      glossy/blurred reflection ray
-                AI_RAY_ALL         mask for all ray types
-                AI_RAY_GENERIC     mask for all ray types
+            To access the ray types without installing arnold,
+            include rayTypes.h and use the namespace arnold.
 
-            For Arnold 5
+            Arnold 5 ray types
                 AI_RAY_UNDEFINED         undefined type
                 AI_RAY_CAMERA            ray originating at the camera
                 AI_RAY_SHADOW            shadow ray towards a light source

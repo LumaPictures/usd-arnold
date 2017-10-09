@@ -12,7 +12,7 @@ public:
     AiShaderExport(const UsdStagePtr& _stage,
                    const SdfPath& parent_scope = SdfPath(),
                    const UsdTimeCode& _time_code = UsdTimeCode::Default());
-    ~AiShaderExport();
+    ~AiShaderExport() = default;
     void bind_material(const SdfPath& shader_path, const SdfPath& shape_path);
     SdfPath export_material(const char* material_name,
                             AtNode* surf_shader, AtNode* disp_shader=nullptr);
