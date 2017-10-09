@@ -724,6 +724,14 @@ void wrapUsdAiShapeAPI()
 namespace {
 
 WRAP_CUSTOM {
+    _class
+        .def("ComputeVisibility",
+             &UsdAiShapeAPI::ComputeVisibility)
+        .def("ComputeSidedness",
+             &UsdAiShapeAPI::ComputeSidedness)
+        .def("ComputeAutobumpVisibility",
+             &UsdAiShapeAPI::ComputeAutobumpVisibility)
+        ;
 }
 
 }
