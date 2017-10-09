@@ -130,6 +130,23 @@ UsdAiShapeAPI::CreateAiReceiveShadowsAttr(VtValue const &defaultValue, bool writ
 }
 
 UsdAttribute
+UsdAiShapeAPI::GetAiRayBiasAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiRay_bias);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiRayBiasAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiRay_bias,
+                       SdfValueTypeNames->Float,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
 UsdAiShapeAPI::GetAiSelfShadowsAttr() const
 {
     return GetPrim().GetAttribute(UsdAiTokens->aiSelf_shadows);
@@ -181,15 +198,15 @@ UsdAiShapeAPI::CreateAiVisibleToShadowAttr(VtValue const &defaultValue, bool wri
 }
 
 UsdAttribute
-UsdAiShapeAPI::GetAiVisibleToReflectionAttr() const
+UsdAiShapeAPI::GetAiVisibleToDiffuseTransmitAttr() const
 {
-    return GetPrim().GetAttribute(UsdAiTokens->aiVisibilityReflected);
+    return GetPrim().GetAttribute(UsdAiTokens->aiVisibilityDiffuse_transmit);
 }
 
 UsdAttribute
-UsdAiShapeAPI::CreateAiVisibleToReflectionAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiShapeAPI::CreateAiVisibleToDiffuseTransmitAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilityReflected,
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilityDiffuse_transmit,
                        SdfValueTypeNames->Bool,
                        /* custom = */ false,
                        SdfVariabilityUniform,
@@ -198,15 +215,66 @@ UsdAiShapeAPI::CreateAiVisibleToReflectionAttr(VtValue const &defaultValue, bool
 }
 
 UsdAttribute
-UsdAiShapeAPI::GetAiVisibleToRefractionAttr() const
+UsdAiShapeAPI::GetAiVisibleToSpecularTransmitAttr() const
 {
-    return GetPrim().GetAttribute(UsdAiTokens->aiVisibilityRefracted);
+    return GetPrim().GetAttribute(UsdAiTokens->aiVisibilitySpecular_transmit);
 }
 
 UsdAttribute
-UsdAiShapeAPI::CreateAiVisibleToRefractionAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiShapeAPI::CreateAiVisibleToSpecularTransmitAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilityRefracted,
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilitySpecular_transmit,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiVisibleToVolumeAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiVisibilityVolume);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiVisibleToVolumeAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilityVolume,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiVisibleToDiffuseReflectAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiVisibilityDiffuse_reflect);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiVisibleToDiffuseReflectAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilityDiffuse_reflect,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiVisibleToSpecularReflectAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiVisibilitySpecular_reflect);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiVisibleToSpecularReflectAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilitySpecular_reflect,
                        SdfValueTypeNames->Bool,
                        /* custom = */ false,
                        SdfVariabilityUniform,
@@ -224,40 +292,6 @@ UsdAttribute
 UsdAiShapeAPI::CreateAiVisibleToSubsurfaceAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
     return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilitySubsurface,
-                       SdfValueTypeNames->Bool,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
-}
-
-UsdAttribute
-UsdAiShapeAPI::GetAiVisibleToDiffuseAttr() const
-{
-    return GetPrim().GetAttribute(UsdAiTokens->aiVisibilityDiffuse);
-}
-
-UsdAttribute
-UsdAiShapeAPI::CreateAiVisibleToDiffuseAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilityDiffuse,
-                       SdfValueTypeNames->Bool,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
-}
-
-UsdAttribute
-UsdAiShapeAPI::GetAiVisibleToGlossyAttr() const
-{
-    return GetPrim().GetAttribute(UsdAiTokens->aiVisibilityGlossy);
-}
-
-UsdAttribute
-UsdAiShapeAPI::CreateAiVisibleToGlossyAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVisibilityGlossy,
                        SdfValueTypeNames->Bool,
                        /* custom = */ false,
                        SdfVariabilityUniform,
@@ -300,15 +334,15 @@ UsdAiShapeAPI::CreateAiDoubleSidedToShadowAttr(VtValue const &defaultValue, bool
 }
 
 UsdAttribute
-UsdAiShapeAPI::GetAiDoubleSidedToReflectionAttr() const
+UsdAiShapeAPI::GetAiDoubleSidedToDiffuseTransmitAttr() const
 {
-    return GetPrim().GetAttribute(UsdAiTokens->aiSidednessReflected);
+    return GetPrim().GetAttribute(UsdAiTokens->aiSidednessDiffuse_transmit);
 }
 
 UsdAttribute
-UsdAiShapeAPI::CreateAiDoubleSidedToReflectionAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiShapeAPI::CreateAiDoubleSidedToDiffuseTransmitAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessReflected,
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessDiffuse_transmit,
                        SdfValueTypeNames->Bool,
                        /* custom = */ false,
                        SdfVariabilityUniform,
@@ -317,15 +351,66 @@ UsdAiShapeAPI::CreateAiDoubleSidedToReflectionAttr(VtValue const &defaultValue, 
 }
 
 UsdAttribute
-UsdAiShapeAPI::GetAiDoubleSidedToRefractionAttr() const
+UsdAiShapeAPI::GetAiDoubleSidedToSpecularTransmitAttr() const
 {
-    return GetPrim().GetAttribute(UsdAiTokens->aiSidednessRefracted);
+    return GetPrim().GetAttribute(UsdAiTokens->aiSidednessSpecular_transmit);
 }
 
 UsdAttribute
-UsdAiShapeAPI::CreateAiDoubleSidedToRefractionAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiShapeAPI::CreateAiDoubleSidedToSpecularTransmitAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessRefracted,
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessSpecular_transmit,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiDoubleSidedToVolumeAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSidednessVolume);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiDoubleSidedToVolumeAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessVolume,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiDoubleSidedToDiffuseReflectAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSidednessDiffuse_reflect);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiDoubleSidedToDiffuseReflectAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessDiffuse_reflect,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiDoubleSidedToSpecularReflectAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiSidednessSpecular_reflect);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiDoubleSidedToSpecularReflectAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessSpecular_reflect,
                        SdfValueTypeNames->Bool,
                        /* custom = */ false,
                        SdfVariabilityUniform,
@@ -351,15 +436,15 @@ UsdAiShapeAPI::CreateAiDoubleSidedToSubsurfaceAttr(VtValue const &defaultValue, 
 }
 
 UsdAttribute
-UsdAiShapeAPI::GetAiDoubleSidedToDiffuseAttr() const
+UsdAiShapeAPI::GetAiAutobumpVisibleToCameraAttr() const
 {
-    return GetPrim().GetAttribute(UsdAiTokens->aiSidednessDiffuse);
+    return GetPrim().GetAttribute(UsdAiTokens->aiAutobump_visibilityCamera);
 }
 
 UsdAttribute
-UsdAiShapeAPI::CreateAiDoubleSidedToDiffuseAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiShapeAPI::CreateAiAutobumpVisibleToCameraAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessDiffuse,
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiAutobump_visibilityCamera,
                        SdfValueTypeNames->Bool,
                        /* custom = */ false,
                        SdfVariabilityUniform,
@@ -368,15 +453,151 @@ UsdAiShapeAPI::CreateAiDoubleSidedToDiffuseAttr(VtValue const &defaultValue, boo
 }
 
 UsdAttribute
-UsdAiShapeAPI::GetAiDoubleSidedToGlossyAttr() const
+UsdAiShapeAPI::GetAiAutobumpVisibleToShadowAttr() const
 {
-    return GetPrim().GetAttribute(UsdAiTokens->aiSidednessGlossy);
+    return GetPrim().GetAttribute(UsdAiTokens->aiAutobump_visibilityShadow);
 }
 
 UsdAttribute
-UsdAiShapeAPI::CreateAiDoubleSidedToGlossyAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiShapeAPI::CreateAiAutobumpVisibleToShadowAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiSidednessGlossy,
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiAutobump_visibilityShadow,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiAutobumpVisibleToDiffuseTransmitAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiAutobump_visibilityDiffuse_transmit);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiAutobumpVisibleToDiffuseTransmitAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiAutobump_visibilityDiffuse_transmit,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiAutobumpVisibleToSpecularTransmitAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiAutobump_visibilitySpecular_transmit);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiAutobumpVisibleToSpecularTransmitAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiAutobump_visibilitySpecular_transmit,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiAutobumpVisibleToVolumeAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiAutobump_visibilityVolume);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiAutobumpVisibleToVolumeAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiAutobump_visibilityVolume,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiAutobumpVisibleToDiffuseReflectAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiAutobump_visibilityDiffuse_reflect);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiAutobumpVisibleToDiffuseReflectAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiAutobump_visibilityDiffuse_reflect,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiAutobumpVisibleToSpecularReflectAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiAutobump_visibilitySpecular_reflect);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiAutobumpVisibleToSpecularReflectAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiAutobump_visibilitySpecular_reflect,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiAutobumpVisibleToSubsurfaceAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiAutobump_visibilitySubsurface);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiAutobumpVisibleToSubsurfaceAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiAutobump_visibilitySubsurface,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiUseLightGroupAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiUse_light_group);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiUseLightGroupAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiUse_light_group,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiUseShadowGroupAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiUse_shadow_group);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiUseShadowGroupAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiUse_shadow_group,
                        SdfValueTypeNames->Bool,
                        /* custom = */ false,
                        SdfVariabilityUniform,
@@ -589,6 +810,32 @@ UsdAiShapeAPI::CreateAiDispAutobumpAttr(VtValue const &defaultValue, bool writeS
 }
 
 UsdRelationship
+UsdAiShapeAPI::GetAiLightGroupRel() const
+{
+    return GetPrim().GetRelationship(UsdAiTokens->aiLight_group);
+}
+
+UsdRelationship
+UsdAiShapeAPI::CreateAiLightGroupRel() const
+{
+    return GetPrim().CreateRelationship(UsdAiTokens->aiLight_group,
+                       /* custom = */ false);
+}
+
+UsdRelationship
+UsdAiShapeAPI::GetAiShadowGroupRel() const
+{
+    return GetPrim().GetRelationship(UsdAiTokens->aiShadow_group);
+}
+
+UsdRelationship
+UsdAiShapeAPI::CreateAiShadowGroupRel() const
+{
+    return GetPrim().CreateRelationship(UsdAiTokens->aiShadow_group,
+                       /* custom = */ false);
+}
+
+UsdRelationship
 UsdAiShapeAPI::GetAiSubdiv_dicing_cameraRel() const
 {
     return GetPrim().GetRelationship(UsdAiTokens->aiSubdiv_dicing_camera);
@@ -621,21 +868,34 @@ UsdAiShapeAPI::GetSchemaAttributeNames(bool includeInherited)
         UsdAiTokens->aiOpaque,
         UsdAiTokens->aiMatte,
         UsdAiTokens->aiReceive_shadows,
+        UsdAiTokens->aiRay_bias,
         UsdAiTokens->aiSelf_shadows,
         UsdAiTokens->aiVisibilityCamera,
         UsdAiTokens->aiVisibilityShadow,
-        UsdAiTokens->aiVisibilityReflected,
-        UsdAiTokens->aiVisibilityRefracted,
+        UsdAiTokens->aiVisibilityDiffuse_transmit,
+        UsdAiTokens->aiVisibilitySpecular_transmit,
+        UsdAiTokens->aiVisibilityVolume,
+        UsdAiTokens->aiVisibilityDiffuse_reflect,
+        UsdAiTokens->aiVisibilitySpecular_reflect,
         UsdAiTokens->aiVisibilitySubsurface,
-        UsdAiTokens->aiVisibilityDiffuse,
-        UsdAiTokens->aiVisibilityGlossy,
         UsdAiTokens->aiSidednessCamera,
         UsdAiTokens->aiSidednessShadow,
-        UsdAiTokens->aiSidednessReflected,
-        UsdAiTokens->aiSidednessRefracted,
+        UsdAiTokens->aiSidednessDiffuse_transmit,
+        UsdAiTokens->aiSidednessSpecular_transmit,
+        UsdAiTokens->aiSidednessVolume,
+        UsdAiTokens->aiSidednessDiffuse_reflect,
+        UsdAiTokens->aiSidednessSpecular_reflect,
         UsdAiTokens->aiSidednessSubsurface,
-        UsdAiTokens->aiSidednessDiffuse,
-        UsdAiTokens->aiSidednessGlossy,
+        UsdAiTokens->aiAutobump_visibilityCamera,
+        UsdAiTokens->aiAutobump_visibilityShadow,
+        UsdAiTokens->aiAutobump_visibilityDiffuse_transmit,
+        UsdAiTokens->aiAutobump_visibilitySpecular_transmit,
+        UsdAiTokens->aiAutobump_visibilityVolume,
+        UsdAiTokens->aiAutobump_visibilityDiffuse_reflect,
+        UsdAiTokens->aiAutobump_visibilitySpecular_reflect,
+        UsdAiTokens->aiAutobump_visibilitySubsurface,
+        UsdAiTokens->aiUse_light_group,
+        UsdAiTokens->aiUse_shadow_group,
         UsdAiTokens->aiSmoothing,
         UsdAiTokens->aiSubdiv_type,
         UsdAiTokens->aiSubdiv_iterations,

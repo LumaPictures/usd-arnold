@@ -71,6 +71,13 @@ _CreateAiReceiveShadowsAttr(UsdAiShapeAPI &self,
 }
         
 static UsdAttribute
+_CreateAiRayBiasAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiRayBiasAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
+}
+        
+static UsdAttribute
 _CreateAiSelfShadowsAttr(UsdAiShapeAPI &self,
                                       object defaultVal, bool writeSparsely) {
     return self.CreateAiSelfShadowsAttr(
@@ -92,16 +99,37 @@ _CreateAiVisibleToShadowAttr(UsdAiShapeAPI &self,
 }
         
 static UsdAttribute
-_CreateAiVisibleToReflectionAttr(UsdAiShapeAPI &self,
+_CreateAiVisibleToDiffuseTransmitAttr(UsdAiShapeAPI &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateAiVisibleToReflectionAttr(
+    return self.CreateAiVisibleToDiffuseTransmitAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
 }
         
 static UsdAttribute
-_CreateAiVisibleToRefractionAttr(UsdAiShapeAPI &self,
+_CreateAiVisibleToSpecularTransmitAttr(UsdAiShapeAPI &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateAiVisibleToRefractionAttr(
+    return self.CreateAiVisibleToSpecularTransmitAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiVisibleToVolumeAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiVisibleToVolumeAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiVisibleToDiffuseReflectAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiVisibleToDiffuseReflectAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiVisibleToSpecularReflectAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiVisibleToSpecularReflectAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
 }
         
@@ -109,20 +137,6 @@ static UsdAttribute
 _CreateAiVisibleToSubsurfaceAttr(UsdAiShapeAPI &self,
                                       object defaultVal, bool writeSparsely) {
     return self.CreateAiVisibleToSubsurfaceAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
-}
-        
-static UsdAttribute
-_CreateAiVisibleToDiffuseAttr(UsdAiShapeAPI &self,
-                                      object defaultVal, bool writeSparsely) {
-    return self.CreateAiVisibleToDiffuseAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
-}
-        
-static UsdAttribute
-_CreateAiVisibleToGlossyAttr(UsdAiShapeAPI &self,
-                                      object defaultVal, bool writeSparsely) {
-    return self.CreateAiVisibleToGlossyAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
 }
         
@@ -141,16 +155,37 @@ _CreateAiDoubleSidedToShadowAttr(UsdAiShapeAPI &self,
 }
         
 static UsdAttribute
-_CreateAiDoubleSidedToReflectionAttr(UsdAiShapeAPI &self,
+_CreateAiDoubleSidedToDiffuseTransmitAttr(UsdAiShapeAPI &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateAiDoubleSidedToReflectionAttr(
+    return self.CreateAiDoubleSidedToDiffuseTransmitAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
 }
         
 static UsdAttribute
-_CreateAiDoubleSidedToRefractionAttr(UsdAiShapeAPI &self,
+_CreateAiDoubleSidedToSpecularTransmitAttr(UsdAiShapeAPI &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateAiDoubleSidedToRefractionAttr(
+    return self.CreateAiDoubleSidedToSpecularTransmitAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiDoubleSidedToVolumeAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiDoubleSidedToVolumeAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiDoubleSidedToDiffuseReflectAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiDoubleSidedToDiffuseReflectAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiDoubleSidedToSpecularReflectAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiDoubleSidedToSpecularReflectAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
 }
         
@@ -162,16 +197,72 @@ _CreateAiDoubleSidedToSubsurfaceAttr(UsdAiShapeAPI &self,
 }
         
 static UsdAttribute
-_CreateAiDoubleSidedToDiffuseAttr(UsdAiShapeAPI &self,
+_CreateAiAutobumpVisibleToCameraAttr(UsdAiShapeAPI &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateAiDoubleSidedToDiffuseAttr(
+    return self.CreateAiAutobumpVisibleToCameraAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
 }
         
 static UsdAttribute
-_CreateAiDoubleSidedToGlossyAttr(UsdAiShapeAPI &self,
+_CreateAiAutobumpVisibleToShadowAttr(UsdAiShapeAPI &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateAiDoubleSidedToGlossyAttr(
+    return self.CreateAiAutobumpVisibleToShadowAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiAutobumpVisibleToDiffuseTransmitAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiAutobumpVisibleToDiffuseTransmitAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiAutobumpVisibleToSpecularTransmitAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiAutobumpVisibleToSpecularTransmitAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiAutobumpVisibleToVolumeAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiAutobumpVisibleToVolumeAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiAutobumpVisibleToDiffuseReflectAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiAutobumpVisibleToDiffuseReflectAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiAutobumpVisibleToSpecularReflectAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiAutobumpVisibleToSpecularReflectAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiAutobumpVisibleToSubsurfaceAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiAutobumpVisibleToSubsurfaceAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiUseLightGroupAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiUseLightGroupAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiUseShadowGroupAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiUseShadowGroupAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
 }
         
@@ -311,6 +402,13 @@ void wrapUsdAiShapeAPI()
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
+        .def("GetAiRayBiasAttr",
+             &This::GetAiRayBiasAttr)
+        .def("CreateAiRayBiasAttr",
+             &_CreateAiRayBiasAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
         .def("GetAiSelfShadowsAttr",
              &This::GetAiSelfShadowsAttr)
         .def("CreateAiSelfShadowsAttr",
@@ -332,17 +430,38 @@ void wrapUsdAiShapeAPI()
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
-        .def("GetAiVisibleToReflectionAttr",
-             &This::GetAiVisibleToReflectionAttr)
-        .def("CreateAiVisibleToReflectionAttr",
-             &_CreateAiVisibleToReflectionAttr,
+        .def("GetAiVisibleToDiffuseTransmitAttr",
+             &This::GetAiVisibleToDiffuseTransmitAttr)
+        .def("CreateAiVisibleToDiffuseTransmitAttr",
+             &_CreateAiVisibleToDiffuseTransmitAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
-        .def("GetAiVisibleToRefractionAttr",
-             &This::GetAiVisibleToRefractionAttr)
-        .def("CreateAiVisibleToRefractionAttr",
-             &_CreateAiVisibleToRefractionAttr,
+        .def("GetAiVisibleToSpecularTransmitAttr",
+             &This::GetAiVisibleToSpecularTransmitAttr)
+        .def("CreateAiVisibleToSpecularTransmitAttr",
+             &_CreateAiVisibleToSpecularTransmitAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiVisibleToVolumeAttr",
+             &This::GetAiVisibleToVolumeAttr)
+        .def("CreateAiVisibleToVolumeAttr",
+             &_CreateAiVisibleToVolumeAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiVisibleToDiffuseReflectAttr",
+             &This::GetAiVisibleToDiffuseReflectAttr)
+        .def("CreateAiVisibleToDiffuseReflectAttr",
+             &_CreateAiVisibleToDiffuseReflectAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiVisibleToSpecularReflectAttr",
+             &This::GetAiVisibleToSpecularReflectAttr)
+        .def("CreateAiVisibleToSpecularReflectAttr",
+             &_CreateAiVisibleToSpecularReflectAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
@@ -350,20 +469,6 @@ void wrapUsdAiShapeAPI()
              &This::GetAiVisibleToSubsurfaceAttr)
         .def("CreateAiVisibleToSubsurfaceAttr",
              &_CreateAiVisibleToSubsurfaceAttr,
-             (arg("defaultValue")=object(),
-              arg("writeSparsely")=false))
-        
-        .def("GetAiVisibleToDiffuseAttr",
-             &This::GetAiVisibleToDiffuseAttr)
-        .def("CreateAiVisibleToDiffuseAttr",
-             &_CreateAiVisibleToDiffuseAttr,
-             (arg("defaultValue")=object(),
-              arg("writeSparsely")=false))
-        
-        .def("GetAiVisibleToGlossyAttr",
-             &This::GetAiVisibleToGlossyAttr)
-        .def("CreateAiVisibleToGlossyAttr",
-             &_CreateAiVisibleToGlossyAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
@@ -381,17 +486,38 @@ void wrapUsdAiShapeAPI()
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
-        .def("GetAiDoubleSidedToReflectionAttr",
-             &This::GetAiDoubleSidedToReflectionAttr)
-        .def("CreateAiDoubleSidedToReflectionAttr",
-             &_CreateAiDoubleSidedToReflectionAttr,
+        .def("GetAiDoubleSidedToDiffuseTransmitAttr",
+             &This::GetAiDoubleSidedToDiffuseTransmitAttr)
+        .def("CreateAiDoubleSidedToDiffuseTransmitAttr",
+             &_CreateAiDoubleSidedToDiffuseTransmitAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
-        .def("GetAiDoubleSidedToRefractionAttr",
-             &This::GetAiDoubleSidedToRefractionAttr)
-        .def("CreateAiDoubleSidedToRefractionAttr",
-             &_CreateAiDoubleSidedToRefractionAttr,
+        .def("GetAiDoubleSidedToSpecularTransmitAttr",
+             &This::GetAiDoubleSidedToSpecularTransmitAttr)
+        .def("CreateAiDoubleSidedToSpecularTransmitAttr",
+             &_CreateAiDoubleSidedToSpecularTransmitAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiDoubleSidedToVolumeAttr",
+             &This::GetAiDoubleSidedToVolumeAttr)
+        .def("CreateAiDoubleSidedToVolumeAttr",
+             &_CreateAiDoubleSidedToVolumeAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiDoubleSidedToDiffuseReflectAttr",
+             &This::GetAiDoubleSidedToDiffuseReflectAttr)
+        .def("CreateAiDoubleSidedToDiffuseReflectAttr",
+             &_CreateAiDoubleSidedToDiffuseReflectAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiDoubleSidedToSpecularReflectAttr",
+             &This::GetAiDoubleSidedToSpecularReflectAttr)
+        .def("CreateAiDoubleSidedToSpecularReflectAttr",
+             &_CreateAiDoubleSidedToSpecularReflectAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
@@ -402,17 +528,73 @@ void wrapUsdAiShapeAPI()
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
-        .def("GetAiDoubleSidedToDiffuseAttr",
-             &This::GetAiDoubleSidedToDiffuseAttr)
-        .def("CreateAiDoubleSidedToDiffuseAttr",
-             &_CreateAiDoubleSidedToDiffuseAttr,
+        .def("GetAiAutobumpVisibleToCameraAttr",
+             &This::GetAiAutobumpVisibleToCameraAttr)
+        .def("CreateAiAutobumpVisibleToCameraAttr",
+             &_CreateAiAutobumpVisibleToCameraAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
-        .def("GetAiDoubleSidedToGlossyAttr",
-             &This::GetAiDoubleSidedToGlossyAttr)
-        .def("CreateAiDoubleSidedToGlossyAttr",
-             &_CreateAiDoubleSidedToGlossyAttr,
+        .def("GetAiAutobumpVisibleToShadowAttr",
+             &This::GetAiAutobumpVisibleToShadowAttr)
+        .def("CreateAiAutobumpVisibleToShadowAttr",
+             &_CreateAiAutobumpVisibleToShadowAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiAutobumpVisibleToDiffuseTransmitAttr",
+             &This::GetAiAutobumpVisibleToDiffuseTransmitAttr)
+        .def("CreateAiAutobumpVisibleToDiffuseTransmitAttr",
+             &_CreateAiAutobumpVisibleToDiffuseTransmitAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiAutobumpVisibleToSpecularTransmitAttr",
+             &This::GetAiAutobumpVisibleToSpecularTransmitAttr)
+        .def("CreateAiAutobumpVisibleToSpecularTransmitAttr",
+             &_CreateAiAutobumpVisibleToSpecularTransmitAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiAutobumpVisibleToVolumeAttr",
+             &This::GetAiAutobumpVisibleToVolumeAttr)
+        .def("CreateAiAutobumpVisibleToVolumeAttr",
+             &_CreateAiAutobumpVisibleToVolumeAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiAutobumpVisibleToDiffuseReflectAttr",
+             &This::GetAiAutobumpVisibleToDiffuseReflectAttr)
+        .def("CreateAiAutobumpVisibleToDiffuseReflectAttr",
+             &_CreateAiAutobumpVisibleToDiffuseReflectAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiAutobumpVisibleToSpecularReflectAttr",
+             &This::GetAiAutobumpVisibleToSpecularReflectAttr)
+        .def("CreateAiAutobumpVisibleToSpecularReflectAttr",
+             &_CreateAiAutobumpVisibleToSpecularReflectAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiAutobumpVisibleToSubsurfaceAttr",
+             &This::GetAiAutobumpVisibleToSubsurfaceAttr)
+        .def("CreateAiAutobumpVisibleToSubsurfaceAttr",
+             &_CreateAiAutobumpVisibleToSubsurfaceAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiUseLightGroupAttr",
+             &This::GetAiUseLightGroupAttr)
+        .def("CreateAiUseLightGroupAttr",
+             &_CreateAiUseLightGroupAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiUseShadowGroupAttr",
+             &This::GetAiUseShadowGroupAttr)
+        .def("CreateAiUseShadowGroupAttr",
+             &_CreateAiUseShadowGroupAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
@@ -500,6 +682,16 @@ void wrapUsdAiShapeAPI()
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
 
+        
+        .def("GetAiLightGroupRel",
+             &This::GetAiLightGroupRel)
+        .def("CreateAiLightGroupRel",
+             &This::CreateAiLightGroupRel)
+        
+        .def("GetAiShadowGroupRel",
+             &This::GetAiShadowGroupRel)
+        .def("CreateAiShadowGroupRel",
+             &This::CreateAiShadowGroupRel)
         
         .def("GetAiSubdiv_dicing_cameraRel",
              &This::GetAiSubdiv_dicing_cameraRel)

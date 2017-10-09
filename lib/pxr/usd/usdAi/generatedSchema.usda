@@ -39,10 +39,37 @@ class "AiShapeAPI" (
                 AI_RAY_ALL          mask for all ray types"""
 )
 {
+    uniform bool ai:autobump_visibility:camera = 1 (
+        doc = "Whether the autobump is enabled for camera rays."
+    )
+    uniform bool ai:autobump_visibility:diffuse_reflect = 0 (
+        doc = "Whether the autobump is enabled for diffuse reflection rays."
+    )
+    uniform bool ai:autobump_visibility:diffuse_transmit = 0 (
+        doc = "Whether the autobump is enabled for diffuse transmission rays."
+    )
+    uniform bool ai:autobump_visibility:shadow = 0 (
+        doc = "Whether the autobump is enabled for shadow rays."
+    )
+    uniform bool ai:autobump_visibility:specular_reflect = 0 (
+        doc = "Whether the autobump is enabled for specular reflection rays."
+    )
+    uniform bool ai:autobump_visibility:specular_transmit = 0 (
+        doc = "Whether the autobump is enabled for specular transmission rays."
+    )
+    uniform bool ai:autobump_visibility:subsurface = 0 (
+        doc = "Whether the autobump is enabled for subsurface scattering rays."
+    )
+    uniform bool ai:autobump_visibility:volume = 0 (
+        doc = "Whether the autobump is enabled for volume scattering rays."
+    )
     uniform bool ai:disp_autobump = 0
     uniform float ai:disp_height = 1
     uniform float ai:disp_padding = 0
     uniform float ai:disp_zero_value = 0
+    rel ai:light_group (
+        doc = "Light groups for the shape."
+    )
     uniform bool ai:matte = 0 (
         doc = """This attribute, when enabled, turns an object or group into a
                  holdout matte. This affects primary rays only.
@@ -59,32 +86,41 @@ class "AiShapeAPI" (
                  default all objects are marked as opaque, because it speeds up
                  rendering considerably."""
     )
+    uniform float ai:ray_bias = 0.000001 (
+        doc = "Ray bias for handling precision issues."
+    )
     uniform bool ai:receive_shadows = 1 (
         doc = "Whether the object picks up shadows from other objects."
     )
     uniform bool ai:self_shadows = 1 (
         doc = "Whether the object casts shadows on itself."
     )
+    rel ai:shadow_group (
+        doc = "Shadow groups for the shape."
+    )
     uniform bool ai:sidedness:camera = 1 (
         doc = "Whether the object is double-sided to camera rays."
     )
-    uniform bool ai:sidedness:diffuse = 1 (
-        doc = "Whether the object is double-sided to the diffuse rays."
+    uniform bool ai:sidedness:diffuse_reflect = 1 (
+        doc = "Whether the object is double-sided to diffuse reflection rays."
     )
-    uniform bool ai:sidedness:glossy = 1 (
-        doc = "Whether the object is double-sided to the glossy rays."
-    )
-    uniform bool ai:sidedness:reflected = 1 (
-        doc = "Whether the object is double-sided to the reflected rays."
-    )
-    uniform bool ai:sidedness:refracted = 1 (
-        doc = "Whether the object is double-sided to the refracted rays."
+    uniform bool ai:sidedness:diffuse_transmit = 1 (
+        doc = "Whether the object is double-sided to diffuse transmission rays."
     )
     uniform bool ai:sidedness:shadow = 1 (
         doc = "Whether the object is double-sided to shadow rays."
     )
+    uniform bool ai:sidedness:specular_reflect = 1 (
+        doc = "Whether the object is double-sided to specular reflection rays."
+    )
+    uniform bool ai:sidedness:specular_transmit = 1 (
+        doc = "Whether the object is double-sided to specular transmission rays."
+    )
     uniform bool ai:sidedness:subsurface = 1 (
-        doc = "Whether the object is double-sided to the SSS rays."
+        doc = "Whether the object is double-sided to subsurface scattering rays."
+    )
+    uniform bool ai:sidedness:volume = 1 (
+        doc = "Whether the object is double-sided to volume scattering rays."
     )
     uniform bool ai:smoothing = 0
     uniform float ai:subdiv_adaptive_error = 0
@@ -103,26 +139,35 @@ class "AiShapeAPI" (
     uniform token ai:subdiv_uv_smoothing = "pin_corners" (
         allowedTokens = ["pin_corners", "pin_borders", "linear", "smooth"]
     )
+    uniform bool ai:use_light_group = 0 (
+        doc = "Enable the use of light groups."
+    )
+    uniform bool ai:use_shadow_group = 0 (
+        doc = "Enable the use of shadow groups."
+    )
     uniform bool ai:visibility:camera = 1 (
         doc = "Whether the object is visible to camera rays."
     )
-    uniform bool ai:visibility:diffuse = 1 (
-        doc = "Whether the object is visible to the diffuse rays."
+    uniform bool ai:visibility:diffuse_reflect = 1 (
+        doc = "Whether the object is visible to diffuse reflection rays."
     )
-    uniform bool ai:visibility:glossy = 1 (
-        doc = "Whether the object is visible to the glossy rays."
-    )
-    uniform bool ai:visibility:reflected = 1 (
-        doc = "Whether the object is visible to the reflected rays."
-    )
-    uniform bool ai:visibility:refracted = 1 (
-        doc = "Whether the object is visible to the refracted rays."
+    uniform bool ai:visibility:diffuse_transmit = 1 (
+        doc = "Whether the object is visible to diffuse transmission rays."
     )
     uniform bool ai:visibility:shadow = 1 (
         doc = "Whether the object is visible to shadow rays."
     )
+    uniform bool ai:visibility:specular_reflect = 1 (
+        doc = "Whether the object is visible to specular reflection rays."
+    )
+    uniform bool ai:visibility:specular_transmit = 1 (
+        doc = "Whether the object is visible to specular transmission rays."
+    )
     uniform bool ai:visibility:subsurface = 1 (
-        doc = "Whether the object is visible to the SSS rays."
+        doc = "Whether the object is visible to subsurface scattering rays."
+    )
+    uniform bool ai:visibility:volume = 1 (
+        doc = "Whether the object is visible to volume scattering rays."
     )
 }
 

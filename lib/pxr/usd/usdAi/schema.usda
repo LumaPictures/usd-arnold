@@ -102,7 +102,12 @@ class "AiShapeAPI" (
         }
     )
 
-    # visibility
+    uniform float ai:ray_bias = 0.000001 (
+        doc = """Ray bias for handling precision issues."""
+        customData = {
+            string apiName = "aiRayBias"
+        }
+    )
 
     uniform bool ai:self_shadows = true (
         doc = """Whether the object casts shadows on itself."""
@@ -111,46 +116,61 @@ class "AiShapeAPI" (
         }
     )
 
+    # visibility
+
     uniform bool ai:visibility:camera = true (
         doc = """Whether the object is visible to camera rays."""
         customData = {
             string apiName = "aiVisibleToCamera"
         }
     )
+
     uniform bool ai:visibility:shadow = true (
         doc = """Whether the object is visible to shadow rays."""
         customData = {
             string apiName = "aiVisibleToShadow"
         }
     )
-    uniform bool ai:visibility:reflected = true (
-        doc = """Whether the object is visible to the reflected rays."""
+
+    uniform bool ai:visibility:diffuse_transmit = true (
+        doc = """Whether the object is visible to diffuse transmission rays."""
         customData = {
-            string apiName = "aiVisibleToReflection"
+            string apiName = "aiVisibleToDiffuseTransmit"
         }
     )
-    uniform bool ai:visibility:refracted = true (
-        doc = """Whether the object is visible to the refracted rays."""
+
+    uniform bool ai:visibility:specular_transmit = true (
+        doc = """Whether the object is visible to specular transmission rays."""
         customData = {
-            string apiName = "aiVisibleToRefraction"
+            string apiName = "aiVisibleToSpecularTransmit"
         }
     )
+
+    uniform bool ai:visibility:volume = true (
+        doc = """Whether the object is visible to volume scattering rays."""
+        customData = {
+            string apiName = "aiVisibleToVolume"
+        }
+    )
+
+    uniform bool ai:visibility:diffuse_reflect = true (
+        doc = """Whether the object is visible to diffuse reflection rays."""
+        customData = {
+            string apiName = "aiVisibleToDiffuseReflect"
+        }
+    )
+
+    uniform bool ai:visibility:specular_reflect = true (
+        doc = """Whether the object is visible to specular reflection rays."""
+        customData = {
+            string apiName = "aiVisibleToSpecularReflect"
+        }
+    )
+
     uniform bool ai:visibility:subsurface = true (
-        doc = """Whether the object is visible to the SSS rays."""
+        doc = """Whether the object is visible to subsurface scattering rays."""
         customData = {
             string apiName = "aiVisibleToSubsurface"
-        }
-    )
-    uniform bool ai:visibility:diffuse = true (
-        doc = """Whether the object is visible to the diffuse rays."""
-        customData = {
-            string apiName = "aiVisibleToDiffuse"
-        }
-    )
-    uniform bool ai:visibility:glossy = true (
-        doc = """Whether the object is visible to the glossy rays."""
-        customData = {
-            string apiName = "aiVisibleToGlossy"
         }
     )
 
@@ -169,40 +189,53 @@ class "AiShapeAPI" (
             string apiName = "aiDoubleSidedToCamera"
         }
     )
+
     uniform bool ai:sidedness:shadow = true (
         doc = """Whether the object is double-sided to shadow rays."""
         customData = {
             string apiName = "aiDoubleSidedToShadow"
         }
     )
-    uniform bool ai:sidedness:reflected = true (
-        doc = """Whether the object is double-sided to the reflected rays."""
+
+    uniform bool ai:sidedness:diffuse_transmit = true (
+        doc = """Whether the object is double-sided to diffuse transmission rays."""
         customData = {
-            string apiName = "aiDoubleSidedToReflection"
+            string apiName = "aiDoubleSidedToDiffuseTransmit"
         }
     )
-    uniform bool ai:sidedness:refracted = true (
-        doc = """Whether the object is double-sided to the refracted rays."""
+
+    uniform bool ai:sidedness:specular_transmit = true (
+        doc = """Whether the object is double-sided to specular transmission rays."""
         customData = {
-            string apiName = "aiDoubleSidedToRefraction"
+            string apiName = "aiDoubleSidedToSpecularTransmit"
         }
     )
+
+    uniform bool ai:sidedness:volume = true (
+        doc = """Whether the object is double-sided to volume scattering rays."""
+        customData = {
+            string apiName = "aiDoubleSidedToVolume"
+        }
+    )
+
+    uniform bool ai:sidedness:diffuse_reflect = true (
+        doc = """Whether the object is double-sided to diffuse reflection rays."""
+        customData = {
+            string apiName = "aiDoubleSidedToDiffuseReflect"
+        }
+    )
+
+    uniform bool ai:sidedness:specular_reflect = true (
+        doc = """Whether the object is double-sided to specular reflection rays."""
+        customData = {
+            string apiName = "aiDoubleSidedToSpecularReflect"
+        }
+    )
+
     uniform bool ai:sidedness:subsurface = true (
-        doc = """Whether the object is double-sided to the SSS rays."""
+        doc = """Whether the object is double-sided to subsurface scattering rays."""
         customData = {
             string apiName = "aiDoubleSidedToSubsurface"
-        }
-    )
-    uniform bool ai:sidedness:diffuse = true (
-        doc = """Whether the object is double-sided to the diffuse rays."""
-        customData = {
-            string apiName = "aiDoubleSidedToDiffuse"
-        }
-    )
-    uniform bool ai:sidedness:glossy = true (
-        doc = """Whether the object is double-sided to the glossy rays."""
-        customData = {
-            string apiName = "aiDoubleSidedToGlossy"
         }
     )
 
@@ -215,28 +248,128 @@ class "AiShapeAPI" (
 #                 are double-sided for all rays."""
 #    )
 
+    # autobump visibility
+
+    uniform bool ai:autobump_visibility:camera = true (
+        doc = """Whether the autobump is enabled for camera rays."""
+        customData = {
+            string apiName = "aiAutobumpVisibleToCamera"
+        }
+    )
+
+    uniform bool ai:autobump_visibility:shadow = false (
+        doc = """Whether the autobump is enabled for shadow rays."""
+        customData = {
+            string apiName = "aiAutobumpVisibleToShadow"
+        }
+    )
+
+    uniform bool ai:autobump_visibility:diffuse_transmit = false (
+        doc = """Whether the autobump is enabled for diffuse transmission rays."""
+        customData = {
+            string apiName = "aiAutobumpVisibleToDiffuseTransmit"
+        }
+    )
+
+    uniform bool ai:autobump_visibility:specular_transmit = false (
+        doc = """Whether the autobump is enabled for specular transmission rays."""
+        customData = {
+            string apiName = "aiAutobumpVisibleToSpecularTransmit"
+        }
+    )
+
+    uniform bool ai:autobump_visibility:volume = false (
+        doc = """Whether the autobump is enabled for volume scattering rays."""
+        customData = {
+            string apiName = "aiAutobumpVisibleToVolume"
+        }
+    )
+
+    uniform bool ai:autobump_visibility:diffuse_reflect = false (
+        doc = """Whether the autobump is enabled for diffuse reflection rays."""
+        customData = {
+            string apiName = "aiAutobumpVisibleToDiffuseReflect"
+        }
+    )
+
+    uniform bool ai:autobump_visibility:specular_reflect = false (
+        doc = """Whether the autobump is enabled for specular reflection rays."""
+        customData = {
+            string apiName = "aiAutobumpVisibleToSpecularReflect"
+        }
+    )
+
+    uniform bool ai:autobump_visibility:subsurface = false (
+        doc = """Whether the autobump is enabled for subsurface scattering rays."""
+        customData = {
+            string apiName = "aiAutobumpVisibleToSubsurface"
+        }
+    )
+
+#    (
+#        doc = """The autobump of the object for each Arnold ray type, as
+#                 a bitmask.
+#
+#                 Just as you can disable an object's visibility for specific ray
+#                 types, you can also change its autobump. By default, autobump
+#                 is only enabled for camera rays."""
+#    )
+
+    # --- light group properties --- #
+    uniform bool ai:use_light_group = false (
+        doc = """Enable the use of light groups."""
+        customData = {
+            string apiName = "aiUseLightGroup"
+        }
+    )
+
+    rel ai:light_group (
+        doc = """Light groups for the shape."""
+        customData = {
+            string apiName = "aiLightGroup"
+        }
+    )
+
+    uniform bool ai:use_shadow_group = false (
+        doc = """Enable the use of shadow groups."""
+        customData = {
+            string apiName = "aiUseShadowGroup"
+        }
+    )
+
+    rel ai:shadow_group (
+        doc = """Shadow groups for the shape."""
+        customData = {
+            string apiName = "aiShadowGroup"
+        }
+    )
+
     # --- polymesh properties --- #
     uniform bool ai:smoothing = false (
         customData = {
             string apiName = "aiSmoothing"
         }
     )
+
     uniform token ai:subdiv_type = "none" (
         customData = {
             string apiName = "aiSubdivType"
         }
         allowedTokens = ["none", "catclark", "linear"]
     )
+
     uniform uint ai:subdiv_iterations = 1 (
         customData = {
             string apiName = "aiSubdivIterations"
         }
     )
+
     uniform float ai:subdiv_adaptive_error = 0 (
         customData = {
             string apiName = "aiSubdivAdaptiveError"
         }
     )
+
     uniform token ai:subdiv_adaptive_metric = "auto_" (
         customData = {
             string apiName = "aiSubdivAdaptiveMetric"
@@ -244,44 +377,51 @@ class "AiShapeAPI" (
         # FIXME: auto -> auto_ (is there a way to specify the API name of a token?)
         allowedTokens = ["auto_", "edge_length", "flatness"]
     )
+
     uniform token ai:subdiv_adaptive_space = "raster" (
         customData = {
             string apiName = "aiSubdivAdaptiveSpace"
         }
         allowedTokens = ["raster", "object"]
     )
+
     uniform token ai:subdiv_uv_smoothing = "pin_corners" (
         customData = {
             string apiName = "aiSubdivUVSmoothing"
         }
         allowedTokens = ["pin_corners", "pin_borders", "linear", "smooth"]
     )
+
     uniform bool ai:subdiv_smooth_derivs = false (
         customData = {
             string apiName = "aiSubdivSmoothDerivs"
         }
     )
+
     uniform float ai:disp_padding = 0 (
         customData = {
             string apiName = "aiDispPadding"
         }
     )
+
     uniform float ai:disp_height = 1 (
         customData = {
             string apiName = "aiDispHeight"
         }
     )
+
     uniform float ai:disp_zero_value = 0 (
         customData = {
             string apiName = "aiDispZeroValue"
         }
     )
+
     uniform bool ai:disp_autobump = false (
         customData = {
             string apiName = "aiDispAutobump"
         }
     )
-    # uniform ai:autobump_visibility = 159
+
     rel ai:subdiv_dicing_camera
 
 }

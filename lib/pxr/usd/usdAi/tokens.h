@@ -41,22 +41,34 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 /// \hideinitializer
 #define USDAI_TOKENS \
+    ((aiAutobump_visibilityCamera, "ai:autobump_visibility:camera")) \
+    ((aiAutobump_visibilityDiffuse_reflect, "ai:autobump_visibility:diffuse_reflect")) \
+    ((aiAutobump_visibilityDiffuse_transmit, "ai:autobump_visibility:diffuse_transmit")) \
+    ((aiAutobump_visibilityShadow, "ai:autobump_visibility:shadow")) \
+    ((aiAutobump_visibilitySpecular_reflect, "ai:autobump_visibility:specular_reflect")) \
+    ((aiAutobump_visibilitySpecular_transmit, "ai:autobump_visibility:specular_transmit")) \
+    ((aiAutobump_visibilitySubsurface, "ai:autobump_visibility:subsurface")) \
+    ((aiAutobump_visibilityVolume, "ai:autobump_visibility:volume")) \
     ((aiDisp_autobump, "ai:disp_autobump")) \
     ((aiDisp_height, "ai:disp_height")) \
     ((aiDisp_padding, "ai:disp_padding")) \
     ((aiDisp_zero_value, "ai:disp_zero_value")) \
     ((aiDisplacement, "ai:displacement")) \
+    ((aiLight_group, "ai:light_group")) \
     ((aiMatte, "ai:matte")) \
     ((aiOpaque, "ai:opaque")) \
+    ((aiRay_bias, "ai:ray_bias")) \
     ((aiReceive_shadows, "ai:receive_shadows")) \
     ((aiSelf_shadows, "ai:self_shadows")) \
+    ((aiShadow_group, "ai:shadow_group")) \
     ((aiSidednessCamera, "ai:sidedness:camera")) \
-    ((aiSidednessDiffuse, "ai:sidedness:diffuse")) \
-    ((aiSidednessGlossy, "ai:sidedness:glossy")) \
-    ((aiSidednessReflected, "ai:sidedness:reflected")) \
-    ((aiSidednessRefracted, "ai:sidedness:refracted")) \
+    ((aiSidednessDiffuse_reflect, "ai:sidedness:diffuse_reflect")) \
+    ((aiSidednessDiffuse_transmit, "ai:sidedness:diffuse_transmit")) \
     ((aiSidednessShadow, "ai:sidedness:shadow")) \
+    ((aiSidednessSpecular_reflect, "ai:sidedness:specular_reflect")) \
+    ((aiSidednessSpecular_transmit, "ai:sidedness:specular_transmit")) \
     ((aiSidednessSubsurface, "ai:sidedness:subsurface")) \
+    ((aiSidednessVolume, "ai:sidedness:volume")) \
     ((aiSmoothing, "ai:smoothing")) \
     ((aiSubdiv_adaptive_error, "ai:subdiv_adaptive_error")) \
     ((aiSubdiv_adaptive_metric, "ai:subdiv_adaptive_metric")) \
@@ -67,13 +79,16 @@ PXR_NAMESPACE_OPEN_SCOPE
     ((aiSubdiv_type, "ai:subdiv_type")) \
     ((aiSubdiv_uv_smoothing, "ai:subdiv_uv_smoothing")) \
     ((aiSurface, "ai:surface")) \
+    ((aiUse_light_group, "ai:use_light_group")) \
+    ((aiUse_shadow_group, "ai:use_shadow_group")) \
     ((aiVisibilityCamera, "ai:visibility:camera")) \
-    ((aiVisibilityDiffuse, "ai:visibility:diffuse")) \
-    ((aiVisibilityGlossy, "ai:visibility:glossy")) \
-    ((aiVisibilityReflected, "ai:visibility:reflected")) \
-    ((aiVisibilityRefracted, "ai:visibility:refracted")) \
+    ((aiVisibilityDiffuse_reflect, "ai:visibility:diffuse_reflect")) \
+    ((aiVisibilityDiffuse_transmit, "ai:visibility:diffuse_transmit")) \
     ((aiVisibilityShadow, "ai:visibility:shadow")) \
+    ((aiVisibilitySpecular_reflect, "ai:visibility:specular_reflect")) \
+    ((aiVisibilitySpecular_transmit, "ai:visibility:specular_transmit")) \
     ((aiVisibilitySubsurface, "ai:visibility:subsurface")) \
+    ((aiVisibilityVolume, "ai:visibility:volume")) \
     ((aRRAY, "ARRAY")) \
     (auto_) \
     ((bOOL, "BOOL")) \
@@ -129,22 +144,34 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \endcode
 ///
 /// The tokens are:
+/// \li <b>aiAutobump_visibilityCamera</b> - UsdAiShapeAPI
+/// \li <b>aiAutobump_visibilityDiffuse_reflect</b> - UsdAiShapeAPI
+/// \li <b>aiAutobump_visibilityDiffuse_transmit</b> - UsdAiShapeAPI
+/// \li <b>aiAutobump_visibilityShadow</b> - UsdAiShapeAPI
+/// \li <b>aiAutobump_visibilitySpecular_reflect</b> - UsdAiShapeAPI
+/// \li <b>aiAutobump_visibilitySpecular_transmit</b> - UsdAiShapeAPI
+/// \li <b>aiAutobump_visibilitySubsurface</b> - UsdAiShapeAPI
+/// \li <b>aiAutobump_visibilityVolume</b> - UsdAiShapeAPI
 /// \li <b>aiDisp_autobump</b> - UsdAiShapeAPI
 /// \li <b>aiDisp_height</b> - UsdAiShapeAPI
 /// \li <b>aiDisp_padding</b> - UsdAiShapeAPI
 /// \li <b>aiDisp_zero_value</b> - UsdAiShapeAPI
 /// \li <b>aiDisplacement</b> - UsdAiMaterialAPI
+/// \li <b>aiLight_group</b> - UsdAiShapeAPI
 /// \li <b>aiMatte</b> - UsdAiShapeAPI
 /// \li <b>aiOpaque</b> - UsdAiShapeAPI
+/// \li <b>aiRay_bias</b> - UsdAiShapeAPI
 /// \li <b>aiReceive_shadows</b> - UsdAiShapeAPI
 /// \li <b>aiSelf_shadows</b> - UsdAiShapeAPI
+/// \li <b>aiShadow_group</b> - UsdAiShapeAPI
 /// \li <b>aiSidednessCamera</b> - UsdAiShapeAPI
-/// \li <b>aiSidednessDiffuse</b> - UsdAiShapeAPI
-/// \li <b>aiSidednessGlossy</b> - UsdAiShapeAPI
-/// \li <b>aiSidednessReflected</b> - UsdAiShapeAPI
-/// \li <b>aiSidednessRefracted</b> - UsdAiShapeAPI
+/// \li <b>aiSidednessDiffuse_reflect</b> - UsdAiShapeAPI
+/// \li <b>aiSidednessDiffuse_transmit</b> - UsdAiShapeAPI
 /// \li <b>aiSidednessShadow</b> - UsdAiShapeAPI
+/// \li <b>aiSidednessSpecular_reflect</b> - UsdAiShapeAPI
+/// \li <b>aiSidednessSpecular_transmit</b> - UsdAiShapeAPI
 /// \li <b>aiSidednessSubsurface</b> - UsdAiShapeAPI
+/// \li <b>aiSidednessVolume</b> - UsdAiShapeAPI
 /// \li <b>aiSmoothing</b> - UsdAiShapeAPI
 /// \li <b>aiSubdiv_adaptive_error</b> - UsdAiShapeAPI
 /// \li <b>aiSubdiv_adaptive_metric</b> - UsdAiShapeAPI
@@ -155,13 +182,16 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \li <b>aiSubdiv_type</b> - UsdAiShapeAPI
 /// \li <b>aiSubdiv_uv_smoothing</b> - UsdAiShapeAPI
 /// \li <b>aiSurface</b> - UsdAiMaterialAPI
+/// \li <b>aiUse_light_group</b> - UsdAiShapeAPI
+/// \li <b>aiUse_shadow_group</b> - UsdAiShapeAPI
 /// \li <b>aiVisibilityCamera</b> - UsdAiShapeAPI
-/// \li <b>aiVisibilityDiffuse</b> - UsdAiShapeAPI
-/// \li <b>aiVisibilityGlossy</b> - UsdAiShapeAPI
-/// \li <b>aiVisibilityReflected</b> - UsdAiShapeAPI
-/// \li <b>aiVisibilityRefracted</b> - UsdAiShapeAPI
+/// \li <b>aiVisibilityDiffuse_reflect</b> - UsdAiShapeAPI
+/// \li <b>aiVisibilityDiffuse_transmit</b> - UsdAiShapeAPI
 /// \li <b>aiVisibilityShadow</b> - UsdAiShapeAPI
+/// \li <b>aiVisibilitySpecular_reflect</b> - UsdAiShapeAPI
+/// \li <b>aiVisibilitySpecular_transmit</b> - UsdAiShapeAPI
 /// \li <b>aiVisibilitySubsurface</b> - UsdAiShapeAPI
+/// \li <b>aiVisibilityVolume</b> - UsdAiShapeAPI
 /// \li <b>aRRAY</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>auto_</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_metricAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_adaptive_metricAttr()
 /// \li <b>bOOL</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
