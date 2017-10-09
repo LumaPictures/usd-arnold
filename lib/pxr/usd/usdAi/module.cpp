@@ -6,6 +6,7 @@ PXR_NAMESPACE_USING_DIRECTIVE
 TF_WRAP_MODULE
 {
     TF_WRAP(UsdAiAOV);
+    TF_WRAP(UsdAiLightAPI);
     TF_WRAP(UsdAiMaterialAPI);
     TF_WRAP(UsdAiNodeAPI);
     TF_WRAP(UsdAiProcedural);

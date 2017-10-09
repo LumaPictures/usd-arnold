@@ -41,6 +41,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 /// \hideinitializer
 #define USDAI_TOKENS \
+    ((aiAov, "ai:aov")) \
     ((aiAutobump_visibilityCamera, "ai:autobump_visibility:camera")) \
     ((aiAutobump_visibilityDiffuse_reflect, "ai:autobump_visibility:diffuse_reflect")) \
     ((aiAutobump_visibilityDiffuse_transmit, "ai:autobump_visibility:diffuse_transmit")) \
@@ -79,6 +80,7 @@ PXR_NAMESPACE_OPEN_SCOPE
     ((aiSubdiv_type, "ai:subdiv_type")) \
     ((aiSubdiv_uv_smoothing, "ai:subdiv_uv_smoothing")) \
     ((aiSurface, "ai:surface")) \
+    ((aiTransform_type, "ai:transform_type")) \
     ((aiUse_light_group, "ai:use_light_group")) \
     ((aiUse_shadow_group, "ai:use_shadow_group")) \
     ((aiVisibilityCamera, "ai:visibility:camera")) \
@@ -118,6 +120,8 @@ PXR_NAMESPACE_OPEN_SCOPE
     (raster) \
     ((rGB, "RGB")) \
     ((rGBA, "RGBA")) \
+    (rotate_about_center) \
+    (rotate_about_origin) \
     (smooth) \
     (step_size) \
     ((uINT, "UINT")) \
@@ -144,6 +148,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \endcode
 ///
 /// The tokens are:
+/// \li <b>aiAov</b> - UsdAiLightAPI
 /// \li <b>aiAutobump_visibilityCamera</b> - UsdAiShapeAPI
 /// \li <b>aiAutobump_visibilityDiffuse_reflect</b> - UsdAiShapeAPI
 /// \li <b>aiAutobump_visibilityDiffuse_transmit</b> - UsdAiShapeAPI
@@ -182,6 +187,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \li <b>aiSubdiv_type</b> - UsdAiShapeAPI
 /// \li <b>aiSubdiv_uv_smoothing</b> - UsdAiShapeAPI
 /// \li <b>aiSurface</b> - UsdAiMaterialAPI
+/// \li <b>aiTransform_type</b> - UsdAiShapeAPI
 /// \li <b>aiUse_light_group</b> - UsdAiShapeAPI
 /// \li <b>aiUse_shadow_group</b> - UsdAiShapeAPI
 /// \li <b>aiVisibilityCamera</b> - UsdAiShapeAPI
@@ -206,7 +212,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \li <b>flatness</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_metricAttr()
 /// \li <b>fLOAT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>iNT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
-/// \li <b>linear</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_typeAttr(), Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
+/// \li <b>linear</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_typeAttr(), Possible value for UsdAiShapeAPI::GetAiTransform_typeAttr(), Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
 /// \li <b>loat_at_init</b> - UsdAiProcedural
 /// \li <b>mATRIX</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>name</b> - UsdAiAOV
@@ -221,6 +227,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \li <b>raster</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_spaceAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_adaptive_spaceAttr()
 /// \li <b>rGB</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>rGBA</b> - Possible value for UsdAiAOV::GetDataTypeAttr(), Default value for UsdAiAOV::GetDataTypeAttr()
+/// \li <b>rotate_about_center</b> - Possible value for UsdAiShapeAPI::GetAiTransform_typeAttr(), Default value for UsdAiShapeAPI::GetAiTransform_typeAttr()
+/// \li <b>rotate_about_origin</b> - Possible value for UsdAiShapeAPI::GetAiTransform_typeAttr()
 /// \li <b>smooth</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
 /// \li <b>step_size</b> - UsdAiVolume
 /// \li <b>uINT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()

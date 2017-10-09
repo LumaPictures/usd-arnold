@@ -24,6 +24,7 @@ pxr_shared_library(usdAi
     PUBLIC_CLASSES
         tokens
         aiAOV
+        aiLightAPI
         aiMaterialAPI
         aiNodeAPI
         aiProcedural
@@ -42,6 +43,7 @@ pxr_shared_library(usdAi
     PYMODULE_CPPFILES
         module.cpp
         wrapAiAOV.cpp
+        wrapAiLightAPI.cpp
         wrapAiMaterialAPI.cpp
         wrapAiNodeAPI.cpp
         wrapAiProcedural.cpp

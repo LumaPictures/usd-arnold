@@ -116,6 +116,13 @@ class "AiShapeAPI" (
         }
     )
 
+    uniform token ai:transform_type = "rotate_about_center" (
+        customData = {
+            string apiName = "aiTransformType"
+        }
+        allowedTokens = ["linear", "rotate_about_origin", "rotate_about_center"]
+    )
+
     # visibility
 
     uniform bool ai:visibility:camera = true (
@@ -424,6 +431,14 @@ class "AiShapeAPI" (
 
     rel ai:subdiv_dicing_camera
 
+}
+
+class "AiLightAPI" (
+    doc = """API for interacting with common Arnold light parameters."""
+) {
+    uniform string ai:aov = "" (
+        doc = """The name of the output AOV for the light."""
+    )
 }
 
 class "AiMaterialAPI" (

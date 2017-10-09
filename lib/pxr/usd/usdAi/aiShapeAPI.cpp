@@ -164,6 +164,23 @@ UsdAiShapeAPI::CreateAiSelfShadowsAttr(VtValue const &defaultValue, bool writeSp
 }
 
 UsdAttribute
+UsdAiShapeAPI::GetAiTransformTypeAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiTransform_type);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiTransformTypeAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiTransform_type,
+                       SdfValueTypeNames->Token,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
 UsdAiShapeAPI::GetAiVisibleToCameraAttr() const
 {
     return GetPrim().GetAttribute(UsdAiTokens->aiVisibilityCamera);
@@ -870,6 +887,7 @@ UsdAiShapeAPI::GetSchemaAttributeNames(bool includeInherited)
         UsdAiTokens->aiReceive_shadows,
         UsdAiTokens->aiRay_bias,
         UsdAiTokens->aiSelf_shadows,
+        UsdAiTokens->aiTransform_type,
         UsdAiTokens->aiVisibilityCamera,
         UsdAiTokens->aiVisibilityShadow,
         UsdAiTokens->aiVisibilityDiffuse_transmit,

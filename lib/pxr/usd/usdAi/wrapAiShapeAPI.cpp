@@ -85,6 +85,13 @@ _CreateAiSelfShadowsAttr(UsdAiShapeAPI &self,
 }
         
 static UsdAttribute
+_CreateAiTransformTypeAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiTransformTypeAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
+}
+        
+static UsdAttribute
 _CreateAiVisibleToCameraAttr(UsdAiShapeAPI &self,
                                       object defaultVal, bool writeSparsely) {
     return self.CreateAiVisibleToCameraAttr(
@@ -413,6 +420,13 @@ void wrapUsdAiShapeAPI()
              &This::GetAiSelfShadowsAttr)
         .def("CreateAiSelfShadowsAttr",
              &_CreateAiSelfShadowsAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiTransformTypeAttr",
+             &This::GetAiTransformTypeAttr)
+        .def("CreateAiTransformTypeAttr",
+             &_CreateAiTransformTypeAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         

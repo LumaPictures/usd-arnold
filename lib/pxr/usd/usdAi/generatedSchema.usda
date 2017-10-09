@@ -139,6 +139,9 @@ class "AiShapeAPI" (
     uniform token ai:subdiv_uv_smoothing = "pin_corners" (
         allowedTokens = ["pin_corners", "pin_borders", "linear", "smooth"]
     )
+    uniform token ai:transform_type = "rotate_about_center" (
+        allowedTokens = ["linear", "rotate_about_origin", "rotate_about_center"]
+    )
     uniform bool ai:use_light_group = 0 (
         doc = "Enable the use of light groups."
     )
@@ -168,6 +171,15 @@ class "AiShapeAPI" (
     )
     uniform bool ai:visibility:volume = 1 (
         doc = "Whether the object is visible to volume scattering rays."
+    )
+}
+
+class "AiLightAPI" (
+    doc = "API for interacting with common Arnold light parameters."
+)
+{
+    uniform string ai:aov = "" (
+        doc = "The name of the output AOV for the light."
     )
 }
 

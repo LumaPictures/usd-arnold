@@ -267,6 +267,28 @@ public:
 
 public:
     // --------------------------------------------------------------------- //
+    // AITRANSFORMTYPE 
+    // --------------------------------------------------------------------- //
+    /// 
+    ///
+    /// \n  C++ Type: TfToken
+    /// \n  Usd Type: SdfValueTypeNames->Token
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: rotate_about_center
+    /// \n  \ref UsdAiTokens "Allowed Values": [linear, rotate_about_origin, rotate_about_center]
+    USDAI_API
+    UsdAttribute GetAiTransformTypeAttr() const;
+
+    /// See GetAiTransformTypeAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiTransformTypeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
     // AIVISIBLETOCAMERA 
     // --------------------------------------------------------------------- //
     /// Whether the object is visible to camera rays.
