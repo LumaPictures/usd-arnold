@@ -46,10 +46,13 @@ PXR_NAMESPACE_OPEN_SCOPE
     ((aiDisp_padding, "ai:disp_padding")) \
     ((aiDisp_zero_value, "ai:disp_zero_value")) \
     ((aiDisplacement, "ai:displacement")) \
+    ((aiLight_group, "ai:light_group")) \
     ((aiMatte, "ai:matte")) \
     ((aiOpaque, "ai:opaque")) \
+    ((aiRay_bias, "ai:ray_bias")) \
     ((aiReceive_shadows, "ai:receive_shadows")) \
     ((aiSelf_shadows, "ai:self_shadows")) \
+    ((aiShadow_group, "ai:shadow_group")) \
     ((aiSidednessCamera, "ai:sidedness:camera")) \
     ((aiSidednessDiffuse, "ai:sidedness:diffuse")) \
     ((aiSidednessGlossy, "ai:sidedness:glossy")) \
@@ -67,6 +70,8 @@ PXR_NAMESPACE_OPEN_SCOPE
     ((aiSubdiv_type, "ai:subdiv_type")) \
     ((aiSubdiv_uv_smoothing, "ai:subdiv_uv_smoothing")) \
     ((aiSurface, "ai:surface")) \
+    ((aiUse_light_group, "ai:use_light_group")) \
+    ((aiUse_shadow_group, "ai:use_shadow_group")) \
     ((aiVisibilityCamera, "ai:visibility:camera")) \
     ((aiVisibilityDiffuse, "ai:visibility:diffuse")) \
     ((aiVisibilityGlossy, "ai:visibility:glossy")) \
@@ -134,10 +139,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \li <b>aiDisp_padding</b> - UsdAiShapeAPI
 /// \li <b>aiDisp_zero_value</b> - UsdAiShapeAPI
 /// \li <b>aiDisplacement</b> - UsdAiMaterialAPI
+/// \li <b>aiLight_group</b> - UsdAiShapeAPI
 /// \li <b>aiMatte</b> - UsdAiShapeAPI
 /// \li <b>aiOpaque</b> - UsdAiShapeAPI
+/// \li <b>aiRay_bias</b> - UsdAiShapeAPI
 /// \li <b>aiReceive_shadows</b> - UsdAiShapeAPI
 /// \li <b>aiSelf_shadows</b> - UsdAiShapeAPI
+/// \li <b>aiShadow_group</b> - UsdAiShapeAPI
 /// \li <b>aiSidednessCamera</b> - UsdAiShapeAPI
 /// \li <b>aiSidednessDiffuse</b> - UsdAiShapeAPI
 /// \li <b>aiSidednessGlossy</b> - UsdAiShapeAPI
@@ -155,6 +163,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \li <b>aiSubdiv_type</b> - UsdAiShapeAPI
 /// \li <b>aiSubdiv_uv_smoothing</b> - UsdAiShapeAPI
 /// \li <b>aiSurface</b> - UsdAiMaterialAPI
+/// \li <b>aiUse_light_group</b> - UsdAiShapeAPI
+/// \li <b>aiUse_shadow_group</b> - UsdAiShapeAPI
 /// \li <b>aiVisibilityCamera</b> - UsdAiShapeAPI
 /// \li <b>aiVisibilityDiffuse</b> - UsdAiShapeAPI
 /// \li <b>aiVisibilityGlossy</b> - UsdAiShapeAPI

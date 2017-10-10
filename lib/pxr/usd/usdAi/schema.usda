@@ -95,17 +95,17 @@ class "AiShapeAPI" (
         }
     )
 
-    uniform bool ai:receive_shadows = true (
-        doc = """Whether the object picks up shadows from other objects."""
-        customData = {
-            string apiName = "aiReceiveShadows"
-        }
-    )
-
     uniform float ai:ray_bias = 0.000001 (
         doc = """Ray bias for handling precision issues."""
         customData = {
             string apiName = "aiRayBias"
+        }
+    )
+
+    uniform bool ai:receive_shadows = true (
+        doc = """Whether the object picks up shadows from other objects."""
+        customData = {
+            string apiName = "aiReceiveShadows"
         }
     )
 

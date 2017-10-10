@@ -199,6 +199,27 @@ public:
 
 public:
     // --------------------------------------------------------------------- //
+    // AIRAYBIAS 
+    // --------------------------------------------------------------------- //
+    /// Ray bias for handling precision issues.
+    ///
+    /// \n  C++ Type: float
+    /// \n  Usd Type: SdfValueTypeNames->Float
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: 9.99999997475e-07
+    USDAI_API
+    UsdAttribute GetAiRayBiasAttr() const;
+
+    /// See GetAiRayBiasAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiRayBiasAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
     // AIRECEIVESHADOWS 
     // --------------------------------------------------------------------- //
     /// Whether the object picks up shadows from other objects.
@@ -535,6 +556,48 @@ public:
 
 public:
     // --------------------------------------------------------------------- //
+    // AIUSELIGHTGROUP 
+    // --------------------------------------------------------------------- //
+    /// Enable the use of light groups.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: False
+    USDAI_API
+    UsdAttribute GetAiUseLightGroupAttr() const;
+
+    /// See GetAiUseLightGroupAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiUseLightGroupAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIUSESHADOWGROUP 
+    // --------------------------------------------------------------------- //
+    /// Enable the use of shadow groups.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: False
+    USDAI_API
+    UsdAttribute GetAiUseShadowGroupAttr() const;
+
+    /// See GetAiUseShadowGroupAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiUseShadowGroupAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
     // AISMOOTHING 
     // --------------------------------------------------------------------- //
     /// 
@@ -788,6 +851,34 @@ public:
     /// the default for \p writeSparsely is \c false.
     USDAI_API
     UsdAttribute CreateAiDispAutobumpAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AILIGHTGROUP 
+    // --------------------------------------------------------------------- //
+    /// Light groups for the shape.
+    ///
+    USDAI_API
+    UsdRelationship GetAiLightGroupRel() const;
+
+    /// See GetAiLightGroupRel(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create
+    USDAI_API
+    UsdRelationship CreateAiLightGroupRel() const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AISHADOWGROUP 
+    // --------------------------------------------------------------------- //
+    /// Shadow groups for the shape.
+    ///
+    USDAI_API
+    UsdRelationship GetAiShadowGroupRel() const;
+
+    /// See GetAiShadowGroupRel(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create
+    USDAI_API
+    UsdRelationship CreateAiShadowGroupRel() const;
 
 public:
     // --------------------------------------------------------------------- //

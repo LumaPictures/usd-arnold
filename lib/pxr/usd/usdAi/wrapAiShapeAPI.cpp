@@ -64,17 +64,17 @@ _CreateAiMatteAttr(UsdAiShapeAPI &self,
 }
         
 static UsdAttribute
-_CreateAiReceiveShadowsAttr(UsdAiShapeAPI &self,
-                                      object defaultVal, bool writeSparsely) {
-    return self.CreateAiReceiveShadowsAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
-}
-        
-static UsdAttribute
 _CreateAiRayBiasAttr(UsdAiShapeAPI &self,
                                       object defaultVal, bool writeSparsely) {
     return self.CreateAiRayBiasAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiReceiveShadowsAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiReceiveShadowsAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
 }
         
 static UsdAttribute
@@ -402,17 +402,17 @@ void wrapUsdAiShapeAPI()
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
-        .def("GetAiReceiveShadowsAttr",
-             &This::GetAiReceiveShadowsAttr)
-        .def("CreateAiReceiveShadowsAttr",
-             &_CreateAiReceiveShadowsAttr,
-             (arg("defaultValue")=object(),
-              arg("writeSparsely")=false))
-        
         .def("GetAiRayBiasAttr",
              &This::GetAiRayBiasAttr)
         .def("CreateAiRayBiasAttr",
              &_CreateAiRayBiasAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiReceiveShadowsAttr",
+             &This::GetAiReceiveShadowsAttr)
+        .def("CreateAiReceiveShadowsAttr",
+             &_CreateAiReceiveShadowsAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         

@@ -64,6 +64,13 @@ _CreateAiMatteAttr(UsdAiShapeAPI &self,
 }
         
 static UsdAttribute
+_CreateAiRayBiasAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiRayBiasAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
+}
+        
+static UsdAttribute
 _CreateAiReceiveShadowsAttr(UsdAiShapeAPI &self,
                                       object defaultVal, bool writeSparsely) {
     return self.CreateAiReceiveShadowsAttr(
@@ -172,6 +179,20 @@ static UsdAttribute
 _CreateAiDoubleSidedToGlossyAttr(UsdAiShapeAPI &self,
                                       object defaultVal, bool writeSparsely) {
     return self.CreateAiDoubleSidedToGlossyAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiUseLightGroupAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiUseLightGroupAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiUseShadowGroupAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiUseShadowGroupAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
 }
         
@@ -304,6 +325,13 @@ void wrapUsdAiShapeAPI()
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
+        .def("GetAiRayBiasAttr",
+             &This::GetAiRayBiasAttr)
+        .def("CreateAiRayBiasAttr",
+             &_CreateAiRayBiasAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
         .def("GetAiReceiveShadowsAttr",
              &This::GetAiReceiveShadowsAttr)
         .def("CreateAiReceiveShadowsAttr",
@@ -416,6 +444,20 @@ void wrapUsdAiShapeAPI()
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
+        .def("GetAiUseLightGroupAttr",
+             &This::GetAiUseLightGroupAttr)
+        .def("CreateAiUseLightGroupAttr",
+             &_CreateAiUseLightGroupAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiUseShadowGroupAttr",
+             &This::GetAiUseShadowGroupAttr)
+        .def("CreateAiUseShadowGroupAttr",
+             &_CreateAiUseShadowGroupAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
         .def("GetAiSmoothingAttr",
              &This::GetAiSmoothingAttr)
         .def("CreateAiSmoothingAttr",
@@ -500,6 +542,16 @@ void wrapUsdAiShapeAPI()
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
 
+        
+        .def("GetAiLightGroupRel",
+             &This::GetAiLightGroupRel)
+        .def("CreateAiLightGroupRel",
+             &This::CreateAiLightGroupRel)
+        
+        .def("GetAiShadowGroupRel",
+             &This::GetAiShadowGroupRel)
+        .def("CreateAiShadowGroupRel",
+             &This::CreateAiShadowGroupRel)
         
         .def("GetAiSubdiv_dicing_cameraRel",
              &This::GetAiSubdiv_dicing_cameraRel)

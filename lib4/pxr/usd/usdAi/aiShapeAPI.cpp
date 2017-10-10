@@ -113,6 +113,23 @@ UsdAiShapeAPI::CreateAiMatteAttr(VtValue const &defaultValue, bool writeSparsely
 }
 
 UsdAttribute
+UsdAiShapeAPI::GetAiRayBiasAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiRay_bias);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiRayBiasAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiRay_bias,
+                       SdfValueTypeNames->Float,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
 UsdAiShapeAPI::GetAiReceiveShadowsAttr() const
 {
     return GetPrim().GetAttribute(UsdAiTokens->aiReceive_shadows);
@@ -385,6 +402,40 @@ UsdAiShapeAPI::CreateAiDoubleSidedToGlossyAttr(VtValue const &defaultValue, bool
 }
 
 UsdAttribute
+UsdAiShapeAPI::GetAiUseLightGroupAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiUse_light_group);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiUseLightGroupAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiUse_light_group,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiUseShadowGroupAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiUse_shadow_group);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiUseShadowGroupAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiUse_shadow_group,
+                       SdfValueTypeNames->Bool,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
 UsdAiShapeAPI::GetAiSmoothingAttr() const
 {
     return GetPrim().GetAttribute(UsdAiTokens->aiSmoothing);
@@ -589,6 +640,32 @@ UsdAiShapeAPI::CreateAiDispAutobumpAttr(VtValue const &defaultValue, bool writeS
 }
 
 UsdRelationship
+UsdAiShapeAPI::GetAiLightGroupRel() const
+{
+    return GetPrim().GetRelationship(UsdAiTokens->aiLight_group);
+}
+
+UsdRelationship
+UsdAiShapeAPI::CreateAiLightGroupRel() const
+{
+    return GetPrim().CreateRelationship(UsdAiTokens->aiLight_group,
+                       /* custom = */ false);
+}
+
+UsdRelationship
+UsdAiShapeAPI::GetAiShadowGroupRel() const
+{
+    return GetPrim().GetRelationship(UsdAiTokens->aiShadow_group);
+}
+
+UsdRelationship
+UsdAiShapeAPI::CreateAiShadowGroupRel() const
+{
+    return GetPrim().CreateRelationship(UsdAiTokens->aiShadow_group,
+                       /* custom = */ false);
+}
+
+UsdRelationship
 UsdAiShapeAPI::GetAiSubdiv_dicing_cameraRel() const
 {
     return GetPrim().GetRelationship(UsdAiTokens->aiSubdiv_dicing_camera);
@@ -620,6 +697,7 @@ UsdAiShapeAPI::GetSchemaAttributeNames(bool includeInherited)
     static TfTokenVector localNames = {
         UsdAiTokens->aiOpaque,
         UsdAiTokens->aiMatte,
+        UsdAiTokens->aiRay_bias,
         UsdAiTokens->aiReceive_shadows,
         UsdAiTokens->aiSelf_shadows,
         UsdAiTokens->aiVisibilityCamera,
@@ -636,6 +714,8 @@ UsdAiShapeAPI::GetSchemaAttributeNames(bool includeInherited)
         UsdAiTokens->aiSidednessSubsurface,
         UsdAiTokens->aiSidednessDiffuse,
         UsdAiTokens->aiSidednessGlossy,
+        UsdAiTokens->aiUse_light_group,
+        UsdAiTokens->aiUse_shadow_group,
         UsdAiTokens->aiSmoothing,
         UsdAiTokens->aiSubdiv_type,
         UsdAiTokens->aiSubdiv_iterations,

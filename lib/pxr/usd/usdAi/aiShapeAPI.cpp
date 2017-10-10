@@ -113,23 +113,6 @@ UsdAiShapeAPI::CreateAiMatteAttr(VtValue const &defaultValue, bool writeSparsely
 }
 
 UsdAttribute
-UsdAiShapeAPI::GetAiReceiveShadowsAttr() const
-{
-    return GetPrim().GetAttribute(UsdAiTokens->aiReceive_shadows);
-}
-
-UsdAttribute
-UsdAiShapeAPI::CreateAiReceiveShadowsAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiReceive_shadows,
-                       SdfValueTypeNames->Bool,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
-}
-
-UsdAttribute
 UsdAiShapeAPI::GetAiRayBiasAttr() const
 {
     return GetPrim().GetAttribute(UsdAiTokens->aiRay_bias);
@@ -140,6 +123,23 @@ UsdAiShapeAPI::CreateAiRayBiasAttr(VtValue const &defaultValue, bool writeSparse
 {
     return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiRay_bias,
                        SdfValueTypeNames->Float,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiShapeAPI::GetAiReceiveShadowsAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->aiReceive_shadows);
+}
+
+UsdAttribute
+UsdAiShapeAPI::CreateAiReceiveShadowsAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiReceive_shadows,
+                       SdfValueTypeNames->Bool,
                        /* custom = */ false,
                        SdfVariabilityUniform,
                        defaultValue,
@@ -884,8 +884,8 @@ UsdAiShapeAPI::GetSchemaAttributeNames(bool includeInherited)
     static TfTokenVector localNames = {
         UsdAiTokens->aiOpaque,
         UsdAiTokens->aiMatte,
-        UsdAiTokens->aiReceive_shadows,
         UsdAiTokens->aiRay_bias,
+        UsdAiTokens->aiReceive_shadows,
         UsdAiTokens->aiSelf_shadows,
         UsdAiTokens->aiTransform_type,
         UsdAiTokens->aiVisibilityCamera,

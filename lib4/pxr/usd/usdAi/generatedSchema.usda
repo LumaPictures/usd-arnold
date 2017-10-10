@@ -38,6 +38,9 @@ class "AiShapeAPI" (
     uniform float ai:disp_height = 1
     uniform float ai:disp_padding = 0
     uniform float ai:disp_zero_value = 0
+    rel ai:light_group (
+        doc = "Light groups for the shape."
+    )
     uniform bool ai:matte = 0 (
         doc = """This attribute, when enabled, turns an object or group into a
                  holdout matte. This affects primary rays only.
@@ -54,11 +57,17 @@ class "AiShapeAPI" (
                  default all objects are marked as opaque, because it speeds up
                  rendering considerably."""
     )
+    uniform float ai:ray_bias = 0.000001 (
+        doc = "Ray bias for handling precision issues."
+    )
     uniform bool ai:receive_shadows = 1 (
         doc = "Whether the object picks up shadows from other objects."
     )
     uniform bool ai:self_shadows = 1 (
         doc = "Whether the object casts shadows on itself."
+    )
+    rel ai:shadow_group (
+        doc = "Shadow groups for the shape."
     )
     uniform bool ai:sidedness:camera = 1 (
         doc = "Whether the object is double-sided to camera rays."
@@ -97,6 +106,12 @@ class "AiShapeAPI" (
     )
     uniform token ai:subdiv_uv_smoothing = "pin_corners" (
         allowedTokens = ["pin_corners", "pin_borders", "linear", "smooth"]
+    )
+    uniform bool ai:use_light_group = 0 (
+        doc = "Enable the use of light groups."
+    )
+    uniform bool ai:use_shadow_group = 0 (
+        doc = "Enable the use of shadow groups."
     )
     uniform bool ai:visibility:camera = 1 (
         doc = "Whether the object is visible to camera rays."
