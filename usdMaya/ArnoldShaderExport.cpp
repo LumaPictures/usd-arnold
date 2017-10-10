@@ -23,7 +23,7 @@ namespace {
         auto* trans = arnoldSession->ExportNode(node.findPlug(plugName));
 #if MTOA12
         return trans == nullptr ? nullptr : trans->GetArnoldRootNode();
-#elif MTOA14
+#else
         return trans == nullptr ? nullptr : trans->GetArnoldNode();
 #endif
     }
@@ -83,7 +83,8 @@ ArnoldShaderExport::setup_shader(const MDagPath& dg, const SdfPath& path) {
         MFnDependencyNode dn(obj);
         if (dn.typeName() == "vdb_visualizer") {
             auto* volume_node = mtoa_export_node(obj, "message");
-            if (!AiNodeIs(volume_node, "volume")) {
+            static const AtString volumeString("volume");
+            if (!AiNodeIs(volume_node, volumeString)) {
                 return;
             }
             const auto* linked_shader = reinterpret_cast<const AtNode*>(AiNodeGetPtr(volume_node, "shader"));
