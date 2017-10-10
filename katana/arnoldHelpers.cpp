@@ -180,6 +180,7 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
         {&UsdAiShapeAPI::GetAiDispPaddingAttr, "disp_padding", 0.0f},
         {&UsdAiShapeAPI::GetAiDispHeightAttr, "disp_height", 1.0f},
         {&UsdAiShapeAPI::GetAiDispZeroValueAttr, "disp_zero_value", 0.0f},
+        {&UsdAiShapeAPI::GetAiRayBiasAttr, "ray_bias", 0.000001f},
     };
 
     static const std::vector<_attributeDefinition<unsigned int>> uintAttrs {
@@ -191,6 +192,9 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
         {&UsdAiShapeAPI::GetAiSubdivAdaptiveMetricAttr, "subdiv_adaptive_metric", TfToken("auto_")},
         {&UsdAiShapeAPI::GetAiSubdivAdaptiveSpaceAttr, "subdiv_adaptive_space", TfToken("raster")},
         {&UsdAiShapeAPI::GetAiSubdivUVSmoothingAttr, "subdiv_uv_smoothing", TfToken("pin_corners")},
+#ifdef ARNOLD5
+        {&UsdAiShapeAPI::GetAiTransformTypeAttr, "transform_type", TfToken("rotate_about_center")},
+#endif
     };
 
     auto needToBuild = _handleAttributes(boolAttrs, shapeAPI, builder);
