@@ -453,13 +453,13 @@ UsdAiShapeAPI::CreateAiAutobumpVisibleToReflectionAttr(VtValue const &defaultVal
 }
 
 UsdAttribute
-UsdAiShapeAPI::GetAiAutobumpVisibleToSpecularTransmitAttr() const
+UsdAiShapeAPI::GetAiAutobumpVisibleToRefractionAttr() const
 {
     return GetPrim().GetAttribute(UsdAiTokens->aiAutobump_visibilityRefracted);
 }
 
 UsdAttribute
-UsdAiShapeAPI::CreateAiAutobumpVisibleToSpecularTransmitAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiShapeAPI::CreateAiAutobumpVisibleToRefractionAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
     return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiAutobump_visibilityRefracted,
                        SdfValueTypeNames->Bool,

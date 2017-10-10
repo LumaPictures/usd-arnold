@@ -619,7 +619,7 @@ public:
 
 public:
     // --------------------------------------------------------------------- //
-    // AIAUTOBUMPVISIBLETOSPECULARTRANSMIT 
+    // AIAUTOBUMPVISIBLETOREFRACTION 
     // --------------------------------------------------------------------- //
     /// Whether the autobump is enabled for refraction rays.
     ///
@@ -628,15 +628,15 @@ public:
     /// \n  Variability: SdfVariabilityUniform
     /// \n  Fallback Value: True
     USDAI_API
-    UsdAttribute GetAiAutobumpVisibleToSpecularTransmitAttr() const;
+    UsdAttribute GetAiAutobumpVisibleToRefractionAttr() const;
 
-    /// See GetAiAutobumpVisibleToSpecularTransmitAttr(), and also 
+    /// See GetAiAutobumpVisibleToRefractionAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateAiAutobumpVisibleToSpecularTransmitAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAiAutobumpVisibleToRefractionAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // --------------------------------------------------------------------- //

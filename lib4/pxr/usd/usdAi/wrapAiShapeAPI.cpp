@@ -204,9 +204,9 @@ _CreateAiAutobumpVisibleToReflectionAttr(UsdAiShapeAPI &self,
 }
         
 static UsdAttribute
-_CreateAiAutobumpVisibleToSpecularTransmitAttr(UsdAiShapeAPI &self,
+_CreateAiAutobumpVisibleToRefractionAttr(UsdAiShapeAPI &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateAiAutobumpVisibleToSpecularTransmitAttr(
+    return self.CreateAiAutobumpVisibleToRefractionAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
 }
         
@@ -514,10 +514,10 @@ void wrapUsdAiShapeAPI()
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
-        .def("GetAiAutobumpVisibleToSpecularTransmitAttr",
-             &This::GetAiAutobumpVisibleToSpecularTransmitAttr)
-        .def("CreateAiAutobumpVisibleToSpecularTransmitAttr",
-             &_CreateAiAutobumpVisibleToSpecularTransmitAttr,
+        .def("GetAiAutobumpVisibleToRefractionAttr",
+             &This::GetAiAutobumpVisibleToRefractionAttr)
+        .def("CreateAiAutobumpVisibleToRefractionAttr",
+             &_CreateAiAutobumpVisibleToRefractionAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
