@@ -876,3 +876,69 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // 'PXR_NAMESPACE_OPEN_SCOPE', 'PXR_NAMESPACE_CLOSE_SCOPE'.
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+#include <ai_ray.h>
+
+namespace {
+    using _MaskQuery = std::pair<decltype(&UsdAiShapeAPI::GetAiVisibleToCameraAttr), uint8_t>;
+    using _MaskQueryVector = std::vector<_MaskQuery>;
+
+    inline
+    uint8_t _getMask(
+        const UsdAiShapeAPI& api,
+        const _MaskQueryVector& l) {
+        uint8_t result = 0;
+        for (const auto& each: l) {
+            if (((api).*(each.first))()) {
+                result |= each.second;
+            }
+        }
+        return result;
+    }
+}
+
+uint8_t
+UsdAiShapeAPI::ComputeVisibility() const {
+    static const _MaskQueryVector _query = {
+        {&UsdAiShapeAPI::GetAiVisibleToCameraAttr, AI_RAY_CAMERA},
+        {&UsdAiShapeAPI::GetAiVisibleToShadowAttr, AI_RAY_SHADOW},
+        {&UsdAiShapeAPI::GetAiVisibleToReflectionAttr, AI_RAY_REFLECTED},
+        {&UsdAiShapeAPI::GetAiVisibleToRefractionAttr, AI_RAY_REFRACTED},
+        {&UsdAiShapeAPI::GetAiVisibleToSubsurfaceAttr, AI_RAY_SUBSURFACE},
+        {&UsdAiShapeAPI::GetAiVisibleToDiffuseAttr, AI_RAY_DIFFUSE},
+        {&UsdAiShapeAPI::GetAiVisibleToGlossyAttr, AI_RAY_GLOSSY},
+    };
+    return _getMask(*this, _query);
+}
+
+uint8_t
+UsdAiShapeAPI::ComputeSidedness() const {
+    static const _MaskQueryVector _query = {
+        {&UsdAiShapeAPI::GetAiDoubleSidedToCameraAttr, AI_RAY_CAMERA},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToShadowAttr, AI_RAY_SHADOW},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToReflectionAttr, AI_RAY_REFLECTED},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToRefractionAttr, AI_RAY_REFRACTED},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToSubsurfaceAttr, AI_RAY_SUBSURFACE},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToDiffuseAttr, AI_RAY_DIFFUSE},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToGlossyAttr, AI_RAY_GLOSSY},
+    };
+    return _getMask(*this, _query);
+}
+
+uint8_t
+UsdAiShapeAPI::ComputeAutobumpVisibility() const {
+    static const _MaskQueryVector _query = {
+        {&UsdAiShapeAPI::GetAiAutobumpVisibleToCameraAttr, AI_RAY_CAMERA},
+        {&UsdAiShapeAPI::GetAiAutobumpVisibleToShadowAttr, AI_RAY_SHADOW},
+        {&UsdAiShapeAPI::GetAiAutobumpVisibleToReflectionAttr, AI_RAY_REFLECTED},
+        {&UsdAiShapeAPI::GetAiAutobumpVisibleToRefractionAttr, AI_RAY_REFRACTED},
+        {&UsdAiShapeAPI::GetAiAutobumpVisibleToSubsurfaceAttr, AI_RAY_SUBSURFACE},
+        {&UsdAiShapeAPI::GetAiAutobumpVisibleToDiffuseAttr, AI_RAY_DIFFUSE},
+        {&UsdAiShapeAPI::GetAiAutobumpVisibleToGlossyAttr, AI_RAY_GLOSSY},
+    };
+    return _getMask(*this, _query);
+}
+
+PXR_NAMESPACE_CLOSE_SCOPE

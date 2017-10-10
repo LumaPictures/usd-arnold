@@ -1052,6 +1052,21 @@ public:
     //  - Close the include guard with #endif
     // ===================================================================== //
     // --(BEGIN CUSTOM CODE)--
+
+    /// Computes the visibility bitmask for the shape.
+    ///
+    USDAI_API
+    uint8_t ComputeVisibility() const;
+
+    /// Computes the sidedness bitmask for the shape.
+    ///
+    USDAI_API
+    uint8_t ComputeSidedness() const;
+
+    /// Computes the autobump-visibility bitmask for the shape.
+    ///
+    USDAI_API
+    uint8_t ComputeAutobumpVisibility() const;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
