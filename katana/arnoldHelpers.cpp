@@ -1,9 +1,6 @@
 #include "arnoldHelpers.h"
 
 #include <pxr/usd/usdAi/aiShapeAPI.h>
-#include <pxr/usd/usdAi/rayTypes4.h>
-
-using namespace arnold4;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -119,6 +116,24 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
     // Sadly std::array needs the size passed as a parameter, so a static const
     // std::vector will do the same in our case.
     static const std::vector<_attributeDefinition<bool>> boolAttrs = {
+#ifdef ARNOLD5
+        {&UsdAiShapeAPI::GetAiVisibleToCameraAttr, "visibility.AI_RAY_CAMERA", true},
+        {&UsdAiShapeAPI::GetAiVisibleToShadowAttr, "visibility.AI_RAY_SHADOW", true},
+        {&UsdAiShapeAPI::GetAiVisibleToDiffuseTransmitAttr, "visibility.AI_RAY_DIFFUSE_TRANSMIT", true},
+        {&UsdAiShapeAPI::GetAiVisibleToSpecularTransmitAttr, "visibility.AI_RAY_SPECULAR_TRANSMIT", true},
+        {&UsdAiShapeAPI::GetAiVisibleToVolumeAttr, "visibility.AI_RAY_VOLUME", true},
+        {&UsdAiShapeAPI::GetAiVisibleToDiffuseReflectAttr, "visibility.AI_RAY_DIFFUSE_REFLECT", true},
+        {&UsdAiShapeAPI::GetAiVisibleToSpecularReflectAttr, "visibility.AI_RAY_SPECULAR_REFLECT", true},
+        {&UsdAiShapeAPI::GetAiVisibleToSubsurfaceAttr, "visibility.AI_RAY_SUBSURFACE", true},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToCameraAttr, "visibility.AI_RAY_CAMERA", true},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToShadowAttr, "visibility.AI_RAY_SHADOW", true},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToDiffuseTransmitAttr, "visibility.AI_RAY_DIFFUSE_TRANSMIT", true},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToSpecularTransmitAttr, "visibility.AI_RAY_SPECULAR_TRANSMIT", true},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToVolumeAttr, "visibility.AI_RAY_VOLUME", true},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToDiffuseReflectAttr, "visibility.AI_RAY_DIFFUSE_REFLECT", true},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToSpecularReflectAttr, "visibility.AI_RAY_SPECULAR_REFLECT", true},
+        {&UsdAiShapeAPI::GetAiDoubleSidedToSubsurfaceAttr, "visibility.AI_RAY_SUBSURFACE", true},
+#else
         {&UsdAiShapeAPI::GetAiVisibleToCameraAttr, "visibility.AI_RAY_CAMERA", true},
         {&UsdAiShapeAPI::GetAiVisibleToShadowAttr, "visibility.AI_RAY_SHADOW", true},
         {&UsdAiShapeAPI::GetAiVisibleToReflectionAttr, "visibility.AI_RAY_REFLECTED", true},
@@ -133,6 +148,7 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
         {&UsdAiShapeAPI::GetAiDoubleSidedToSubsurfaceAttr, "sidedness.AI_RAY_SUBSURFACE", true},
         {&UsdAiShapeAPI::GetAiDoubleSidedToDiffuseAttr, "sidedness.AI_RAY_DIFFUSE", true},
         {&UsdAiShapeAPI::GetAiDoubleSidedToGlossyAttr, "sidedness.AI_RAY_GLOSSY", true},
+#endif
         // Non visibility attributes where the pattern still applies.
         {&UsdAiShapeAPI::GetAiOpaqueAttr, "opaque", true},
         {&UsdAiShapeAPI::GetAiReceiveShadowsAttr, "receive_shadows", true},

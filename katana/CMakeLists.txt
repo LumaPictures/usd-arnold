@@ -3,15 +3,9 @@ set(PLUGIN_NAME ai_procedural_op)
 find_package(Katana REQUIRED)
 find_package(OpenEXR REQUIRED)
 find_package(Boost REQUIRED)
-
-include_directories(system ${Boost_INCLUDE_DIRS})
-
+find_package(Arnold REQUIRED)
 find_package(USDArnold REQUIRED)
-include_directories(${USD_ARNOLD_INCLUDE_DIR})
 
-include_directories(${KATANA_API_INCLUDE_DIR})
-
-include_directories(${USD_KATANA_INCLUDE_DIR})
 link_directories(${USD_KATANA_LIBRARY_DIR})
 
 file(GLOB FNATTRIBUTE_SRC ${KATANA_API_SOURCE_DIR}/FnAttribute/client/*.cpp)
@@ -37,9 +31,16 @@ set(API_SRC
     ${PYSTRING_SRC})
 add_library(${PLUGIN_NAME} MODULE ${SRC} ${API_SRC})
 set_target_properties(${PLUGIN_NAME} PROPERTIES PREFIX "")
+set_target_properties(${PLUGIN_NAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH ON)
+target_include_directories(${PLUGIN_NAME} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
+target_include_directories(${PLUGIN_NAME} PRIVATE ${USD_ARNOLD_INCLUDE_DIR})
+target_include_directories(${PLUGIN_NAME} PRIVATE ${KATANA_API_INCLUDE_DIR})
+target_include_directories(${PLUGIN_NAME} PRIVATE ${USD_KATANA_INCLUDE_DIR})
 target_link_libraries(${PLUGIN_NAME} CEL ${OPENEXR_LIBRARIES} dl tf gf sdf usd usdGeom ${USD_ARNOLD_LIBRARY} usdKatana)
 
-set_target_properties(${PLUGIN_NAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH ON)
+if (ARNOLD_VERSION_ARCH_NUM VERSION_GREATER "4")
+    target_compile_definitions(${PLUGIN_NAME} PRIVATE "-DARNOLD5")
+endif ()
 
 install(TARGETS ${PLUGIN_NAME}
         DESTINATION Ops)
