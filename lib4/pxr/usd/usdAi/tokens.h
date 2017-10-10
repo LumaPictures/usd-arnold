@@ -41,6 +41,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 /// \hideinitializer
 #define USDAI_TOKENS \
+    ((aiAutobump_visibilityCamera, "ai:autobump_visibility:camera")) \
+    ((aiAutobump_visibilityDiffuse, "ai:autobump_visibility:diffuse")) \
+    ((aiAutobump_visibilityGlossy, "ai:autobump_visibility:glossy")) \
+    ((aiAutobump_visibilityReflected, "ai:autobump_visibility:reflected")) \
+    ((aiAutobump_visibilityRefracted, "ai:autobump_visibility:refracted")) \
+    ((aiAutobump_visibilityShadow, "ai:autobump_visibility:shadow")) \
+    ((aiAutobump_visibilitySubsurface, "ai:autobump_visibility:subsurface")) \
     ((aiDisp_autobump, "ai:disp_autobump")) \
     ((aiDisp_height, "ai:disp_height")) \
     ((aiDisp_padding, "ai:disp_padding")) \
@@ -134,6 +141,13 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \endcode
 ///
 /// The tokens are:
+/// \li <b>aiAutobump_visibilityCamera</b> - UsdAiShapeAPI
+/// \li <b>aiAutobump_visibilityDiffuse</b> - UsdAiShapeAPI
+/// \li <b>aiAutobump_visibilityGlossy</b> - UsdAiShapeAPI
+/// \li <b>aiAutobump_visibilityReflected</b> - UsdAiShapeAPI
+/// \li <b>aiAutobump_visibilityRefracted</b> - UsdAiShapeAPI
+/// \li <b>aiAutobump_visibilityShadow</b> - UsdAiShapeAPI
+/// \li <b>aiAutobump_visibilitySubsurface</b> - UsdAiShapeAPI
 /// \li <b>aiDisp_autobump</b> - UsdAiShapeAPI
 /// \li <b>aiDisp_height</b> - UsdAiShapeAPI
 /// \li <b>aiDisp_padding</b> - UsdAiShapeAPI

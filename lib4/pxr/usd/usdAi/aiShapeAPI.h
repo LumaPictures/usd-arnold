@@ -306,7 +306,7 @@ public:
     // --------------------------------------------------------------------- //
     // AIVISIBLETOREFLECTION 
     // --------------------------------------------------------------------- //
-    /// Whether the object is visible to the reflected rays.
+    /// Whether the object is visible to the reflection rays.
     ///
     /// \n  C++ Type: bool
     /// \n  Usd Type: SdfValueTypeNames->Bool
@@ -327,7 +327,7 @@ public:
     // --------------------------------------------------------------------- //
     // AIVISIBLETOREFRACTION 
     // --------------------------------------------------------------------- //
-    /// Whether the object is visible to the refracted rays.
+    /// Whether the object is visible to the refraction rays.
     ///
     /// \n  C++ Type: bool
     /// \n  Usd Type: SdfValueTypeNames->Bool
@@ -453,7 +453,7 @@ public:
     // --------------------------------------------------------------------- //
     // AIDOUBLESIDEDTOREFLECTION 
     // --------------------------------------------------------------------- //
-    /// Whether the object is double-sided to the reflected rays.
+    /// Whether the object is double-sided to the reflection rays.
     ///
     /// \n  C++ Type: bool
     /// \n  Usd Type: SdfValueTypeNames->Bool
@@ -474,7 +474,7 @@ public:
     // --------------------------------------------------------------------- //
     // AIDOUBLESIDEDTOREFRACTION 
     // --------------------------------------------------------------------- //
-    /// Whether the object is double-sided to the refracted rays.
+    /// Whether the object is double-sided to the refraction rays.
     ///
     /// \n  C++ Type: bool
     /// \n  Usd Type: SdfValueTypeNames->Bool
@@ -553,6 +553,153 @@ public:
     /// the default for \p writeSparsely is \c false.
     USDAI_API
     UsdAttribute CreateAiDoubleSidedToGlossyAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIAUTOBUMPVISIBLETOCAMERA 
+    // --------------------------------------------------------------------- //
+    /// Whether the autobump is enabled for camera rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiAutobumpVisibleToCameraAttr() const;
+
+    /// See GetAiAutobumpVisibleToCameraAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiAutobumpVisibleToCameraAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIAUTOBUMPVISIBLETOSHADOW 
+    // --------------------------------------------------------------------- //
+    /// Whether the autobump is enabled for shadow rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiAutobumpVisibleToShadowAttr() const;
+
+    /// See GetAiAutobumpVisibleToShadowAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiAutobumpVisibleToShadowAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIAUTOBUMPVISIBLETOREFLECTION 
+    // --------------------------------------------------------------------- //
+    /// Whether the autobump is enabled for reflection rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiAutobumpVisibleToReflectionAttr() const;
+
+    /// See GetAiAutobumpVisibleToReflectionAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiAutobumpVisibleToReflectionAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIAUTOBUMPVISIBLETOSPECULARTRANSMIT 
+    // --------------------------------------------------------------------- //
+    /// Whether the autobump is enabled for refraction rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiAutobumpVisibleToSpecularTransmitAttr() const;
+
+    /// See GetAiAutobumpVisibleToSpecularTransmitAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiAutobumpVisibleToSpecularTransmitAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIAUTOBUMPVISIBLETOSUBSURFACE 
+    // --------------------------------------------------------------------- //
+    /// Whether the autobump is enabled for subsurface rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: True
+    USDAI_API
+    UsdAttribute GetAiAutobumpVisibleToSubsurfaceAttr() const;
+
+    /// See GetAiAutobumpVisibleToSubsurfaceAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiAutobumpVisibleToSubsurfaceAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIAUTOBUMPVISIBLETODIFFUSE 
+    // --------------------------------------------------------------------- //
+    /// Whether the autobump is enabled for diffuse rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: False
+    USDAI_API
+    UsdAttribute GetAiAutobumpVisibleToDiffuseAttr() const;
+
+    /// See GetAiAutobumpVisibleToDiffuseAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiAutobumpVisibleToDiffuseAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // AIAUTOBUMPVISIBLETOGLOSSY 
+    // --------------------------------------------------------------------- //
+    /// Whether the autobump is enabled for glossy rays.
+    ///
+    /// \n  C++ Type: bool
+    /// \n  Usd Type: SdfValueTypeNames->Bool
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: False
+    USDAI_API
+    UsdAttribute GetAiAutobumpVisibleToGlossyAttr() const;
+
+    /// See GetAiAutobumpVisibleToGlossyAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateAiAutobumpVisibleToGlossyAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // --------------------------------------------------------------------- //

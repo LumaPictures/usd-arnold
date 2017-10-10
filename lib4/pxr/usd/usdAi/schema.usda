@@ -128,14 +128,14 @@ class "AiShapeAPI" (
     )
 
     uniform bool ai:visibility:reflected = true (
-        doc = """Whether the object is visible to the reflected rays."""
+        doc = """Whether the object is visible to the reflection rays."""
         customData = {
             string apiName = "aiVisibleToReflection"
         }
     )
 
     uniform bool ai:visibility:refracted = true (
-        doc = """Whether the object is visible to the refracted rays."""
+        doc = """Whether the object is visible to the refraction rays."""
         customData = {
             string apiName = "aiVisibleToRefraction"
         }
@@ -186,14 +186,14 @@ class "AiShapeAPI" (
     )
 
     uniform bool ai:sidedness:reflected = true (
-        doc = """Whether the object is double-sided to the reflected rays."""
+        doc = """Whether the object is double-sided to the reflection rays."""
         customData = {
             string apiName = "aiDoubleSidedToReflection"
         }
     )
 
     uniform bool ai:sidedness:refracted = true (
-        doc = """Whether the object is double-sided to the refracted rays."""
+        doc = """Whether the object is double-sided to the refraction rays."""
         customData = {
             string apiName = "aiDoubleSidedToRefraction"
         }
@@ -227,6 +227,67 @@ class "AiShapeAPI" (
 #                 Just as you can disable an object's visibility for specific ray
 #                 types, you can also change its sidedness. By default, objects
 #                 are double-sided for all rays."""
+#    )
+
+    # autobump visibility
+
+    uniform bool ai:autobump_visibility:camera = true (
+        doc = """Whether the autobump is enabled for camera rays."""
+        customData = {
+            string apiName = "aiAutobumpVisibleToCamera"
+        }
+    )
+
+    uniform bool ai:autobump_visibility:shadow = true (
+        doc = """Whether the autobump is enabled for shadow rays."""
+        customData = {
+            string apiName = "aiAutobumpVisibleToShadow"
+        }
+    )
+
+    uniform bool ai:autobump_visibility:reflected = true (
+        doc = """Whether the autobump is enabled for reflection rays."""
+        customData = {
+            string apiName = "aiAutobumpVisibleToReflection"
+        }
+    )
+
+    uniform bool ai:autobump_visibility:refracted = true (
+        doc = """Whether the autobump is enabled for refraction rays."""
+        customData = {
+            string apiName = "aiAutobumpVisibleToSpecularTransmit"
+        }
+    )
+
+    uniform bool ai:autobump_visibility:subsurface = true (
+        doc = """Whether the autobump is enabled for subsurface rays."""
+        customData = {
+            string apiName = "aiAutobumpVisibleToSubsurface"
+        }
+    )
+
+    uniform bool ai:autobump_visibility:diffuse = false (
+        doc = """Whether the autobump is enabled for diffuse rays."""
+        customData = {
+            string apiName = "aiAutobumpVisibleToDiffuse"
+        }
+    )
+
+    uniform bool ai:autobump_visibility:glossy = false (
+        doc = """Whether the autobump is enabled for glossy rays."""
+        customData = {
+            string apiName = "aiAutobumpVisibleToGlossy"
+        }
+    )
+
+#    (
+#        doc = """The autobump of the object for each Arnold ray type, as
+#                 a bitmask.
+#
+#                 Just as you can disable an object's visibility for specific ray
+#                 types, you can also change its autobump. By default, autobump
+#                 is only enabled for camera, shadow, reflected, refracted
+#                 and subsurface rays."""
 #    )
 
     # --- light group properties --- #

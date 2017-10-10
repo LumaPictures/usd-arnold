@@ -183,6 +183,55 @@ _CreateAiDoubleSidedToGlossyAttr(UsdAiShapeAPI &self,
 }
         
 static UsdAttribute
+_CreateAiAutobumpVisibleToCameraAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiAutobumpVisibleToCameraAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiAutobumpVisibleToShadowAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiAutobumpVisibleToShadowAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiAutobumpVisibleToReflectionAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiAutobumpVisibleToReflectionAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiAutobumpVisibleToSpecularTransmitAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiAutobumpVisibleToSpecularTransmitAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiAutobumpVisibleToSubsurfaceAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiAutobumpVisibleToSubsurfaceAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiAutobumpVisibleToDiffuseAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiAutobumpVisibleToDiffuseAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateAiAutobumpVisibleToGlossyAttr(UsdAiShapeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateAiAutobumpVisibleToGlossyAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
+}
+        
+static UsdAttribute
 _CreateAiUseLightGroupAttr(UsdAiShapeAPI &self,
                                       object defaultVal, bool writeSparsely) {
     return self.CreateAiUseLightGroupAttr(
@@ -441,6 +490,55 @@ void wrapUsdAiShapeAPI()
              &This::GetAiDoubleSidedToGlossyAttr)
         .def("CreateAiDoubleSidedToGlossyAttr",
              &_CreateAiDoubleSidedToGlossyAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiAutobumpVisibleToCameraAttr",
+             &This::GetAiAutobumpVisibleToCameraAttr)
+        .def("CreateAiAutobumpVisibleToCameraAttr",
+             &_CreateAiAutobumpVisibleToCameraAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiAutobumpVisibleToShadowAttr",
+             &This::GetAiAutobumpVisibleToShadowAttr)
+        .def("CreateAiAutobumpVisibleToShadowAttr",
+             &_CreateAiAutobumpVisibleToShadowAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiAutobumpVisibleToReflectionAttr",
+             &This::GetAiAutobumpVisibleToReflectionAttr)
+        .def("CreateAiAutobumpVisibleToReflectionAttr",
+             &_CreateAiAutobumpVisibleToReflectionAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiAutobumpVisibleToSpecularTransmitAttr",
+             &This::GetAiAutobumpVisibleToSpecularTransmitAttr)
+        .def("CreateAiAutobumpVisibleToSpecularTransmitAttr",
+             &_CreateAiAutobumpVisibleToSpecularTransmitAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiAutobumpVisibleToSubsurfaceAttr",
+             &This::GetAiAutobumpVisibleToSubsurfaceAttr)
+        .def("CreateAiAutobumpVisibleToSubsurfaceAttr",
+             &_CreateAiAutobumpVisibleToSubsurfaceAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiAutobumpVisibleToDiffuseAttr",
+             &This::GetAiAutobumpVisibleToDiffuseAttr)
+        .def("CreateAiAutobumpVisibleToDiffuseAttr",
+             &_CreateAiAutobumpVisibleToDiffuseAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetAiAutobumpVisibleToGlossyAttr",
+             &This::GetAiAutobumpVisibleToGlossyAttr)
+        .def("CreateAiAutobumpVisibleToGlossyAttr",
+             &_CreateAiAutobumpVisibleToGlossyAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
