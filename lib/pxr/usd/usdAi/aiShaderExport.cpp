@@ -88,8 +88,9 @@ namespace {
         {AI_TYPE_RGBA, {SdfValueTypeNames->Color4f, [](const AtNode* no, const char* na) -> VtValue { const auto v = AiNodeGetRGBA(no, na); return VtValue(GfVec4f(v.r, v.g, v.b, v.a)); }}},
         {AI_TYPE_VECTOR, {SdfValueTypeNames->Vector3f, [](const AtNode* no, const char* na) -> VtValue { const auto v = AiNodeGetVec(no, na); return VtValue(GfVec3f(v.x, v.y, v.z)); }}},
         {AI_TYPE_VECTOR2, {SdfValueTypeNames->Float2, [](const AtNode* no, const char* na) -> VtValue { const auto v = AiNodeGetVec2(no, na); return VtValue(GfVec2f(v.x, v.y)); }}},
-        {AI_TYPE_STRING, {SdfValueTypeNames->String, [](const AtNode* no, const char* na) -> VtValue { return VtValue(AiNodeGetStr(no, na)); }}},
+        {AI_TYPE_STRING, {SdfValueTypeNames->String, [](const AtNode* no, const char* na) -> VtValue { return VtValue(AiNodeGetStr(no, na).c_str()); }}},
         {AI_TYPE_NODE, {SdfValueTypeNames->String, nullptr}},
+        {AI_TYPE_CLOSURE, {SdfValueTypeNames->String, nullptr}},
         {AI_TYPE_MATRIX, {SdfValueTypeNames->Matrix4d, [](const AtNode* no, const char* na) -> VtValue { return VtValue(NodeGetMatrix(no, na)); }}},
         {AI_TYPE_ENUM, {SdfValueTypeNames->String, [](const AtNode* no, const char* na) -> VtValue {
             const auto* nentry = AiNodeGetNodeEntry(no);
@@ -131,6 +132,7 @@ namespace {
         {AI_TYPE_VECTOR2, {SdfValueTypeNames->Float2Array, [](UsdShadeInput& p, const AtArray* a) { export_array<GfVec2f, AtVector2>(p, a, AiArrayGetVec2Func); }}},
         {AI_TYPE_STRING, {SdfValueTypeNames->StringArray, [](UsdShadeInput& p, const AtArray* a) { export_array<std::string, AtString>(p, a, AiArrayGetStrFunc); }}},
         {AI_TYPE_NODE, {SdfValueTypeNames->StringArray, nullptr}},
+        {AI_TYPE_CLOSURE, {SdfValueTypeNames->StringArray, nullptr}},
         {AI_TYPE_MATRIX,
             {SdfValueTypeNames->Matrix4dArray,
                            [](UsdShadeInput& p, const AtArray* a) {
@@ -234,7 +236,6 @@ void AiShaderExport::clean_arnold_name(std::string& name) {
     std::replace(name.begin(), name.end(), '|', '_');
     std::replace(name.begin(), name.end(), ':', '_');
 }
-
 
 bool
 AiShaderExport::get_output(const AtNode* src_arnold_node, UsdAiShader& src_shader,
