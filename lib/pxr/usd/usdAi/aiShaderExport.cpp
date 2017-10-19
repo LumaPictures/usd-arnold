@@ -276,22 +276,23 @@ AiShaderExport::export_connection(const AtNode* dest_arnold_node, UsdAiShader& d
         }
     };
 
+    auto exported_connection = false;
     UsdShadeConnectableAPI connectable_API(dest_shader);
     UsdShadeOutput source_param;
     if (_get_output_parameter(dest_param_name, source_param)) {
         // connected
         UsdShadeConnectableAPI::ConnectToSource(dest_shader.CreateInput(TfToken(dest_param_name), iter_type->type), source_param);
-        return true;
+        exported_connection = true;
     } else {
         // not connected or failed to export node
         if (iter_type->f != nullptr) {
             auto param = dest_shader.CreateInput(TfToken(dest_param_name), iter_type->type);
             param.Set(iter_type->f(dest_arnold_node, dest_param_name));
-            return true;
+            exported_connection = true;
         }
     }
 
-    /*for (const auto& comps : in_comp_names(arnold_param_type)) {
+    for (const auto& comps : in_comp_names(arnold_param_type)) {
         const auto arnold_comp_name = std::string(dest_param_name) + "." + comps;
         const auto usd_comp_name = std::string(dest_param_name) + ":" + comps;
         if (_get_output_parameter(arnold_comp_name.c_str(), source_param)) {
@@ -299,10 +300,11 @@ AiShaderExport::export_connection(const AtNode* dest_arnold_node, UsdAiShader& d
                                                           SdfValueTypeNames->Float);
             if (param_comp) {
                 connectable_API.ConnectToSource(param_comp, source_param);
+                exported_connection = true;
             }
         }
-    }*/
-    return false;
+    }
+    return exported_connection;
 }
 
 
@@ -367,7 +369,6 @@ AiShaderExport::export_parameter(
             auto param = api.CreateUserAttribute(TfToken(arnold_param_name), iter_type->type);
             param.Set(iter_type->f(arnold_node, arnold_param_name));
         } else {
-
             if (AiNodeIsLinked(arnold_node, arnold_param_name)) {
                 // FIXME: should we also end up here if (arnold_param_type == AI_TYPE_NODE)??
                 export_connection(arnold_node, shader, arnold_param_name, arnold_param_type);
