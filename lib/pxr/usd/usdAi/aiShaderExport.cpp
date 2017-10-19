@@ -259,7 +259,7 @@ AiShaderExport::export_connection(const AtNode* dest_arnold_node, UsdAiShader& d
                                   const char* dest_param_name, uint8_t arnold_param_type) {
     const auto iter_type = get_simple_type(arnold_param_type);
     if (iter_type == nullptr) {
-        return false;
+        return true; // No need to do anything else
     }
     auto _get_output_parameter = [this, dest_arnold_node, arnold_param_type] (const char* param_name, UsdShadeOutput& out) -> bool {
         int32_t comp = -1;
@@ -276,35 +276,32 @@ AiShaderExport::export_connection(const AtNode* dest_arnold_node, UsdAiShader& d
         }
     };
 
-    auto exported_connection = false;
+    const auto& comp_names = in_comp_names(arnold_param_type);
+    const auto comp_count = comp_names.size();
+    size_t link_count = 0;
     UsdShadeConnectableAPI connectable_API(dest_shader);
     UsdShadeOutput source_param;
     if (_get_output_parameter(dest_param_name, source_param)) {
         // connected
         UsdShadeConnectableAPI::ConnectToSource(dest_shader.CreateInput(TfToken(dest_param_name), iter_type->type), source_param);
-        exported_connection = true;
-    } else {
-        // not connected or failed to export node
-        if (iter_type->f != nullptr) {
-            auto param = dest_shader.CreateInput(TfToken(dest_param_name), iter_type->type);
-            param.Set(iter_type->f(dest_arnold_node, dest_param_name));
-            exported_connection = true;
-        }
+        link_count = comp_count;
     }
 
-    for (const auto& comps : in_comp_names(arnold_param_type)) {
-        const auto arnold_comp_name = std::string(dest_param_name) + "." + comps;
-        const auto usd_comp_name = std::string(dest_param_name) + ":" + comps;
+    for (const auto& comp : comp_names) {
+        const auto arnold_comp_name = std::string(dest_param_name) + "." + comp;
+        const auto usd_comp_name = std::string(dest_param_name) + ":" + comp;
         if (_get_output_parameter(arnold_comp_name.c_str(), source_param)) {
             auto param_comp = connectable_API.CreateInput(TfToken(usd_comp_name),
                                                           SdfValueTypeNames->Float);
             if (param_comp) {
                 connectable_API.ConnectToSource(param_comp, source_param);
-                exported_connection = true;
+                ++link_count;
             }
         }
     }
-    return exported_connection;
+
+    // If we return true, then all the values are filled out
+    return link_count >= comp_count;
 }
 
 
@@ -369,10 +366,9 @@ AiShaderExport::export_parameter(
             auto param = api.CreateUserAttribute(TfToken(arnold_param_name), iter_type->type);
             param.Set(iter_type->f(arnold_node, arnold_param_name));
         } else {
-            if (AiNodeIsLinked(arnold_node, arnold_param_name)) {
-                // FIXME: should we also end up here if (arnold_param_type == AI_TYPE_NODE)??
-                export_connection(arnold_node, shader, arnold_param_name, arnold_param_type);
-            } else {
+            // FIXME: Are we doing the right thin in case of AI_TYPE_NODE?
+            if (!AiNodeIsLinked(arnold_node, arnold_param_name) || 
+                !export_connection(arnold_node, shader, arnold_param_name, arnold_param_type)) {                
                 const auto iter_type = get_simple_type(arnold_param_type);
                 // Note: iter_type for AI_TYPE_NODE is {String, nullptr}
                 if (iter_type == nullptr  || iter_type->f == nullptr) {
