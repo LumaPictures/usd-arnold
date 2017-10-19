@@ -22,7 +22,8 @@ public:
     bool get_output(const AtNode* src_arnold_node, UsdAiShader& src_shader, UsdShadeOutput& out,
                     bool is_node_type=false, int32_t comp_index=-1);
     bool export_connection(const AtNode* dest_arnold_node, UsdAiShader& dest_shader,
-                           const char* dest_param_name, uint8_t arnold_param_type);
+                           const std::string& dest_param_name, const std::string& dest_param_arnold_name,
+                           uint8_t arnold_param_type);
     bool export_connection(const AtNode* dest_arnold_node, UsdAiShader& dest_shader,
                            const char* dest_param_name,
                            const AtNode* src_arnold_node, UsdAiShader& src_shader,
