@@ -3,6 +3,7 @@
 #include <pxr/usd/usdAi/aiShapeAPI.h>
 #include <pxr/usd/usdAi/aiMaterialAPI.h>
 #include <pxr/usd/usdShade/material.h>
+#include <pxr/usd/usdShade/connectableAPI.h>
 
 #include <usdKatana/attrMap.h>
 #include <usdKatana/utils.h>
@@ -73,9 +74,8 @@ void readPrimLocation(
         static const std::string baseAttr("material.nodes.");
         std::stringstream ss; ss << baseAttr << shadingNodeHandle;
         if (!interface.getOutputAttr(ss.str()).isValid()) { return; }
-        const auto relationships = shader.GetRelationships();
         FnKat::GroupBuilder builder;
-        for (const auto& relationship: relationships) {
+        for (const auto& relationship: shader.GetRelationships()) {
             static const std::string connectedSourceFor("connectedSourceFor:");
             const auto relationshipName = relationship.GetName().GetString();
             if (relationshipName.compare(0, connectedSourceFor.length(), connectedSourceFor) != 0) { continue; }
@@ -116,6 +116,86 @@ void readPrimLocation(
             // TODO: we might traverse things twice because of this.
             // Also, infinite recursion, beware!
             mapRelations(relationship, traverseShader);
+        }
+
+        static constexpr auto _maxSplitCount = 3;
+        using param_split_t = std::array<std::string, _maxSplitCount>;
+        auto splitParamName = [] (const std::string& name,
+                                  param_split_t& out) -> size_t {
+            size_t outputCount = 0;
+            size_t currentIndex = 0;
+            while (outputCount < _maxSplitCount) {
+                size_t colonPos = name.find(':', currentIndex);
+                out[outputCount++] = name.substr(currentIndex, colonPos - currentIndex);
+                if (colonPos == name.npos) { break; }
+                currentIndex = colonPos + 1;
+            }
+            return outputCount;
+        };
+
+        // TODO: Check for more optimal data storage options
+        std::set<std::string> fullConnections;
+        std::set<std::string> partialConnections;
+        // Per array connections already work properly with the new API.
+        // It seems we can't do full connections and component connections at the same
+        // time. To support both combined (full connections and partial connections
+        // we have to collect which full connections are explicitly set by the user,
+        // and which partial ones. After that we need to manually connect the rest of the
+        // component connections not covered by the user.
+        UsdShadeConnectableAPI connectableAPI(shader);
+        if (connectableAPI) {
+            for (const auto& input: connectableAPI.GetInputs()) {
+                if (input.HasConnectedSource()) {
+                    const auto inParamName = input.GetBaseName().GetString();
+                    SdfPathVector sourcePaths;
+                    input.GetRawConnectedSourcePaths(&sourcePaths);
+                    if (sourcePaths.size() == 0) { continue; }
+                    // We are only checking for the first connection
+                    const auto& sourceParamPath = sourcePaths[0];
+                    const auto sourcePath = sourceParamPath.GetPrimPath();
+                    const auto sourcePrim = stage->GetPrimAtPath(sourcePath);
+                    if (sourcePrim.IsValid()) {
+                        traverseShader(shader);
+                    }
+                    static __thread param_split_t _paramSplit;
+                    const auto splitCount = splitParamName(inParamName, _paramSplit);
+                    if (splitCount == 0) {
+                        // Something bad have happened, move on.
+                        continue;
+                    } else if (splitCount == 1) {
+                        // Full param connection, usdKatana already handles this
+                        // add it to the full list and move on.
+                        fullConnections.insert(inParamName);
+                        continue;
+                    } else if (splitCount == _maxSplitCount) {
+                        // Connection to Array elements, no idea how to handle this.
+                        // Yet.
+                        continue;
+                    }
+
+                    // Connections to array elements are already handled.
+                    // Or we are having an invalid string.
+                    if (_paramSplit[1].empty() || _paramSplit[1].front() == 'i') {
+                        continue;
+                    }
+
+                    const std::string paramName = _paramSplit[0] + "." + _paramSplit[1];
+
+                    const auto sourceParam = sourceParamPath.GetName();
+                    static __thread param_split_t _sourceParamSplit;
+                    const auto sourceSplitCount = splitParamName(sourceParam, _sourceParamSplit);
+                    if (sourceSplitCount != 2) { continue; } // we only support component connections for now
+                    if (_sourceParamSplit[1].empty() ||
+                        _sourceParamSplit[1].front() == 'i') {
+                        continue;
+                    }
+                    partialConnections.insert(_paramSplit[0]);
+                    const auto sourceParamAndComponentName =
+                    _sourceParamSplit[1] + "@" + sourcePath.GetName();
+                    builder.set(paramName,
+                                FnKat::StringAttribute(sourceParamAndComponentName));
+                }
+            }
         }
 
         FnKat::Attribute connections = builder.isValid() ? builder.build() : FnKat::Attribute();
