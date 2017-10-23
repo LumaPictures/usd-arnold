@@ -156,12 +156,12 @@ void readPrimLocation(
                     if (sourcePrim.IsValid()) {
                         traverseShader(shader);
                     }
-                    static __thread param_split_t _paramSplit;
-                    const auto splitCount = splitParamName(inParamName, _paramSplit);
-                    if (splitCount == 0) {
+                    static __thread param_split_t _targetParamSplit;
+                    const auto _targetSplitCount = splitParamName(inParamName, _targetParamSplit);
+                    if (_targetSplitCount == 0) {
                         // Something bad have happened, move on.
                         continue;
-                    } else if (splitCount == _maxSplitCount) {
+                    } else if (_targetSplitCount == _maxSplitCount) {
                         // Connection to Array elements, no idea how to handle this.
                         // Yet.
                         continue;
@@ -172,13 +172,13 @@ void readPrimLocation(
                     // But we still need to handle cases when a source component is
                     // connected to a target tuple. The source param to target
                     // param is done properly by pxrUsdIn.
-                    if (splitCount == 2 &&
-                        (_paramSplit[1].empty() || _paramSplit[1].front() == 'i')) {
+                    if (_targetSplitCount == 2 &&
+                        (_targetParamSplit[1].empty() || _targetParamSplit[1].front() == 'i')) {
                         continue;
                     }
 
-                    const std::string paramName = splitCount == 1 ? _paramSplit[0] :
-                                                  _paramSplit[0] + "." + _paramSplit[1];
+                    const auto sourceParamName = _targetSplitCount == 1 ? _targetParamSplit[0] :
+                                                  _targetParamSplit[0] + "." + _targetParamSplit[1];
 
                     const auto& sourceParam = sourceParamPath.GetName();
                     static __thread param_split_t _sourceParamSplit;
@@ -188,12 +188,12 @@ void readPrimLocation(
                         _sourceParamSplit[1].front() == 'i') {
                         continue;
                     }
-                    if (splitCount == 2) {
-                        partialConnections[_paramSplit[0]].insert(_paramSplit[1]);
+                    if (_targetSplitCount == 2) {
+                        partialConnections[_targetParamSplit[0]].insert(_targetParamSplit[1]);
                     }
                     const auto sourceParamAndComponentName =
                     "out." + _sourceParamSplit[1] + "@" + sourcePath.GetName();
-                    builder.set(paramName,
+                    builder.set(sourceParamName,
                                 FnKat::StringAttribute(sourceParamAndComponentName));
                 }
             }
@@ -202,8 +202,6 @@ void readPrimLocation(
                     // We don't have to do anything, the full connection will be replaced.
                     continue;
                 }
-
-
             }
         }
 

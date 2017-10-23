@@ -1,4 +1,4 @@
-set(PLUGIN_NAME ai_procedural_op)
+set(PLUGIN_NAME usd_arnold_katana)
 
 find_package(Katana REQUIRED)
 find_package(OpenEXR REQUIRED)
