@@ -161,11 +161,6 @@ void readPrimLocation(
                     if (splitCount == 0) {
                         // Something bad have happened, move on.
                         continue;
-                    } else if (splitCount == 1) {
-                        // Full param connection, usdKatana already handles this
-                        // add it to the full list and move on.
-                        fullConnections.insert(inParamName);
-                        continue;
                     } else if (splitCount == _maxSplitCount) {
                         // Connection to Array elements, no idea how to handle this.
                         // Yet.
@@ -174,11 +169,16 @@ void readPrimLocation(
 
                     // Connections to array elements are already handled.
                     // Or we are having an invalid string.
-                    if (_paramSplit[1].empty() || _paramSplit[1].front() == 'i') {
+                    // But we still need to handle cases when a source component is
+                    // connected to a target tuple. The source param to target
+                    // param is done properly by pxrUsdIn.
+                    if (splitCount == 2 &&
+                        (_paramSplit[1].empty() || _paramSplit[1].front() == 'i')) {
                         continue;
                     }
 
-                    const std::string paramName = _paramSplit[0] + "." + _paramSplit[1];
+                    const std::string paramName = splitCount == 1 ? _paramSplit[0] :
+                                                  _paramSplit[0] + "." + _paramSplit[1];
 
                     const auto& sourceParam = sourceParamPath.GetName();
                     static __thread param_split_t _sourceParamSplit;
@@ -188,9 +188,11 @@ void readPrimLocation(
                         _sourceParamSplit[1].front() == 'i') {
                         continue;
                     }
-                    partialConnections[_paramSplit[0]].insert(_paramSplit[1]);
+                    if (splitCount == 2) {
+                        partialConnections[_paramSplit[0]].insert(_paramSplit[1]);
+                    }
                     const auto sourceParamAndComponentName =
-                    _sourceParamSplit[1] + "@" + sourcePath.GetName();
+                    "out." + _sourceParamSplit[1] + "@" + sourcePath.GetName();
                     builder.set(paramName,
                                 FnKat::StringAttribute(sourceParamAndComponentName));
                 }
