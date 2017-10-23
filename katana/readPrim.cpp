@@ -118,19 +118,19 @@ void readPrimLocation(
             mapRelations(relationship, traverseShader);
         }
 
-        static constexpr auto _maxSplitCount = 3;
-        using param_split_t = std::array<std::string, _maxSplitCount>;
+        using param_split_t = std::vector<std::string>;
         auto splitParamName = [] (const std::string& name,
                                   param_split_t& out) -> size_t {
-            size_t outputCount = 0;
+            out.clear();
             size_t currentIndex = 0;
-            while (outputCount < _maxSplitCount) {
+            const auto lastPos = name.size() - 1;
+            while (true) {
                 size_t colonPos = name.find(':', currentIndex);
-                out[outputCount++] = name.substr(currentIndex, colonPos - currentIndex);
-                if (colonPos == name.npos) { break; }
+                out.push_back(name.substr(currentIndex, colonPos - currentIndex));
+                if (colonPos == name.npos || colonPos == lastPos) { break; }
                 currentIndex = colonPos + 1;
             }
-            return outputCount;
+            return out.size();
         };
         // Per array connections already work with the new API.
         // It seems we can't do full connections and component connections at the same
@@ -161,7 +161,7 @@ void readPrimLocation(
                     if (_targetSplitCount == 0) {
                         // Something bad have happened, move on.
                         continue;
-                    } else if (_targetSplitCount == _maxSplitCount) {
+                    } else if (_targetSplitCount >= 3) {
                         // Connection to Array elements, no idea how to handle this.
                         // Yet.
                         continue;
@@ -177,23 +177,24 @@ void readPrimLocation(
                         continue;
                     }
 
-                    const auto sourceParamName = _targetSplitCount == 1 ? _targetParamSplit[0] :
+                    const auto targetParamName = _targetSplitCount == 1 ? _targetParamSplit[0] :
                                                   _targetParamSplit[0] + "." + _targetParamSplit[1];
 
                     const auto& sourceParam = sourceParamPath.GetName();
                     static __thread param_split_t _sourceParamSplit;
                     const auto sourceSplitCount = splitParamName(sourceParam, _sourceParamSplit);
-                    if (sourceSplitCount != 2) { continue; } // we only support component connections for now
-                    if (_sourceParamSplit[1].empty() ||
-                        _sourceParamSplit[1].front() == 'i') {
+                    if (sourceSplitCount > 2) { continue; } // we only support component connections for now
+                    if (sourceSplitCount == 2 && (_sourceParamSplit[1].empty() ||
+                        _sourceParamSplit[1].front() == 'i')) {
                         continue;
                     }
                     if (_targetSplitCount == 2) {
                         partialConnections[_targetParamSplit[0]].insert(_targetParamSplit[1]);
                     }
-                    const auto sourceParamAndComponentName =
-                    "out." + _sourceParamSplit[1] + "@" + sourcePath.GetName();
-                    builder.set(sourceParamName,
+                    const auto sourceParamAndComponentName = sourceSplitCount == 1 ?
+                         "out." + _sourceParamSplit[1] + "@" + sourcePath.GetName() :
+                         "out@" + sourcePath.GetName();
+                    builder.set(targetParamName,
                                 FnKat::StringAttribute(sourceParamAndComponentName));
                 }
             }
