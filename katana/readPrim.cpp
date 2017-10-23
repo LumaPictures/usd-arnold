@@ -132,11 +132,7 @@ void readPrimLocation(
             }
             return outputCount;
         };
-
-        // TODO: Check for more optimal data storage options
-        std::set<std::string> fullConnections;
-        std::set<std::string> partialConnections;
-        // Per array connections already work properly with the new API.
+        // Per array connections already work with the new API.
         // It seems we can't do full connections and component connections at the same
         // time. To support both combined (full connections and partial connections
         // we have to collect which full connections are explicitly set by the user,
@@ -144,12 +140,15 @@ void readPrimLocation(
         // component connections not covered by the user.
         UsdShadeConnectableAPI connectableAPI(shader);
         if (connectableAPI) {
+            // TODO: We really need to use more optimal data storage here
+            std::set<std::string> fullConnections;
+            std::map<std::string, std::set<std::string>> partialConnections;
             for (const auto& input: connectableAPI.GetInputs()) {
                 if (input.HasConnectedSource()) {
                     const auto inParamName = input.GetBaseName().GetString();
                     SdfPathVector sourcePaths;
                     input.GetRawConnectedSourcePaths(&sourcePaths);
-                    if (sourcePaths.size() == 0) { continue; }
+                    if (sourcePaths.empty()) { continue; }
                     // We are only checking for the first connection
                     const auto& sourceParamPath = sourcePaths[0];
                     const auto sourcePath = sourceParamPath.GetPrimPath();
@@ -181,7 +180,7 @@ void readPrimLocation(
 
                     const std::string paramName = _paramSplit[0] + "." + _paramSplit[1];
 
-                    const auto sourceParam = sourceParamPath.GetName();
+                    const auto& sourceParam = sourceParamPath.GetName();
                     static __thread param_split_t _sourceParamSplit;
                     const auto sourceSplitCount = splitParamName(sourceParam, _sourceParamSplit);
                     if (sourceSplitCount != 2) { continue; } // we only support component connections for now
@@ -189,12 +188,20 @@ void readPrimLocation(
                         _sourceParamSplit[1].front() == 'i') {
                         continue;
                     }
-                    partialConnections.insert(_paramSplit[0]);
+                    partialConnections[_paramSplit[0]].insert(_paramSplit[1]);
                     const auto sourceParamAndComponentName =
                     _sourceParamSplit[1] + "@" + sourcePath.GetName();
                     builder.set(paramName,
                                 FnKat::StringAttribute(sourceParamAndComponentName));
                 }
+            }
+            for (auto it = partialConnections.cbegin(); it != partialConnections.cend(); ++it) {
+                if (fullConnections.find(it->first) == fullConnections.end()) {
+                    // We don't have to do anything, the full connection will be replaced.
+                    continue;
+                }
+
+
             }
         }
 
