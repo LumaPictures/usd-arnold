@@ -194,7 +194,6 @@ void readPrimLocation(
 
                     builder.set(targetParamName,
                                 FnKat::StringAttribute(sourceParamAndComponentName));
-                    std::cerr << targetParamName << " -- " << sourceParamAndComponentName << std::endl;
                 }
             }
             for (auto it = partialConnections.cbegin(); it != partialConnections.cend(); ++it) {
