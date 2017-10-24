@@ -154,7 +154,9 @@ void readPrimLocation(
                     const auto sourcePath = sourceParamPath.GetPrimPath();
                     const auto sourcePrim = stage->GetPrimAtPath(sourcePath);
                     if (sourcePrim.IsValid()) {
-                        traverseShader(shader);
+                        traverseShader(sourcePrim);
+                    } else {
+                        continue;
                     }
                     static __thread param_split_t _targetParamSplit;
                     const auto _targetSplitCount = splitParamName(inParamName, _targetParamSplit);
