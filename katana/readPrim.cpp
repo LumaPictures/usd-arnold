@@ -158,10 +158,7 @@ void readPrimLocation(
                     }
                     static __thread param_split_t _targetParamSplit;
                     const auto _targetSplitCount = splitParamName(inParamName, _targetParamSplit);
-                    if (_targetSplitCount == 0) {
-                        // Something bad have happened, move on.
-                        continue;
-                    } else if (_targetSplitCount >= 3) {
+                    if (_targetSplitCount >= 3) {
                         // Connection to Array elements, no idea how to handle this.
                         // Yet.
                         continue;
@@ -183,19 +180,21 @@ void readPrimLocation(
                     const auto& sourceParam = sourceParamPath.GetName();
                     static __thread param_split_t _sourceParamSplit;
                     const auto sourceSplitCount = splitParamName(sourceParam, _sourceParamSplit);
-                    if (sourceSplitCount > 2) { continue; } // we only support component connections for now
-                    if (sourceSplitCount == 2 && (_sourceParamSplit[1].empty() ||
+                    if (sourceSplitCount != 2) { continue; } // we only support component connections for now
+                    // this is both covers out and components
+                    if ((_sourceParamSplit[1].empty() ||
                         _sourceParamSplit[1].front() == 'i')) {
                         continue;
                     }
                     if (_targetSplitCount == 2) {
                         partialConnections[_targetParamSplit[0]].insert(_targetParamSplit[1]);
                     }
-                    const auto sourceParamAndComponentName = sourceSplitCount == 1 ?
-                         "out." + _sourceParamSplit[1] + "@" + sourcePath.GetName() :
-                         "out@" + sourcePath.GetName();
+                    const auto sourceParamAndComponentName = (_sourceParamSplit[1] == "out" ?
+                        "out@" : "out." + _sourceParamSplit[1] + "@") + sourcePath.GetName();
+
                     builder.set(targetParamName,
                                 FnKat::StringAttribute(sourceParamAndComponentName));
+                    std::cerr << targetParamName << " -- " << sourceParamAndComponentName << std::endl;
                 }
             }
             for (auto it = partialConnections.cbegin(); it != partialConnections.cend(); ++it) {
