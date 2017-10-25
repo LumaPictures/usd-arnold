@@ -192,7 +192,7 @@ void readPrimLocation(
                         partialConnections[_targetParamSplit[0]].insert(_targetParamSplit[1]);
                     }
                     const auto sourceParamAndComponentName = (_sourceParamSplit[1] == "out" ?
-                        "out@" : "out." + _sourceParamSplit[1] + "@") + sourcePath.GetName();
+                        "out@" : ("out." + _sourceParamSplit[1] + "@")) + sourcePath.GetName();
 
                     builder.set(targetParamName,
                                 FnKat::StringAttribute(sourceParamAndComponentName));
