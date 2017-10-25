@@ -11,7 +11,55 @@
 #include "arnoldHelpers.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+/*
+    There are a couple of things that are important to note when
+    handling connections in Katana. We let USD import its connections
+    but we are overwriting it using the read prim location function
+    to make sure all the component connections work fine that we support
+    in usd-arnold.
 
+    When USD imports a shading network, it's creating a network material
+    for each network material (so certain nodes can be duplicate). Since
+    the network material in Katana uses strings to identify each material,
+    we need to use a remapping function to figure out the names for the materials.
+    This is PxrUsdKatanaUtils::GenerateShadingNodeHandle . Without this function
+    you won't get the right shader names in some cases.
+
+    Katana creates a group attribute that stores all the nodes, named material.nodes,
+    which has all node definitions. Each node has multiple parameters, the most important
+    for us is the connections group attribute. This stores the incoming connections
+    to each node. Each sub attribute here is either a String Attribute, or a Group Attribute
+    storing multiple String Attributes.
+
+    In case of a connection where the target is the full parameter (ie, none of it's components)
+    you can setup the connection by creating a string attribute like
+    ("TargetParamName", "SourceParamName")
+
+    If you have a connection that's targeting a parameter's connection, you need to create a group
+    attribute named like the parameter, and a string attribute with the component's name.
+    Or just create a String Attribute like parameter.component, and that'll create the group
+    for you. It looks like this:
+    ("TargetParamName.TargetComponentName", "SourceParamName")
+
+    Component names are simply r, g, b, a, x, y, z in case of colors and vectors, otherwise
+    you need to use the i prefix for array elements, like i0, i1, i2.
+
+    Source connection can also represent a parameter or a parameter's component. In the case of
+    a parameter, you need to name the source parameter the following way:
+    out@SourceNodeName
+
+    If you are connecting a parameter's component, you need to name the source param like this:
+    out.componentName@SourceNodeName
+
+    Like: out.r@SourceNodeName, out.x@SourceNodeName
+
+    A couple of example String Attributes the can represent a connection.
+
+    ("kd_Color", "out@MyTexture")
+    ("inputs:i1", "out@Checker")
+    ("kd_Color.r", "out.g@MyTexture")
+
+*/ 
 void readPrimLocation(
     FnKat::GeolibCookInterface& interface,
     FnKat::GroupAttribute opArgs,
