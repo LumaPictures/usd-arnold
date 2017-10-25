@@ -67,6 +67,7 @@ void readPrimLocation(
         = [&](const UsdPrim& shader) {
         // TODO: we can also use getInputs from the new API.
         const auto shadingNodeHandle = PxrUsdKatanaUtils::GenerateShadingNodeHandle(shader);
+        std::cerr << shader.GetPrimPath() << " " << shadingNodeHandle << std::endl;
         if (processedMaterials.find(shadingNodeHandle) != processedMaterials.end()) {
             return;
         }
@@ -109,8 +110,10 @@ void readPrimLocation(
             if (targetName != "out") { // component connection
                 targetName = "out." + targetName;
             }
+            const auto targetPrim = stage->GetPrimAtPath(target.GetParentPath());
+            const auto targetHandle = PxrUsdKatanaUtils::GenerateShadingNodeHandle(targetPrim);
             std::stringstream targetSS; targetSS << targetName << '@';
-            targetSS << target.GetParentPath().GetName();
+            targetSS << targetHandle;
             builder.set(paramName, FnKat::StringAttribute(targetSS.str()));
 
             // TODO: we might traverse things twice because of this.
@@ -158,6 +161,7 @@ void readPrimLocation(
                     } else {
                         continue;
                     }
+                    const auto sourcePrimHandle = PxrUsdKatanaUtils::GenerateShadingNodeHandle(sourcePrim);
                     static __thread param_split_t _targetParamSplit;
                     const auto _targetSplitCount = splitParamName(inParamName, _targetParamSplit);
                     if (_targetSplitCount >= 3) {
@@ -192,7 +196,7 @@ void readPrimLocation(
                         partialConnections[_targetParamSplit[0]].insert(_targetParamSplit[1]);
                     }
                     const auto sourceParamAndComponentName = (_sourceParamSplit[1] == "out" ?
-                        "out@" : ("out." + _sourceParamSplit[1] + "@")) + sourcePath.GetName();
+                        "out@" : ("out." + _sourceParamSplit[1] + "@")) + sourcePrimHandle;
 
                     builder.set(targetParamName,
                                 FnKat::StringAttribute(sourceParamAndComponentName));
