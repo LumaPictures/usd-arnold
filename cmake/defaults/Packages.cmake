@@ -45,7 +45,10 @@ set(PXR_THREAD_LIBS "${CMAKE_THREAD_LIBS_INIT}")
 
 if(PXR_ENABLE_PYTHON_SUPPORT)
     # --Python.  We are generally but not completely 2.6 compliant.
-    add_definitions(-DPXR_PYTHON_SUPPORT_ENABLED)
+    # We don't need this flag if we are on 0.8.2.
+    if (${USD_VERSION} VERSION_LESS "0.8.2")
+        add_definitions(-DPXR_PYTHON_SUPPORT_ENABLED)
+    endif ()
     find_package(PythonInterp 2.7 REQUIRED)
     find_package(PythonLibs 2.7 REQUIRED)
 
