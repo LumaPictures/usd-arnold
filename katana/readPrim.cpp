@@ -19,7 +19,7 @@ PXR_NAMESPACE_OPEN_SCOPE
     in usd-arnold.
 
     When USD imports a shading network, it's creating a network material
-    for each network material (so certain nodes can be duplicate). Since
+    for each network material (so certain nodes might get duplicated). Since
     the network material in Katana uses strings to identify each material,
     we need to use a remapping function to figure out the names for the materials.
     This is PxrUsdKatanaUtils::GenerateShadingNodeHandle . Without this function
@@ -53,7 +53,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
     Like: out.r@SourceNodeName, out.x@SourceNodeName
 
-    A couple of example String Attributes the can represent a connection.
+    A couple of example String Attributes that represent a valid connection.
 
     ("kd_Color", "out@MyTexture")
     ("inputs:i1", "out@Checker")
