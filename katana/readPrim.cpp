@@ -67,7 +67,8 @@ void readPrimLocation(
     // privateData can be a nullptr!
     if (privateData == nullptr) { return; }
     const auto prim = privateData->GetUsdPrim();
-    if (!prim.IsValid()) { return; }
+    // As of 0.8.2 this function is also called on the root: "/"
+    if (!prim.IsValid() || !prim.GetPrimPath().IsPrimPath()) { return; }
 
     // Based on PxrUsdKatanaAttrMap::toInterface
     auto updateOrCreateAttr = [&interface] (const std::string& attrName, const FnKat::Attribute& attr) {
@@ -115,7 +116,6 @@ void readPrimLocation(
         = [&](const UsdPrim& shader) {
         // TODO: we can also use getInputs from the new API.
         const auto shadingNodeHandle = PxrUsdKatanaUtils::GenerateShadingNodeHandle(shader);
-        std::cerr << shader.GetPrimPath() << " " << shadingNodeHandle << std::endl;
         if (processedMaterials.find(shadingNodeHandle) != processedMaterials.end()) {
             return;
         }
