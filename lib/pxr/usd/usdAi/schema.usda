@@ -521,7 +521,7 @@ class AiAOV "AiAOV" (
         doc = """The name of the AOV."""
     )
     token dataType = "RGBA" (
-        allowedTokens = ["BYTE", "INT", "UINT", "BOOL", "FLOAT", "RGB", "RGBA", "VECTOR", "POINT", "POINT2", "POINTER", "NODE", "ARRAY", "MATRIX"]
+        allowedTokens = ["BYTE", "INT", "UINT", "BOOL", "FLOAT", "RGB", "RGBA", "VECTOR", "VECTOR2", "POINTER", "NODE", "ARRAY", "MATRIX"]
     )
     rel driver
     rel filter
