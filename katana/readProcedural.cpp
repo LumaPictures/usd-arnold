@@ -17,10 +17,10 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-FnLogSetup("ReadAiProcedural");
+FnLogSetup("readAiProcedural");
 
 void
-ReadAiProcedural(
+readAiProcedural(
     const UsdAiProcedural& procedural,
     const PxrUsdKatanaUsdInPrivateData& data,
     PxrUsdKatanaAttrMap& attrs)
@@ -87,7 +87,7 @@ ReadAiProcedural(
             attrHints.push_back("true");
         }
 
-        std::string typeHint = GetArnoldAttrTypeHint(
+        std::string typeHint = getArnoldAttrTypeHint(
             userAttr.GetTypeName().GetScalarType());
         if (!typeHint.empty()) {
             attrHints.push_back("type");

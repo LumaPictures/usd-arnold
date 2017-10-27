@@ -11,7 +11,7 @@ class UsdAiProcedural;
 
 /// \brief read \p procedural into \p attrs.
 void
-ReadAiProcedural(
+readAiProcedural(
     const UsdAiProcedural& procedural,
     const PxrUsdKatanaUsdInPrivateData& data,
     PxrUsdKatanaAttrMap& attrs);

@@ -6,6 +6,7 @@
 
 #include <pxr/usd/usdAi/aiProcedural.h>
 #include <pxr/usd/usdAi/aiVolume.h>
+#include <pxr/usd/usdAi/aiAOV.h>
 
 #include "readProcedural.h"
 #include "readPrim.h"
@@ -22,7 +23,7 @@ PXRUSDKATANA_USDIN_PLUGIN_DEFINE(AiProceduralOp, privateData, interface)
 {
     PxrUsdKatanaAttrMap attrs;
 
-    ReadAiProcedural(
+    readAiProcedural(
         UsdAiProcedural(privateData.GetUsdPrim()), privateData, attrs);
 
     attrs.toInterface(interface);

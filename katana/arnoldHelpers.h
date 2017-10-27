@@ -5,6 +5,7 @@
 
 #include <FnAttribute/FnAttribute.h>
 #include <FnAttribute/FnGroupBuilder.h>
+#include <FnGeolib/op/FnGeolibCookInterface.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -13,11 +14,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 class SdfValueTypeName;
 
 // Given an SDF value type, return a (possibly empty) type hint string for KtoA.
-std::string GetArnoldAttrTypeHint(const SdfValueTypeName& scalarType);
+std::string getArnoldAttrTypeHint(const SdfValueTypeName& scalarType);
 
 // Given a prim, return a new GroupAttribute to apply as its `arnoldStatements`
 // attribute in Katana.
-FnKat::Attribute GetArnoldStatementsGroup(const UsdPrim& prim);
+FnKat::Attribute getArnoldStatementsGroup(const UsdPrim& prim);
+
+// Based on PxrUsdKatanaAttrMap::toInterface
+void updateOrCreateAttr(
+        FnKat::GeolibCookInterface& interface,
+        const std::string& attrName,
+        const FnKat::Attribute& attr);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

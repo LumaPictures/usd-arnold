@@ -55,7 +55,7 @@ namespace {
 }
 
 std::string
-GetArnoldAttrTypeHint(const SdfValueTypeName& scalarType)
+getArnoldAttrTypeHint(const SdfValueTypeName& scalarType)
 {
     std::string hint;
     if (scalarType == SdfValueTypeNames->Bool) {
@@ -107,7 +107,7 @@ GetArnoldAttrTypeHint(const SdfValueTypeName& scalarType)
 
 
 FnKat::Attribute
-GetArnoldStatementsGroup(const UsdPrim& prim) {
+getArnoldStatementsGroup(const UsdPrim& prim) {
     FnKat::GroupBuilder builder;
 
     UsdAiShapeAPI shapeAPI(prim);
@@ -209,6 +209,28 @@ GetArnoldStatementsGroup(const UsdPrim& prim) {
     // keyword, so we had to name it auto_.
 
     return needToBuild ? builder.build() : FnKat::Attribute();
+}
+
+void updateOrCreateAttr(
+    FnKat::GeolibCookInterface& interface,
+    const std::string& attrName,
+    const FnKat::Attribute& attr) {
+    if (!attr.isValid()) { return;  }
+
+    if (attr.getType() == kFnKatAttributeTypeGroup) {
+        FnAttribute::GroupAttribute existingAttr = interface.getOutputAttr(attrName);
+        if (existingAttr.isValid()) {
+            interface.setAttr(attrName
+                , FnAttribute::GroupBuilder()
+                                  .update(existingAttr)
+                                  .deepUpdate(attr)
+                                  .build());
+        } else {
+            interface.setAttr(attrName, attr);
+        }
+    } else {
+        interface.setAttr(attrName, attr);
+    }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
