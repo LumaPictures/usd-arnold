@@ -6,52 +6,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
     template <typename T>
-    struct _attributeDefinition {
-        decltype(&UsdAiShapeAPI::GetAiVisibleToCameraAttr) queryFn;
-        const char* paramName;
-        T defaultValue;
-    };
-
-    template <typename T> inline
-    FnKat::Attribute _createAttribute(const T& v) {
-        return FnKat::IntAttribute(static_cast<int>(v));
-    }
-
-    template <> inline
-    FnKat::Attribute _createAttribute(const bool& v) {
-        return FnKat::IntAttribute(v ? 1 : 0);
-    }
-
-    template <> inline
-    FnKat::Attribute _createAttribute(const float& v) {
-        return FnKat::FloatAttribute(v);
-    }
-
-    template <> inline
-    FnKat::Attribute _createAttribute(const TfToken& v) {
-        return FnKat::StringAttribute(v.GetString());
-    }
-
-    template <typename T>
-    bool _handleAttributes(const std::vector<_attributeDefinition<T>>& attributes,
-                          const UsdAiShapeAPI& shapeAPI,
-                          FnKat::GroupBuilder& builder) {
-        auto attributeSet = false;
-        for (const auto& each : attributes) {
-            const auto attr = ((shapeAPI).*(each.queryFn))();
-            if (!attr.IsValid()) { continue; }
-            T v = each.defaultValue;
-            // TODO: Check if we need to filter the defaultValues.
-            // I think because of how Katana behaves we have to set these up,
-            // even if they are the default value, because the USD API handles
-            // the concept of an attribute not being set. Which doesn't work in Arnold.
-            if (attr.Get(&v) && v != each.defaultValue) {
-                builder.set(each.paramName, _createAttribute(v));
-                attributeSet = true;
-            }
-        }
-        return attributeSet;
-    }
+    using _attributeDefinition = OptionalAttributeDefinition<T, UsdAiShapeAPI>;
 }
 
 std::string
@@ -172,7 +127,7 @@ getArnoldStatementsGroup(const UsdPrim& prim) {
         {&UsdAiShapeAPI::GetAiMatteAttr, "matte", false},
         {&UsdAiShapeAPI::GetAiSmoothingAttr, "smoothing", false},
         {&UsdAiShapeAPI::GetAiSubdivSmoothDerivsAttr, "subdiv_smooth_derivs", false},
-        {&UsdAiShapeAPI::GetAiDispAutobumpAttr, "disp_autobump", false},
+        {&UsdAiShapeAPI::GetAiDispAutobumpAttr, "disp_autobump", false}
     };
 
     static const std::vector<_attributeDefinition<float>> floatAttrs {
@@ -197,10 +152,10 @@ getArnoldStatementsGroup(const UsdPrim& prim) {
 #endif
     };
 
-    auto needToBuild = _handleAttributes(boolAttrs, shapeAPI, builder);
-    needToBuild |= _handleAttributes(floatAttrs, shapeAPI, builder);
-    needToBuild |= _handleAttributes(uintAttrs, shapeAPI, builder);
-    needToBuild |= _handleAttributes(stringAttrs, shapeAPI, builder);
+    auto needToBuild = handleAttributes(boolAttrs, shapeAPI, builder);
+    needToBuild |= handleAttributes(floatAttrs, shapeAPI, builder);
+    needToBuild |= handleAttributes(uintAttrs, shapeAPI, builder);
+    needToBuild |= handleAttributes(stringAttrs, shapeAPI, builder);
 
     // SubdivAdaptiveMetricAttr will require special handling,
     // if we decide to setup parameters even with the

@@ -61,6 +61,13 @@ PXR_NAMESPACE_OPEN_SCOPE
     ("inputs:i1", "out@Checker")
     ("kd_Color.r", "out.g@MyTexture")
 
+
+    AOVS
+
+    Arnold stores the AOV settings on the root node.
+    In "arnoldGlobalStatements.Channel Definitions.outputChannels"
+    Note the space in the name.
+
 */ 
 void readPrimLocation(
     FnKat::GeolibCookInterface& interface,
@@ -84,6 +91,22 @@ void readPrimLocation(
     if (material) {
         UsdAiMaterialAPI aiMaterialAPI(prim);
         readMaterial(stage, interface, aiMaterialAPI);
+    }
+
+    const UsdAiAOV aov(prim);
+    if (aov) {
+        const auto grp = readAOV(aov);
+        if (grp.isValid()) {
+            // The easiest way here is to run the AttributeSet op.
+            FnKat::GroupBuilder builder;
+            std::stringstream ss; ss << "arnoldGlobalStatements.Channel Definitions.outputChannels.";
+            ss << aov.GetPath().GetName();
+            builder.set("locationPaths", FnKat::StringAttribute(std::vector<std::string>{"/root"}, 1));
+            builder.set("setAttrs.s0.name", FnKat::StringAttribute(ss.str()));
+            builder.set("setAttrs.s0.attr", grp);
+            builder.set("setAttrs.s0.inherit", FnKat::IntAttribute(0));
+            interface.execOp("AttributeSet", builder.build());
+        }
     }
 }
 

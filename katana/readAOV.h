@@ -11,7 +11,7 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 // Given a prim, return a new GroupAttribute to setup an AOV
-FnKat::Attribute getAOV(const UsdAiAOV& aov);
+FnKat::Attribute readAOV(const UsdAiAOV& aov);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
