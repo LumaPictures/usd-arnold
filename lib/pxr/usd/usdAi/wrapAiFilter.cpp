@@ -21,7 +21,7 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/usd/usdAi/aiAOV.h"
+#include "pxr/usd/usdAi/aiFilter.h"
 #include "pxr/usd/usd/schemaBase.h"
 
 #include "pxr/usd/sdf/primSpec.h"
@@ -50,34 +50,20 @@ WRAP_CUSTOM;
 
         
 static UsdAttribute
-_CreateNameAttr(UsdAiAOV &self,
+_CreateSizeAttr(UsdAiFilter &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateNameAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->String), writeSparsely);
-}
-        
-static UsdAttribute
-_CreateDataTypeAttr(UsdAiAOV &self,
-                                      object defaultVal, bool writeSparsely) {
-    return self.CreateDataTypeAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
-}
-        
-static UsdAttribute
-_CreateLPEAttr(UsdAiAOV &self,
-                                      object defaultVal, bool writeSparsely) {
-    return self.CreateLPEAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->String), writeSparsely);
+    return self.CreateSizeAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
 }
 
 } // anonymous namespace
 
-void wrapUsdAiAOV()
+void wrapUsdAiFilter()
 {
-    typedef UsdAiAOV This;
+    typedef UsdAiFilter This;
 
     class_<This, bases<UsdTyped> >
-        cls("AiAOV");
+        cls("AiFilter");
 
     cls
         .def(init<UsdPrim>(arg("prim")))
@@ -103,37 +89,13 @@ void wrapUsdAiAOV()
         .def(!self)
 
         
-        .def("GetNameAttr",
-             &This::GetNameAttr)
-        .def("CreateNameAttr",
-             &_CreateNameAttr,
-             (arg("defaultValue")=object(),
-              arg("writeSparsely")=false))
-        
-        .def("GetDataTypeAttr",
-             &This::GetDataTypeAttr)
-        .def("CreateDataTypeAttr",
-             &_CreateDataTypeAttr,
-             (arg("defaultValue")=object(),
-              arg("writeSparsely")=false))
-        
-        .def("GetLPEAttr",
-             &This::GetLPEAttr)
-        .def("CreateLPEAttr",
-             &_CreateLPEAttr,
+        .def("GetSizeAttr",
+             &This::GetSizeAttr)
+        .def("CreateSizeAttr",
+             &_CreateSizeAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
 
-        
-        .def("GetDriverRel",
-             &This::GetDriverRel)
-        .def("CreateDriverRel",
-             &This::CreateDriverRel)
-        
-        .def("GetFilterRel",
-             &This::GetFilterRel)
-        .def("CreateFilterRel",
-             &This::CreateFilterRel)
     ;
 
     _CustomWrapCode(cls);

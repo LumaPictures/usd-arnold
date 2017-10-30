@@ -21,10 +21,10 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef USDAI_GENERATED_AIAOV_H
-#define USDAI_GENERATED_AIAOV_H
+#ifndef USDAI_GENERATED_AIDRIVER_H
+#define USDAI_GENERATED_AIDRIVER_H
 
-/// \file usdAi/aiAOV.h
+/// \file usdAi/aiDriver.h
 
 #include "pxr/pxr.h"
 #include "pxr/usd/usdAi/api.h"
@@ -47,21 +47,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 class SdfAssetPath;
 
 // -------------------------------------------------------------------------- //
-// AIAOV                                                                      //
+// AIDRIVER                                                                   //
 // -------------------------------------------------------------------------- //
 
-/// \class UsdAiAOV
+/// \class UsdAiDriver
 ///
-/// Represents an Arnold output target. 
-/// 
-/// Defined by a name, a data type, a driver, and a filter.
+/// Represents an Arnold driver.
 ///
-/// For any described attribute \em Fallback \em Value or \em Allowed \em Values below
-/// that are text/tokens, the actual token is published and defined in \ref UsdAiTokens.
-/// So to set an attribute to the value "rightHanded", use UsdAiTokens->rightHanded
-/// as the value.
-///
-class UsdAiAOV : public UsdTyped
+class UsdAiDriver : public UsdTyped
 {
 public:
     /// Compile-time constant indicating whether or not this class corresponds
@@ -70,26 +63,26 @@ public:
     /// a non-empty typeName.
     static const bool IsConcrete = true;
 
-    /// Construct a UsdAiAOV on UsdPrim \p prim .
-    /// Equivalent to UsdAiAOV::Get(prim.GetStage(), prim.GetPath())
+    /// Construct a UsdAiDriver on UsdPrim \p prim .
+    /// Equivalent to UsdAiDriver::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdAiAOV(const UsdPrim& prim=UsdPrim())
+    explicit UsdAiDriver(const UsdPrim& prim=UsdPrim())
         : UsdTyped(prim)
     {
     }
 
-    /// Construct a UsdAiAOV on the prim held by \p schemaObj .
-    /// Should be preferred over UsdAiAOV(schemaObj.GetPrim()),
+    /// Construct a UsdAiDriver on the prim held by \p schemaObj .
+    /// Should be preferred over UsdAiDriver(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdAiAOV(const UsdSchemaBase& schemaObj)
+    explicit UsdAiDriver(const UsdSchemaBase& schemaObj)
         : UsdTyped(schemaObj)
     {
     }
 
     /// Destructor.
     USDAI_API
-    virtual ~UsdAiAOV();
+    virtual ~UsdAiDriver();
 
     /// Return a vector of names of all pre-declared attributes for this schema
     /// class and all its ancestor classes.  Does not include attributes that
@@ -98,17 +91,17 @@ public:
     static const TfTokenVector &
     GetSchemaAttributeNames(bool includeInherited=true);
 
-    /// Return a UsdAiAOV holding the prim adhering to this
+    /// Return a UsdAiDriver holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
     /// \p stage, or if the prim at that path does not adhere to this schema,
     /// return an invalid schema object.  This is shorthand for the following:
     ///
     /// \code
-    /// UsdAiAOV(stage->GetPrimAtPath(path));
+    /// UsdAiDriver(stage->GetPrimAtPath(path));
     /// \endcode
     ///
     USDAI_API
-    static UsdAiAOV
+    static UsdAiDriver
     Get(const UsdStagePtr &stage, const SdfPath &path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
@@ -134,7 +127,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDAI_API
-    static UsdAiAOV
+    static UsdAiDriver
     Define(const UsdStagePtr &stage, const SdfPath &path);
 
 private:
@@ -151,95 +144,24 @@ private:
 
 public:
     // --------------------------------------------------------------------- //
-    // NAME 
+    // PATH 
     // --------------------------------------------------------------------- //
-    /// The name of the AOV.
+    /// Output path for the driver
     ///
     /// \n  C++ Type: std::string
     /// \n  Usd Type: SdfValueTypeNames->String
     /// \n  Variability: SdfVariabilityUniform
     /// \n  Fallback Value: No Fallback
     USDAI_API
-    UsdAttribute GetNameAttr() const;
+    UsdAttribute GetPathAttr() const;
 
-    /// See GetNameAttr(), and also 
+    /// See GetPathAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateNameAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
-
-public:
-    // --------------------------------------------------------------------- //
-    // DATATYPE 
-    // --------------------------------------------------------------------- //
-    /// 
-    ///
-    /// \n  C++ Type: TfToken
-    /// \n  Usd Type: SdfValueTypeNames->Token
-    /// \n  Variability: SdfVariabilityVarying
-    /// \n  Fallback Value: RGBA
-    /// \n  \ref UsdAiTokens "Allowed Values": [BYTE, INT, UINT, BOOL, FLOAT, RGB, RGBA, VECTOR, VECTOR2, POINTER, NODE, ARRAY, MATRIX]
-    USDAI_API
-    UsdAttribute GetDataTypeAttr() const;
-
-    /// See GetDataTypeAttr(), and also 
-    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
-    /// If specified, author \p defaultValue as the attribute's default,
-    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
-    /// the default for \p writeSparsely is \c false.
-    USDAI_API
-    UsdAttribute CreateDataTypeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
-
-public:
-    // --------------------------------------------------------------------- //
-    // LPE 
-    // --------------------------------------------------------------------- //
-    /// The Light Path Expression for the AOV.
-    ///
-    /// \n  C++ Type: std::string
-    /// \n  Usd Type: SdfValueTypeNames->String
-    /// \n  Variability: SdfVariabilityUniform
-    /// \n  Fallback Value: 
-    USDAI_API
-    UsdAttribute GetLPEAttr() const;
-
-    /// See GetLPEAttr(), and also 
-    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
-    /// If specified, author \p defaultValue as the attribute's default,
-    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
-    /// the default for \p writeSparsely is \c false.
-    USDAI_API
-    UsdAttribute CreateLPEAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
-
-public:
-    // --------------------------------------------------------------------- //
-    // DRIVER 
-    // --------------------------------------------------------------------- //
-    /// 
-    ///
-    USDAI_API
-    UsdRelationship GetDriverRel() const;
-
-    /// See GetDriverRel(), and also 
-    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create
-    USDAI_API
-    UsdRelationship CreateDriverRel() const;
-
-public:
-    // --------------------------------------------------------------------- //
-    // FILTER 
-    // --------------------------------------------------------------------- //
-    /// 
-    ///
-    USDAI_API
-    UsdRelationship GetFilterRel() const;
-
-    /// See GetFilterRel(), and also 
-    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create
-    USDAI_API
-    UsdRelationship CreateFilterRel() const;
+    UsdAttribute CreatePathAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // ===================================================================== //

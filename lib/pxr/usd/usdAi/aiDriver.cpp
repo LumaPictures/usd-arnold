@@ -21,7 +21,7 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/usd/usdAi/aiAOV.h"
+#include "pxr/usd/usdAi/aiDriver.h"
 #include "pxr/usd/usd/schemaRegistry.h"
 #include "pxr/usd/usd/typed.h"
 
@@ -33,58 +33,58 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<UsdAiAOV,
+    TfType::Define<UsdAiDriver,
         TfType::Bases< UsdTyped > >();
     
     // Register the usd prim typename as an alias under UsdSchemaBase. This
     // enables one to call
-    // TfType::Find<UsdSchemaBase>().FindDerivedByName("AiAOV")
-    // to find TfType<UsdAiAOV>, which is how IsA queries are
+    // TfType::Find<UsdSchemaBase>().FindDerivedByName("AiDriver")
+    // to find TfType<UsdAiDriver>, which is how IsA queries are
     // answered.
-    TfType::AddAlias<UsdSchemaBase, UsdAiAOV>("AiAOV");
+    TfType::AddAlias<UsdSchemaBase, UsdAiDriver>("AiDriver");
 }
 
 /* virtual */
-UsdAiAOV::~UsdAiAOV()
+UsdAiDriver::~UsdAiDriver()
 {
 }
 
 /* static */
-UsdAiAOV
-UsdAiAOV::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdAiDriver
+UsdAiDriver::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
-        return UsdAiAOV();
+        return UsdAiDriver();
     }
-    return UsdAiAOV(stage->GetPrimAtPath(path));
+    return UsdAiDriver(stage->GetPrimAtPath(path));
 }
 
 /* static */
-UsdAiAOV
-UsdAiAOV::Define(
+UsdAiDriver
+UsdAiDriver::Define(
     const UsdStagePtr &stage, const SdfPath &path)
 {
-    static TfToken usdPrimTypeName("AiAOV");
+    static TfToken usdPrimTypeName("AiDriver");
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
-        return UsdAiAOV();
+        return UsdAiDriver();
     }
-    return UsdAiAOV(
+    return UsdAiDriver(
         stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* static */
 const TfType &
-UsdAiAOV::_GetStaticTfType()
+UsdAiDriver::_GetStaticTfType()
 {
-    static TfType tfType = TfType::Find<UsdAiAOV>();
+    static TfType tfType = TfType::Find<UsdAiDriver>();
     return tfType;
 }
 
 /* static */
 bool 
-UsdAiAOV::_IsTypedSchema()
+UsdAiDriver::_IsTypedSchema()
 {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
@@ -92,86 +92,26 @@ UsdAiAOV::_IsTypedSchema()
 
 /* virtual */
 const TfType &
-UsdAiAOV::_GetTfType() const
+UsdAiDriver::_GetTfType() const
 {
     return _GetStaticTfType();
 }
 
 UsdAttribute
-UsdAiAOV::GetNameAttr() const
+UsdAiDriver::GetPathAttr() const
 {
-    return GetPrim().GetAttribute(UsdAiTokens->name);
+    return GetPrim().GetAttribute(UsdAiTokens->path);
 }
 
 UsdAttribute
-UsdAiAOV::CreateNameAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiDriver::CreatePathAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->name,
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->path,
                        SdfValueTypeNames->String,
                        /* custom = */ false,
                        SdfVariabilityUniform,
                        defaultValue,
                        writeSparsely);
-}
-
-UsdAttribute
-UsdAiAOV::GetDataTypeAttr() const
-{
-    return GetPrim().GetAttribute(UsdAiTokens->dataType);
-}
-
-UsdAttribute
-UsdAiAOV::CreateDataTypeAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->dataType,
-                       SdfValueTypeNames->Token,
-                       /* custom = */ false,
-                       SdfVariabilityVarying,
-                       defaultValue,
-                       writeSparsely);
-}
-
-UsdAttribute
-UsdAiAOV::GetLPEAttr() const
-{
-    return GetPrim().GetAttribute(UsdAiTokens->lPE);
-}
-
-UsdAttribute
-UsdAiAOV::CreateLPEAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->lPE,
-                       SdfValueTypeNames->String,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
-}
-
-UsdRelationship
-UsdAiAOV::GetDriverRel() const
-{
-    return GetPrim().GetRelationship(UsdAiTokens->driver);
-}
-
-UsdRelationship
-UsdAiAOV::CreateDriverRel() const
-{
-    return GetPrim().CreateRelationship(UsdAiTokens->driver,
-                       /* custom = */ false);
-}
-
-UsdRelationship
-UsdAiAOV::GetFilterRel() const
-{
-    return GetPrim().GetRelationship(UsdAiTokens->filter);
-}
-
-UsdRelationship
-UsdAiAOV::CreateFilterRel() const
-{
-    return GetPrim().CreateRelationship(UsdAiTokens->filter,
-                       /* custom = */ false);
 }
 
 namespace {
@@ -188,12 +128,10 @@ _ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
 
 /*static*/
 const TfTokenVector&
-UsdAiAOV::GetSchemaAttributeNames(bool includeInherited)
+UsdAiDriver::GetSchemaAttributeNames(bool includeInherited)
 {
     static TfTokenVector localNames = {
-        UsdAiTokens->name,
-        UsdAiTokens->dataType,
-        UsdAiTokens->lPE,
+        UsdAiTokens->path,
     };
     static TfTokenVector allNames =
         _ConcatenateAttributeNames(

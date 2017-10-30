@@ -456,12 +456,33 @@ class AiAOV "AiAOV" (
 )
 {
     token dataType = "RGBA" (
-        allowedTokens = ["BYTE", "INT", "UINT", "BOOL", "FLOAT", "RGB", "RGBA", "VECTOR", "POINT", "POINT2", "POINTER", "NODE", "ARRAY", "MATRIX"]
+        allowedTokens = ["BYTE", "INT", "UINT", "BOOL", "FLOAT", "RGB", "RGBA", "VECTOR", "VECTOR2", "POINTER", "NODE", "ARRAY", "MATRIX"]
     )
     rel driver
     rel filter
+    uniform string LPE = "" (
+        doc = "The Light Path Expression for the AOV."
+    )
     uniform string name (
         doc = "The name of the AOV."
+    )
+}
+
+class AiDriver "AiDriver" (
+    doc = "Represents an Arnold driver."
+)
+{
+    uniform string path (
+        doc = "Output path for the driver"
+    )
+}
+
+class AiFilter "AiFilter" (
+    doc = "Represents an Arnold filter."
+)
+{
+    uniform float size (
+        doc = "The size of the filter."
     )
 }
 

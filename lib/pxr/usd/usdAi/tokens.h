@@ -107,26 +107,28 @@ PXR_NAMESPACE_OPEN_SCOPE
     ((iNT, "INT")) \
     (linear) \
     (loat_at_init) \
+    ((lPE, "LPE")) \
     ((mATRIX, "MATRIX")) \
     (name) \
     ((nODE, "NODE")) \
     (none) \
     (object) \
+    (path) \
     (pin_borders) \
     (pin_corners) \
-    ((pOINT, "POINT")) \
-    ((pOINT2, "POINT2")) \
     ((pOINTER, "POINTER")) \
     (raster) \
     ((rGB, "RGB")) \
     ((rGBA, "RGBA")) \
     (rotate_about_center) \
     (rotate_about_origin) \
+    (size) \
     (smooth) \
     (step_size) \
     ((uINT, "UINT")) \
     ((userPrefix, "user:")) \
-    ((vECTOR, "VECTOR"))
+    ((vECTOR, "VECTOR")) \
+    ((vECTOR2, "VECTOR2"))
 
 /// \anchor UsdAiTokens
 ///
@@ -214,26 +216,28 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \li <b>iNT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>linear</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_typeAttr(), Possible value for UsdAiShapeAPI::GetAiTransform_typeAttr(), Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
 /// \li <b>loat_at_init</b> - UsdAiProcedural
+/// \li <b>lPE</b> - UsdAiAOV
 /// \li <b>mATRIX</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>name</b> - UsdAiAOV
 /// \li <b>nODE</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>none</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_typeAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_typeAttr()
 /// \li <b>object</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_spaceAttr()
+/// \li <b>path</b> - UsdAiDriver
 /// \li <b>pin_borders</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
 /// \li <b>pin_corners</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
-/// \li <b>pOINT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
-/// \li <b>pOINT2</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>pOINTER</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>raster</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_spaceAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_adaptive_spaceAttr()
 /// \li <b>rGB</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>rGBA</b> - Possible value for UsdAiAOV::GetDataTypeAttr(), Default value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>rotate_about_center</b> - Possible value for UsdAiShapeAPI::GetAiTransform_typeAttr(), Default value for UsdAiShapeAPI::GetAiTransform_typeAttr()
 /// \li <b>rotate_about_origin</b> - Possible value for UsdAiShapeAPI::GetAiTransform_typeAttr()
+/// \li <b>size</b> - UsdAiFilter
 /// \li <b>smooth</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
 /// \li <b>step_size</b> - UsdAiVolume
 /// \li <b>uINT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>userPrefix</b> - The attribute prefix used to qualify user parameters on nodes using the AiNodeAPI.
 /// \li <b>vECTOR</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
+/// \li <b>vECTOR2</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 TF_DECLARE_PUBLIC_TOKENS(UsdAiTokens, USDAI_API, USDAI_TOKENS);
 
 PXR_NAMESPACE_CLOSE_SCOPE
