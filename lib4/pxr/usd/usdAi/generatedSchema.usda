@@ -439,3 +439,21 @@ class AiAOV "AiAOV" (
     )
 }
 
+class AiDriver "AiDriver" (
+    doc = "Represents an Arnold driver."
+)
+{
+    uniform string path (
+        doc = "Output path for the driver"
+    )
+}
+
+class AiFilter "AiFilter" (
+    doc = "Represents an Arnold filter."
+)
+{
+    uniform float size (
+        doc = "The size of the filter."
+    )
+}
+

@@ -485,3 +485,21 @@ class AiAOV "AiAOV" (
     rel driver
     rel filter
 }
+
+class AiDriver "AiDriver" (
+    inherits = </Typed>
+    doc = """Represents an Arnold driver."""
+) {
+    uniform string path (
+        doc = """Output path for the driver"""
+    )
+}
+
+class AiFilter "AiFilter" (
+    inherits = </Typed>
+    doc = """Represents an Arnold filter."""
+) {
+    uniform float size (
+        doc = """The size of the filter."""
+    )
+}

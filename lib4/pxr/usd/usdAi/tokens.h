@@ -107,6 +107,7 @@ PXR_NAMESPACE_OPEN_SCOPE
     ((nODE, "NODE")) \
     (none) \
     (object) \
+    (path) \
     (pin_borders) \
     (pin_corners) \
     ((pOINT, "POINT")) \
@@ -115,6 +116,7 @@ PXR_NAMESPACE_OPEN_SCOPE
     (raster) \
     ((rGB, "RGB")) \
     ((rGBA, "RGBA")) \
+    (size) \
     (smooth) \
     (step_size) \
     ((uINT, "UINT")) \
@@ -207,6 +209,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \li <b>nODE</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>none</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_typeAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_typeAttr()
 /// \li <b>object</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_spaceAttr()
+/// \li <b>path</b> - UsdAiDriver
 /// \li <b>pin_borders</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
 /// \li <b>pin_corners</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
 /// \li <b>pOINT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
@@ -215,6 +218,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \li <b>raster</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_spaceAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_adaptive_spaceAttr()
 /// \li <b>rGB</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>rGBA</b> - Possible value for UsdAiAOV::GetDataTypeAttr(), Default value for UsdAiAOV::GetDataTypeAttr()
+/// \li <b>size</b> - UsdAiFilter
 /// \li <b>smooth</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
 /// \li <b>step_size</b> - UsdAiVolume
 /// \li <b>uINT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
