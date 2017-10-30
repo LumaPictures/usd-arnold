@@ -10,7 +10,7 @@ find_path(USD_INCLUDE_DIR pxr/pxr.h
 
 find_path(USD_LIBRARY_DIR libusd.so
           PATHS ${USD_ROOT}/lib
-          DOC "USD Librarires directory")
+          DOC "USD Libraries directory")
 
 find_file(USD_GENSCHEMA
           names usdGenSchema

@@ -10,6 +10,10 @@ include(Options)
 include(ProjectDefaults)
 include(Packages)
 
+if (PXR_BUILD_TESTS)
+    find_package(GTest REQUIRED)
+endif ()
+
 # This has to be defined after Packages is included, because it relies on the
 # discovered path to the python executable.
 set(PXR_PYTHON_SHEBANG "${PYTHON_EXECUTABLE}" 
