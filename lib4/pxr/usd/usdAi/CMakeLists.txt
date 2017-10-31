@@ -63,14 +63,14 @@ pxr_shared_library(usdAi
         generatedSchema.usda
 )
 
-pxr_build_test(testUsdAiAPI
+pxr_build_test(testUsdAiShapeAPI
    LIBRARIES
        usd
        ${PYTHON_LIBRARIES}
        arch
        usdAi
    CPPFILES
-       testenv/testUsdAiAPI.cpp
+       testenv/testUsdAiShapeAPI.cpp
 )
 
 # pxr_install_test_dir(
@@ -78,8 +78,8 @@ pxr_build_test(testUsdAiAPI
 #     DEST testUsdAiAPI
 # )
 
-pxr_register_test(testUsdAiAPI
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdAiAPI"
+pxr_register_test(testUsdAiShapeAPI
+    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdAiShapeAPI"
     EXPECTED_RETURN_CODE 0
 )
 
