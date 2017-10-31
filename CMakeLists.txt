@@ -10,10 +10,6 @@ include(Options)
 include(ProjectDefaults)
 include(Packages)
 
-if (PXR_BUILD_TESTS)
-    find_package(GTest REQUIRED)
-endif ()
-
 # This has to be defined after Packages is included, because it relies on the
 # discovered path to the python executable.
 set(PXR_PYTHON_SHEBANG "${PYTHON_EXECUTABLE}" 
@@ -49,7 +45,11 @@ if (BUILD_USD_PLUGIN)
     else ()
         add_subdirectory(lib4/pxr/usd/usdAi)
     endif ()
-    
+
+    if (PXR_BUILD_TESTS)
+        # find_package(GTest REQUIRED)
+        # add_subdirectory(tests)
+    endif ()
 endif ()
 
 if (BUILD_USD_MAYA_PLUGIN)

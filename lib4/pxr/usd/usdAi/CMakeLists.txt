@@ -59,6 +59,25 @@ pxr_shared_library(usdAi
         generatedSchema.usda
 )
 
+pxr_build_test(testUsdAiAPI
+   LIBRARIES
+       usd
+       usdGeom
+       usdAi
+   CPPFILES
+       testenv/testUsdAiAPI.cpp
+)
+
+# pxr_install_test_dir(
+#     SRC testenv/testUsdAiAPI
+#     DEST testUsdAiAPI
+# )
+
+pxr_register_test(testUsdAiAPI
+    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdAiAPI"
+    EXPECTED_RETURN_CODE 0
+)
+
 if (PXR_ENABLE_PYTHON_SUPPORT)
     install(CODE
     "file(WRITE \"${CMAKE_INSTALL_PREFIX}/lib/python/pxr/__init__.py\"
