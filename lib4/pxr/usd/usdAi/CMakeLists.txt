@@ -24,6 +24,8 @@ pxr_shared_library(usdAi
     PUBLIC_CLASSES
         tokens
         aiAOV
+        aiDriver
+        aiFilter
         aiMaterialAPI
         aiNodeAPI
         aiProcedural
@@ -42,6 +44,8 @@ pxr_shared_library(usdAi
     PYMODULE_CPPFILES
         module.cpp
         wrapAiAOV.cpp
+        wrapAiDriver.cpp
+        wrapAiFilter.cpp
         wrapAiMaterialAPI.cpp
         wrapAiNodeAPI.cpp
         wrapAiProcedural.cpp
@@ -62,7 +66,8 @@ pxr_shared_library(usdAi
 pxr_build_test(testUsdAiAPI
    LIBRARIES
        usd
-       usdGeom
+       ${PYTHON_LIBRARIES}
+       arch
        usdAi
    CPPFILES
        testenv/testUsdAiAPI.cpp
