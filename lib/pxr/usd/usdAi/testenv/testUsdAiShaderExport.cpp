@@ -180,6 +180,18 @@ TEST(UsdAiShaderExport, ParentScope) {
     EXPECT_TRUE(checkRelationship(materialAPI.GetDisplacementRel(), SdfPath("/something/else/noise")));
 }
 
+bool validateConnection(
+    const UsdShadeConnectableAPI& api,
+    const std::string& paramName,
+    const std::string& target) {
+    auto input = api.GetInput(TfToken(paramName));
+    if (input.GetBaseName() == paramName) {
+        SdfPathVector sourcePaths;
+        input.GetRawConnectedSourcePaths(&sourcePaths);
+        return sourcePaths.size() == 1 && sourcePaths[0] == SdfPath(target);
+    } else { return false; }
+};
+
 TEST(UsdAiShaderExport, ParameterConnections) {
     SETUP_UNIVERSE();
     SETUP_BASE();
@@ -219,22 +231,71 @@ TEST(UsdAiShaderExport, ParameterConnections) {
     EXPECT_TRUE(image1Prim.GetAttribute(TfToken("outputs:g")));
     EXPECT_TRUE(image1Prim.GetAttribute(TfToken("outputs:out")));
 
-    UsdShadeConnectableAPI connectableAPI(standardPrim);
-    EXPECT_TRUE(connectableAPI);
+    UsdShadeConnectableAPI api(standardPrim);
+    EXPECT_TRUE(api);
 
-    auto validateConnection = [&connectableAPI] (const std::string& paramName, const std::string& target) -> bool {
-        auto input = connectableAPI.GetInput(TfToken(paramName));
-        if (input.GetBaseName() == paramName) {
-            SdfPathVector sourcePaths;
-            input.GetRawConnectedSourcePaths(&sourcePaths);
-            return sourcePaths.size() == 1 && sourcePaths[0] == SdfPath(target);
-        } else { return false; }
-    };
+    EXPECT_TRUE(validateConnection(api, "specular", "/Looks/image2.outputs:b"));
+    EXPECT_TRUE(validateConnection(api, "specular_color", "/Looks/image2.outputs:out"));
+    EXPECT_TRUE(validateConnection(api, "base", "/Looks/image1.outputs:g"));
+    EXPECT_TRUE(validateConnection(api, "base_color", "/Looks/image1.outputs:out"));
+    EXPECT_TRUE(validateConnection(api, "transmission_color:r", "/Looks/image2.outputs:r"));
+    EXPECT_TRUE(validateConnection(api, "transmission_color:b", "/Looks/image1.outputs:g"));
+}
 
-    EXPECT_TRUE(validateConnection("specular", "/Looks/image2.outputs:b"));
-    EXPECT_TRUE(validateConnection("specular_color", "/Looks/image2.outputs:out"));
-    EXPECT_TRUE(validateConnection("base", "/Looks/image1.outputs:g"));
-    EXPECT_TRUE(validateConnection("base_color", "/Looks/image1.outputs:out"));
-    EXPECT_TRUE(validateConnection("transmission_color:r", "/Looks/image2.outputs:r"));
-    EXPECT_TRUE(validateConnection("transmission_color:b", "/Looks/image1.outputs:g"));
+// By default there isn't really a node in the arnold core
+// that has array values as its inputs.
+
+AI_SHADER_NODE_EXPORT_METHODS(UsdAiArrayShader);
+
+node_parameters
+{
+    AiParameterArray("arr", AiArray(1, 1, AI_TYPE_FLOAT, 1.0f));
+}
+
+node_initialize { }
+node_update { }
+node_finish { }
+shader_evaluate { }
+
+TEST(UsdAiShaderExport, ArrayConnections) {
+    SETUP_UNIVERSE();
+    SETUP_BASE();
+
+    AiNodeEntryInstall(
+        AI_NODE_SHADER, AI_TYPE_RGB,
+        "UsdAiArrayShader", "UsdAi",
+        UsdAiArrayShader, AI_VERSION);
+
+    auto* array = AiNode(AtString("UsdAiArrayShader"));
+    auto* image1 = AiNode(AtString("image"));
+    auto* image2 = AiNode(AtString("image"));
+
+    AiNodeSetStr(array, AtString("name"), AtString("array"));
+    AiNodeSetStr(image1, AtString("name"), AtString("image1"));
+    AiNodeSetStr(image2, AtString("name"), AtString("image2"));
+
+    // We use the already set array to figure out which connections to
+    // look for. Without this there isn't really a way to list
+    // all the connections to an array.
+    AiNodeSetArray(array, AtString("arr"), AiArray(2, 1, AI_TYPE_FLOAT, 0.5f, 0.8f));
+    AiNodeLinkOutput(image1, AtString("g"), array, AtString("arr[0]"));
+    AiNodeLinkOutput(image2, AtString("b"), array, AtString("arr[1]"));
+
+    auto arrayPath = shaderExport.export_arnold_node(array, SdfPath("/Looks"));
+    EXPECT_EQ(arrayPath, SdfPath("/Looks/array"));
+
+    auto arrayPrim = stage->GetPrimAtPath(arrayPath);
+    auto image1Prim = stage->GetPrimAtPath(SdfPath("/Looks/image1"));
+    auto image2Prim = stage->GetPrimAtPath(SdfPath("/Looks/image2"));
+
+    EXPECT_TRUE(arrayPrim);
+    EXPECT_TRUE(image1Prim);
+    EXPECT_TRUE(image2Prim);
+
+    EXPECT_TRUE(image1Prim.GetAttribute(TfToken("outputs:g")));
+    EXPECT_TRUE(image2Prim.GetAttribute(TfToken("outputs:b")));
+
+    UsdShadeConnectableAPI api(arrayPrim);
+    EXPECT_TRUE(validateConnection(api, "arr:i0", "/Looks/image1.outputs:g"));
+    EXPECT_TRUE(validateConnection(api, "arr:i1", "/Looks/image2.outputs:b"));
 }
