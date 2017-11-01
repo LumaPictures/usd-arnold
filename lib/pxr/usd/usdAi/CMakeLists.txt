@@ -94,6 +94,20 @@ if (PXR_BUILD_TESTS)
         testenv/testMain.cpp
     )
 
+    pxr_build_test(testUsdAiShaderExport
+        LIBRARIES
+            usd
+            ${PYTHON_LIBRARIES}
+            arch
+            usdAi
+            ${GTEST_LIBRARY}
+        INCLUDES
+            ${GTEST_INCLUDE_DIR}
+        CPPFILES
+            testenv/testUsdAiShaderExport.cpp
+            testenv/testMain.cpp
+    )
+
     pxr_register_test(testUsdAiShapeAPI
         COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdAiShapeAPI"
         EXPECTED_RETURN_CODE 0
@@ -101,6 +115,11 @@ if (PXR_BUILD_TESTS)
 
     pxr_register_test(testUsdAiNodeAPI
         COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdAiNodeAPI"
+        EXPECTED_RETURN_CODE 0
+    )
+
+    pxr_register_test(testUsdAiShaderExport
+        COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdAiShaderExport"
         EXPECTED_RETURN_CODE 0
     )
 endif ()
