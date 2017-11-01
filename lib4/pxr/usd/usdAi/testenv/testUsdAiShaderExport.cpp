@@ -23,7 +23,10 @@ auto stage = UsdStage::CreateInMemory("test.usda"); \
 AiShaderExport shaderExport(stage)
 
 struct ArnoldUniverse {
-    ArnoldUniverse() { AiBegin(); }
+    ArnoldUniverse() {
+        AiBegin();
+        AiMsgSetConsoleFlags(AI_LOG_NONE);
+    }
     ~ArnoldUniverse() { AiEnd(); }
 };
 
@@ -234,4 +237,14 @@ TEST(UsdAiShaderExport, ParameterConnections) {
     EXPECT_TRUE(validateConnection("Kt_color", "/Looks/image1.outputs:out"));
     EXPECT_TRUE(validateConnection("transmittance:r", "/Looks/image2.outputs:r"));
     EXPECT_TRUE(validateConnection("transmittance:b", "/Looks/image1.outputs:g"));
+}
+
+// By default there isn't really a node in the arnold core
+// that has array values as its inputs.
+
+
+
+TEST(UsdAiShaderExport, ArrayConnections) {
+    SETUP_UNIVERSE();
+    SETUP_BASE();
 }

@@ -23,7 +23,10 @@ auto stage = UsdStage::CreateInMemory("test.usda"); \
 AiShaderExport shaderExport(stage)
 
 struct ArnoldUniverse {
-    ArnoldUniverse() { AiBegin(); }
+    ArnoldUniverse() {
+        AiBegin();
+        AiMsgSetConsoleFlags(AI_LOG_NONE);
+    }
     ~ArnoldUniverse() { AiEnd(); }
 };
 
@@ -83,34 +86,34 @@ TEST(UsdAiShaderExport, ExportArnoldNode) {
     SETUP_UNIVERSE();
     SETUP_BASE();
 
-    auto* standard1 = AiNode(AtString("standard"));
+    auto* standard1 = AiNode(AtString("standard_surface"));
     AiNodeSetStr(standard1, AtString("name"), AtString("standard1"));
-    AiNodeSetFlt(standard1, AtString("Kt"), 0.8f);
-    AiNodeSetFlt(standard1, AtString("Kr"), 0.7f);
-    AiNodeSetRGB(standard1, AtString("Ks_color"), 0.5f, 0.12f, 0.4f);
+    AiNodeSetFlt(standard1, AtString("base"), 0.8f);
+    AiNodeSetFlt(standard1, AtString("specular"), 0.7f);
+    AiNodeSetRGB(standard1, AtString("specular_color"), 0.5f, 0.12f, 0.4f);
 
     auto standard1Path = shaderExport.export_arnold_node(standard1, SdfPath("/"));
     EXPECT_EQ(standard1Path, SdfPath("/standard1"));
     auto prim = stage->GetPrimAtPath(standard1Path);
     EXPECT_TRUE(prim);
-    EXPECT_TRUE(equalParam(prim, "info:id", TfToken("standard")));
-    EXPECT_TRUE(equalParam(prim, "inputs:Kt", 0.8f));
-    EXPECT_TRUE(equalParam(prim, "inputs:Kr", 0.7f));
-    EXPECT_TRUE(equalParam(prim, "inputs:Ks_color", GfVec3f(0.5f, 0.12f, 0.4f)));
+    EXPECT_TRUE(equalParam(prim, "info:id", TfToken("standard_surface")));
+    EXPECT_TRUE(equalParam(prim, "inputs:base", 0.8f));
+    EXPECT_TRUE(equalParam(prim, "inputs:specular", 0.7f));
+    EXPECT_TRUE(equalParam(prim, "inputs:specular_color", GfVec3f(0.5f, 0.12f, 0.4f)));
 
-    auto* standard2 = AiNode(AtString("standard"));
+    auto* standard2 = AiNode(AtString("standard_surface"));
     AiNodeSetStr(standard2, AtString("name"), AtString("standard2"));
-    AiNodeSetFlt(standard2, AtString("Kt"), 0.5f);
-    AiNodeSetFlt(standard2, AtString("Kr"), 0.42f);
+    AiNodeSetFlt(standard2, AtString("base"), 0.5f);
+    AiNodeSetFlt(standard2, AtString("specular"), 0.42f);
 
-    std::set<std::string> exportableParams = {"Kt"};
+    std::set<std::string> exportableParams = {"base"};
     auto standard2Path = shaderExport.export_arnold_node(standard2, SdfPath("/"), &exportableParams);
     EXPECT_EQ(standard2Path, SdfPath("/standard2"));
     prim = stage->GetPrimAtPath(standard2Path);
     EXPECT_TRUE(prim);
-    EXPECT_TRUE(equalParam(prim, "info:id", TfToken("standard")));
-    EXPECT_TRUE(equalParam(prim, "inputs:Kt", 0.5f));
-    EXPECT_FALSE(prim.GetAttribute(TfToken("inputs:Kr")));
+    EXPECT_TRUE(equalParam(prim, "info:id", TfToken("standard_surface")));
+    EXPECT_TRUE(equalParam(prim, "inputs:base", 0.5f));
+    EXPECT_FALSE(prim.GetAttribute(TfToken("inputs:specular")));
 }
 
 bool checkRelationship(const UsdRelationship& rel, const SdfPath& path) {
@@ -124,7 +127,7 @@ TEST(UsdAiShaderExport, ExportMaterial) {
     SETUP_UNIVERSE();
     SETUP_BASE();
 
-    auto* hair = AiNode(AtString("hair"));
+    auto* hair = AiNode(AtString("standard_hair"));
     AiNodeSetStr(hair, AtString("name"), AtString("hair"));
     auto* noise = AiNode(AtString("noise"));
     AiNodeSetStr(noise, AtString("name"), AtString("noise"));
@@ -142,7 +145,7 @@ TEST(UsdAiShaderExport, ExportMaterial) {
     EXPECT_TRUE(hairPrim.IsA<UsdAiShader>());
     EXPECT_TRUE(noisePrim.IsA<UsdAiShader>());
 
-    EXPECT_TRUE(equalParam(hairPrim, "info:id", TfToken("hair")));
+    EXPECT_TRUE(equalParam(hairPrim, "info:id", TfToken("standard_hair")));
     EXPECT_TRUE(equalParam(noisePrim, "info:id", TfToken("noise")));
 
     EXPECT_EQ(materialPrim.GetPath(), SdfPath("/Looks/myMaterial"));
@@ -157,7 +160,7 @@ TEST(UsdAiShaderExport, ParentScope) {
     auto stage = UsdStage::CreateInMemory("test.usda");
     AiShaderExport shaderExport(stage, SdfPath("/something/else"));
 
-    auto* hair = AiNode(AtString("hair"));
+    auto* hair = AiNode(AtString("standard_hair"));
     AiNodeSetStr(hair, AtString("name"), AtString("hair"));
     auto* noise = AiNode(AtString("noise"));
     AiNodeSetStr(noise, AtString("name"), AtString("noise"));
@@ -181,7 +184,7 @@ TEST(UsdAiShaderExport, ParameterConnections) {
     SETUP_UNIVERSE();
     SETUP_BASE();
 
-    auto* standard = AiNode(AtString("standard"));
+    auto* standard = AiNode(AtString("standard_surface"));
     auto* image1 = AiNode(AtString("image"));
     auto* image2 = AiNode(AtString("image"));
 
@@ -189,14 +192,14 @@ TEST(UsdAiShaderExport, ParameterConnections) {
     AiNodeSetStr(image1, AtString("name"), AtString("image1"));
     AiNodeSetStr(image2, AtString("name"), AtString("image2"));
 
-    AiNodeLink(image1, AtString("Kt_color"), standard);
-    AiNodeLink(image2, AtString("Kr_color"), standard);
+    AiNodeLink(image1, AtString("base_color"), standard);
+    AiNodeLink(image2, AtString("specular_color"), standard);
 
-    AiNodeLinkOutput(image1, AtString("g"), standard, AtString("Kt"));
-    AiNodeLinkOutput(image2, AtString("b"), standard, AtString("Kr"));
+    AiNodeLinkOutput(image1, AtString("g"), standard, AtString("base"));
+    AiNodeLinkOutput(image2, AtString("b"), standard, AtString("specular"));
 
-    AiNodeLinkOutput(image1, AtString("g"), standard, AtString("transmittance.b"));
-    AiNodeLinkOutput(image2, AtString("r"), standard, AtString("transmittance.r"));
+    AiNodeLinkOutput(image1, AtString("g"), standard, AtString("transmission_color.b"));
+    AiNodeLinkOutput(image2, AtString("r"), standard, AtString("transmission_color.r"));
 
     auto standardPath = shaderExport.export_arnold_node(standard, SdfPath("/Looks"));
     EXPECT_EQ(standardPath, SdfPath("/Looks/standard"));
@@ -228,10 +231,10 @@ TEST(UsdAiShaderExport, ParameterConnections) {
         } else { return false; }
     };
 
-    EXPECT_TRUE(validateConnection("Kr", "/Looks/image2.outputs:b"));
-    EXPECT_TRUE(validateConnection("Kr_color", "/Looks/image2.outputs:out"));
-    EXPECT_TRUE(validateConnection("Kt", "/Looks/image1.outputs:g"));
-    EXPECT_TRUE(validateConnection("Kt_color", "/Looks/image1.outputs:out"));
-    EXPECT_TRUE(validateConnection("transmittance:r", "/Looks/image2.outputs:r"));
-    EXPECT_TRUE(validateConnection("transmittance:b", "/Looks/image1.outputs:g"));
+    EXPECT_TRUE(validateConnection("specular", "/Looks/image2.outputs:b"));
+    EXPECT_TRUE(validateConnection("specular_color", "/Looks/image2.outputs:out"));
+    EXPECT_TRUE(validateConnection("base", "/Looks/image1.outputs:g"));
+    EXPECT_TRUE(validateConnection("base_color", "/Looks/image1.outputs:out"));
+    EXPECT_TRUE(validateConnection("transmission_color:r", "/Looks/image2.outputs:r"));
+    EXPECT_TRUE(validateConnection("transmission_color:b", "/Looks/image1.outputs:g"));
 }
