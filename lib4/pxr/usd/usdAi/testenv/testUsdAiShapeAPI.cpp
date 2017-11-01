@@ -54,19 +54,31 @@ void testMaskAttributes(const A& api,
     }
 }
 
-TEST(USDAiShapeAPI, Visibilities) {
-    auto stage = UsdStage::CreateInMemory("test.usda");
-    stage->SetFramesPerSecond(framesPerSecond); // Do we need to set this up?
+#define SETUP_API() \
+auto stage = UsdStage::CreateInMemory("test.usda"); \
+stage->SetFramesPerSecond(framesPerSecond); \
+auto something = UsdGeomMesh::Define(stage, primPath); \
+EXPECT_TRUE(something); \
+UsdAiShapeAPI shapeAPI(something.GetPrim()); \
+EXPECT_TRUE(shapeAPI);
 
-    auto something = UsdGeomMesh::Define(stage, primPath);
-    EXPECT_TRUE(something);
-
-    UsdAiShapeAPI shapeAPI(something.GetPrim());
-    EXPECT_TRUE(shapeAPI);
-
+TEST(USDAiShapeAPI, DefaultVisibility) {
+    SETUP_API()
     EXPECT_EQ(shapeAPI.ComputeVisibility(), allRays);
+}
+
+TEST(USDAiShapeAPI, DefaultSidedness) {
+    SETUP_API()
     EXPECT_EQ(shapeAPI.ComputeSidedness(), allRays);
-    EXPECT_EQ(shapeAPI.ComputeAutobumpVisibility(), autobumpVisibility);
+}
+
+TEST(USDAiShapeAPI, DefaultAutobumpVisibility) {
+    SETUP_API()
+    EXPECT_EQ(shapeAPI.ComputeSidedness(), allRays);
+}
+
+TEST(USDAiShapeAPI, Visibility) {
+    SETUP_API()
 
     const std::vector<MaskAttributeDefinition<UsdAiShapeAPI>> visibilityTest {
         {&UsdAiShapeAPI::CreateAiVisibleToCameraAttr, AI_RAY_CAMERA},
@@ -78,6 +90,12 @@ TEST(USDAiShapeAPI, Visibilities) {
         {&UsdAiShapeAPI::CreateAiVisibleToGlossyAttr, AI_RAY_GLOSSY},
     };
 
+    testMaskAttributes(shapeAPI, &UsdAiShapeAPI::ComputeVisibility, visibilityTest);
+}
+
+TEST(USDAiShapeAPI, Sidedness) {
+    SETUP_API()
+
     const std::vector<MaskAttributeDefinition<UsdAiShapeAPI>> sidednessTest {
         {&UsdAiShapeAPI::CreateAiDoubleSidedToCameraAttr, AI_RAY_CAMERA},
         {&UsdAiShapeAPI::CreateAiDoubleSidedToShadowAttr, AI_RAY_SHADOW},
@@ -87,6 +105,12 @@ TEST(USDAiShapeAPI, Visibilities) {
         {&UsdAiShapeAPI::CreateAiDoubleSidedToDiffuseAttr, AI_RAY_DIFFUSE},
         {&UsdAiShapeAPI::CreateAiDoubleSidedToGlossyAttr, AI_RAY_GLOSSY},
     };
+
+    testMaskAttributes(shapeAPI, &UsdAiShapeAPI::ComputeSidedness, sidednessTest);
+}
+
+TEST(USDAiShapeAPI, AutobumpVisibility) {
+    SETUP_API()
 
     const std::vector<MaskAttributeDefinition<UsdAiShapeAPI>> autobumpVisibilityTest {
         {&UsdAiShapeAPI::CreateAiAutobumpVisibleToCameraAttr, AI_RAY_CAMERA},
@@ -98,7 +122,5 @@ TEST(USDAiShapeAPI, Visibilities) {
         {&UsdAiShapeAPI::CreateAiAutobumpVisibleToGlossyAttr, AI_RAY_GLOSSY},
     };
 
-    testMaskAttributes(shapeAPI, &UsdAiShapeAPI::ComputeVisibility, visibilityTest);
-    testMaskAttributes(shapeAPI, &UsdAiShapeAPI::ComputeSidedness, sidednessTest);
     testMaskAttributes(shapeAPI, &UsdAiShapeAPI::ComputeAutobumpVisibility, autobumpVisibilityTest);
 }
