@@ -14,10 +14,10 @@ public:
                    const UsdTimeCode& _time_code = UsdTimeCode::Default());
     ~AiShaderExport();
     void bind_material(const SdfPath& shader_path, const SdfPath& shape_path);
+    SdfPath export_arnold_node(const AtNode* arnold_node,
+                               const SdfPath& parent_path, const std::set<std::string>* exportable_params = nullptr);
     SdfPath export_material(const char* material_name,
                             AtNode* surf_shader, AtNode* disp_shader=nullptr);
-    SdfPath export_arnold_node(const AtNode* arnold_node,
-                               SdfPath& parent_path, const std::set<std::string>* exportable_params = nullptr);
     static void clean_arnold_name(std::string& name);
     bool get_output(const AtNode* src_arnold_node, UsdAiShader& src_shader, UsdShadeOutput& out,
                     bool is_node_type=false, int32_t comp_index=-1);

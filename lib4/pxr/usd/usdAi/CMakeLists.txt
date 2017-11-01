@@ -119,6 +119,8 @@ if (PXR_BUILD_TESTS)
     pxr_register_test(testUsdAiShaderExport
         COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdAiShaderExport"
         EXPECTED_RETURN_CODE 0
+        ENV
+            USD_SHADE_WRITE_NEW_ENCODING=1
     )
 endif ()
 

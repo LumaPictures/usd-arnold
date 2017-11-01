@@ -398,7 +398,7 @@ AiShaderExport::export_parameter(
 }
 
 SdfPath
-AiShaderExport::export_arnold_node(const AtNode* arnold_node, SdfPath& parent_path,
+AiShaderExport::export_arnold_node(const AtNode* arnold_node, const SdfPath& parent_path,
                                    const std::set<std::string>* exportable_params) {
     if (arnold_node == nullptr) {
         return SdfPath();
@@ -484,7 +484,7 @@ AiShaderExport::export_material(const char* material_name, AtNode* surf_shader, 
     auto material = UsdAiMaterialAPI(UsdShadeMaterial::Define(m_stage, material_path));
 
     if (surf_shader != nullptr) {
-        auto surf_path = export_arnold_node(surf_shader, material_path);
+        auto surf_path = export_arnold_node(surf_shader, m_shaders_scope);
         if (!surf_path.IsEmpty()) {
             auto rel = material.CreateSurfaceRel();
             rel.AddTarget(surf_path);
@@ -492,7 +492,6 @@ AiShaderExport::export_material(const char* material_name, AtNode* surf_shader, 
     }
 
     if (disp_shader != nullptr) {
-        // FIXME: it's unclear why disp uses m_shaders_scope and surf uses material_path...
         auto disp_path = export_arnold_node(disp_shader, m_shaders_scope);
         if (!disp_path.IsEmpty()) {
             auto rel = material.CreateDisplacementRel();
