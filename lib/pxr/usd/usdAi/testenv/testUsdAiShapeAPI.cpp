@@ -5,7 +5,7 @@
 #include "pxr/usd/usdAi/aiShapeAPI.h"
 
 #include <ai.h>
-#include <vector>
+
 #include <gtest/gtest.h>
 
 PXR_NAMESPACE_USING_DIRECTIVE
@@ -14,12 +14,12 @@ constexpr auto framesPerSecond = 24.0;
 const SdfPath primPath("/something");
 
 constexpr uint8_t allRays =
-    AI_RAY_CAMERA | AI_RAY_SHADOW | AI_RAY_REFLECTED |
-    AI_RAY_REFRACTED | AI_RAY_SUBSURFACE | AI_RAY_DIFFUSE | AI_RAY_GLOSSY;
+    AI_RAY_CAMERA | AI_RAY_SHADOW | AI_RAY_DIFFUSE_TRANSMIT |
+    AI_RAY_SPECULAR_TRANSMIT | AI_RAY_VOLUME |
+    AI_RAY_DIFFUSE_REFLECT | AI_RAY_SPECULAR_REFLECT | AI_RAY_SUBSURFACE;
 
 constexpr uint8_t autobumpVisibility =
-    AI_RAY_CAMERA | AI_RAY_SHADOW | AI_RAY_REFLECTED |
-    AI_RAY_REFRACTED | AI_RAY_SUBSURFACE;
+    AI_RAY_CAMERA;
 
 template <typename A>
 struct MaskAttributeDefinition {
@@ -71,31 +71,34 @@ TEST(USDAiShapeAPI, Visibilities) {
     const std::vector<MaskAttributeDefinition<UsdAiShapeAPI>> visibilityTest {
         {&UsdAiShapeAPI::CreateAiVisibleToCameraAttr, AI_RAY_CAMERA},
         {&UsdAiShapeAPI::CreateAiVisibleToShadowAttr, AI_RAY_SHADOW},
-        {&UsdAiShapeAPI::CreateAiVisibleToReflectionAttr, AI_RAY_REFLECTED},
-        {&UsdAiShapeAPI::CreateAiVisibleToRefractionAttr, AI_RAY_REFRACTED},
+        {&UsdAiShapeAPI::CreateAiVisibleToDiffuseTransmitAttr, AI_RAY_DIFFUSE_TRANSMIT},
+        {&UsdAiShapeAPI::CreateAiVisibleToSpecularTransmitAttr, AI_RAY_SPECULAR_TRANSMIT},
+        {&UsdAiShapeAPI::CreateAiVisibleToVolumeAttr, AI_RAY_VOLUME},
+        {&UsdAiShapeAPI::CreateAiVisibleToDiffuseReflectAttr, AI_RAY_DIFFUSE_REFLECT},
+        {&UsdAiShapeAPI::CreateAiVisibleToSpecularReflectAttr, AI_RAY_SPECULAR_REFLECT},
         {&UsdAiShapeAPI::CreateAiVisibleToSubsurfaceAttr, AI_RAY_SUBSURFACE},
-        {&UsdAiShapeAPI::CreateAiVisibleToDiffuseAttr, AI_RAY_DIFFUSE},
-        {&UsdAiShapeAPI::CreateAiVisibleToGlossyAttr, AI_RAY_GLOSSY},
     };
 
     const std::vector<MaskAttributeDefinition<UsdAiShapeAPI>> sidednessTest {
         {&UsdAiShapeAPI::CreateAiDoubleSidedToCameraAttr, AI_RAY_CAMERA},
         {&UsdAiShapeAPI::CreateAiDoubleSidedToShadowAttr, AI_RAY_SHADOW},
-        {&UsdAiShapeAPI::CreateAiDoubleSidedToReflectionAttr, AI_RAY_REFLECTED},
-        {&UsdAiShapeAPI::CreateAiDoubleSidedToRefractionAttr, AI_RAY_REFRACTED},
+        {&UsdAiShapeAPI::CreateAiDoubleSidedToDiffuseTransmitAttr, AI_RAY_DIFFUSE_TRANSMIT},
+        {&UsdAiShapeAPI::CreateAiDoubleSidedToSpecularTransmitAttr, AI_RAY_SPECULAR_TRANSMIT},
+        {&UsdAiShapeAPI::CreateAiDoubleSidedToVolumeAttr, AI_RAY_VOLUME},
+        {&UsdAiShapeAPI::CreateAiDoubleSidedToDiffuseReflectAttr, AI_RAY_DIFFUSE_REFLECT},
+        {&UsdAiShapeAPI::CreateAiDoubleSidedToSpecularReflectAttr, AI_RAY_SPECULAR_REFLECT},
         {&UsdAiShapeAPI::CreateAiDoubleSidedToSubsurfaceAttr, AI_RAY_SUBSURFACE},
-        {&UsdAiShapeAPI::CreateAiDoubleSidedToDiffuseAttr, AI_RAY_DIFFUSE},
-        {&UsdAiShapeAPI::CreateAiDoubleSidedToGlossyAttr, AI_RAY_GLOSSY},
     };
 
     const std::vector<MaskAttributeDefinition<UsdAiShapeAPI>> autobumpVisibilityTest {
         {&UsdAiShapeAPI::CreateAiAutobumpVisibleToCameraAttr, AI_RAY_CAMERA},
         {&UsdAiShapeAPI::CreateAiAutobumpVisibleToShadowAttr, AI_RAY_SHADOW},
-        {&UsdAiShapeAPI::CreateAiAutobumpVisibleToReflectionAttr, AI_RAY_REFLECTED},
-        {&UsdAiShapeAPI::CreateAiAutobumpVisibleToRefractionAttr, AI_RAY_REFRACTED},
+        {&UsdAiShapeAPI::CreateAiAutobumpVisibleToDiffuseTransmitAttr, AI_RAY_DIFFUSE_TRANSMIT},
+        {&UsdAiShapeAPI::CreateAiAutobumpVisibleToSpecularTransmitAttr, AI_RAY_SPECULAR_TRANSMIT},
+        {&UsdAiShapeAPI::CreateAiAutobumpVisibleToVolumeAttr, AI_RAY_VOLUME},
+        {&UsdAiShapeAPI::CreateAiAutobumpVisibleToDiffuseReflectAttr, AI_RAY_DIFFUSE_REFLECT},
+        {&UsdAiShapeAPI::CreateAiAutobumpVisibleToSpecularReflectAttr, AI_RAY_SPECULAR_REFLECT},
         {&UsdAiShapeAPI::CreateAiAutobumpVisibleToSubsurfaceAttr, AI_RAY_SUBSURFACE},
-        {&UsdAiShapeAPI::CreateAiAutobumpVisibleToDiffuseAttr, AI_RAY_DIFFUSE},
-        {&UsdAiShapeAPI::CreateAiAutobumpVisibleToGlossyAttr, AI_RAY_GLOSSY},
     };
 
     testMaskAttributes(shapeAPI, &UsdAiShapeAPI::ComputeVisibility, visibilityTest);

@@ -63,25 +63,27 @@ pxr_shared_library(usdAi
         generatedSchema.usda
 )
 
-pxr_build_test(testUsdAiShapeAPI
-   LIBRARIES
-       usd
-       ${PYTHON_LIBRARIES}
-       arch
-       usdAi
-   CPPFILES
-       testenv/testUsdAiShapeAPI.cpp
-)
+if (PXR_BUILD_TESTS)
+    pxr_build_test(testUsdAiShapeAPI
+        LIBRARIES
+            usd
+            ${PYTHON_LIBRARIES}
+            arch
+            usdAi
+            ${GTEST_LIBRARY}
+        INCLUDES
+            ${GTEST_INCLUDE_DIR}
+        CPPFILES
+            testenv/testUsdAiShapeAPI.cpp
+            testenv/testMain.cpp
+    )
 
-# pxr_install_test_dir(
-#     SRC testenv/testUsdAiAPI
-#     DEST testUsdAiAPI
-# )
+    pxr_register_test(testUsdAiShapeAPI
+        COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdAiShapeAPI"
+        EXPECTED_RETURN_CODE 0
+    )
+endif ()
 
-pxr_register_test(testUsdAiShapeAPI
-    COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdAiShapeAPI"
-    EXPECTED_RETURN_CODE 0
-)
 
 if (PXR_ENABLE_PYTHON_SUPPORT)
     install(CODE

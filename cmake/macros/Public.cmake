@@ -483,7 +483,7 @@ function(pxr_build_test TEST_NAME)
     if (PXR_BUILD_TESTS)
         cmake_parse_arguments(bt
             "" ""
-            "LIBRARIES;CPPFILES"
+            "LIBRARIES;INCLUDES;CPPFILES"
             ${ARGN}
         )
 
@@ -500,7 +500,7 @@ function(pxr_build_test TEST_NAME)
             	POSITION_INDEPENDENT_CODE ON
         )
         target_include_directories(${TEST_NAME}
-            PRIVATE $<TARGET_PROPERTY:${PXR_PACKAGE},INCLUDE_DIRECTORIES>
+            PRIVATE $<TARGET_PROPERTY:${PXR_PACKAGE},INCLUDE_DIRECTORIES> ${bt_INCLUDES}
         )
         _pxr_target_link_libraries(${TEST_NAME}
             ${bt_LIBRARIES}

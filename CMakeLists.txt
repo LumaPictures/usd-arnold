@@ -40,15 +40,13 @@ include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
 
 
 if (BUILD_USD_PLUGIN)
+    if (PXR_BUILD_TESTS)
+        find_package(GTest REQUIRED)
+    endif ()
     if (ARNOLD_VERSION_ARCH_NUM VERSION_GREATER "4")
         add_subdirectory(lib/pxr/usd/usdAi)
     else ()
         add_subdirectory(lib4/pxr/usd/usdAi)
-    endif ()
-
-    if (PXR_BUILD_TESTS)
-        # find_package(GTest REQUIRED)
-        # add_subdirectory(tests)
     endif ()
 endif ()
 

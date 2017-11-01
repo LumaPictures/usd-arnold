@@ -24,6 +24,8 @@ pxr_shared_library(usdAi
     PUBLIC_CLASSES
         tokens
         aiAOV
+        aiDriver
+        aiFilter
         aiLightAPI
         aiMaterialAPI
         aiNodeAPI
@@ -43,6 +45,8 @@ pxr_shared_library(usdAi
     PYMODULE_CPPFILES
         module.cpp
         wrapAiAOV.cpp
+        wrapAiDriver.cpp
+        wrapAiFilter.cpp
         wrapAiLightAPI.cpp
         wrapAiMaterialAPI.cpp
         wrapAiNodeAPI.cpp
@@ -60,6 +64,27 @@ pxr_shared_library(usdAi
         plugInfo.json
         generatedSchema.usda
 )
+
+if (PXR_BUILD_TESTS)
+    pxr_build_test(testUsdAiShapeAPI
+       LIBRARIES
+           usd
+           ${PYTHON_LIBRARIES}
+           arch
+           usdAi
+           ${GTEST_LIBRARY}
+       INCLUDES
+           ${GTEST_INCLUDE_DIR}
+       CPPFILES
+           testenv/testUsdAiShapeAPI.cpp
+           testenv/testMain.cpp
+    )
+
+    pxr_register_test(testUsdAiShapeAPI
+        COMMAND "${CMAKE_INSTALL_PREFIX}/tests/testUsdAiShapeAPI"
+        EXPECTED_RETURN_CODE 0
+    )
+endif ()
 
 if (PXR_ENABLE_PYTHON_SUPPORT)
     install(CODE
