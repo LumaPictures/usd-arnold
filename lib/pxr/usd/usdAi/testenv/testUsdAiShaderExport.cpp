@@ -220,6 +220,7 @@ TEST(UsdAiShaderExport, ParameterConnections) {
     EXPECT_TRUE(connectableAPI);
 
     auto validateConnection = [&connectableAPI] (const std::string& paramName, const std::string& target) -> bool {
+        auto input = connectableAPI.GetInput(TfToken(paramName));
         if (input.GetBaseName() == paramName) {
             SdfPathVector sourcePaths;
             input.GetRawConnectedSourcePaths(&sourcePaths);
