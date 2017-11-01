@@ -3,6 +3,7 @@
 #include <pxr/usd/usdGeom/xform.h>
 #include <pxr/usd/usdShade/tokens.h>
 #include <pxr/usd/usdShade/material.h>
+#include <pxr/usd/usdShade/connectableAPI.h>
 
 #include "pxr/usd/usdAi/aiShaderExport.h"
 #include "pxr/usd/usdAi/aiMaterialAPI.h"
@@ -174,4 +175,62 @@ TEST(UsdAiShaderExport, ParentScope) {
     UsdAiMaterialAPI materialAPI(materialPrim);
     EXPECT_TRUE(checkRelationship(materialAPI.GetSurfaceRel(), SdfPath("/something/else/hair")));
     EXPECT_TRUE(checkRelationship(materialAPI.GetDisplacementRel(), SdfPath("/something/else/noise")));
+}
+
+TEST(UsdAiShaderExport, ParameterConnections) {
+    SETUP_UNIVERSE();
+    SETUP_BASE();
+
+    auto* standard = AiNode(AtString("standard"));
+    auto* image1 = AiNode(AtString("image"));
+    auto* image2 = AiNode(AtString("image"));
+
+    AiNodeSetStr(standard, AtString("name"), AtString("standard"));
+    AiNodeSetStr(image1, AtString("name"), AtString("image1"));
+    AiNodeSetStr(image2, AtString("name"), AtString("image2"));
+
+    AiNodeLink(image1, AtString("Kt_color"), standard);
+    AiNodeLink(image2, AtString("Kr_color"), standard);
+
+    AiNodeLinkOutput(image1, AtString("g"), standard, AtString("Kt"));
+    AiNodeLinkOutput(image2, AtString("b"), standard, AtString("Kr"));
+
+    AiNodeLinkOutput(image1, AtString("g"), standard, AtString("transmittance.b"));
+    AiNodeLinkOutput(image2, AtString("r"), standard, AtString("transmittance.r"));
+
+    auto standardPath = shaderExport.export_arnold_node(standard, SdfPath("/Looks"));
+    EXPECT_EQ(standardPath, SdfPath("/Looks/standard"));
+
+    auto standardPrim = stage->GetPrimAtPath(standardPath);
+    auto image1Prim = stage->GetPrimAtPath(SdfPath("/Looks/image1"));
+    auto image2Prim = stage->GetPrimAtPath(SdfPath("/Looks/image2"));
+
+    EXPECT_TRUE(standardPrim);
+    EXPECT_TRUE(image1Prim);
+    EXPECT_TRUE(image2Prim);
+
+    EXPECT_TRUE(image2Prim.GetAttribute(TfToken("outputs:b")));
+    EXPECT_TRUE(image2Prim.GetAttribute(TfToken("outputs:out")));
+    EXPECT_TRUE(image2Prim.GetAttribute(TfToken("outputs:r")));
+
+    EXPECT_TRUE(image1Prim.GetAttribute(TfToken("outputs:g")));
+    EXPECT_TRUE(image1Prim.GetAttribute(TfToken("outputs:out")));
+
+    UsdShadeConnectableAPI connectableAPI(standardPrim);
+    EXPECT_TRUE(connectableAPI);
+
+    auto validateConnection = [&connectableAPI] (const std::string& paramName, const std::string& target) -> bool {
+        if (input.GetBaseName() == paramName) {
+            SdfPathVector sourcePaths;
+            input.GetRawConnectedSourcePaths(&sourcePaths);
+            return sourcePaths.size() == 1 && sourcePaths[0] == SdfPath(target);
+        } else { return false; }
+    };
+
+    EXPECT_TRUE(validateConnection("Kr", "/Looks/image2.outputs:b"));
+    EXPECT_TRUE(validateConnection("Kr_color", "/Looks/image2.outputs:out"));
+    EXPECT_TRUE(validateConnection("Kt", "/Looks/image1.outputs:g"));
+    EXPECT_TRUE(validateConnection("Kt_color", "/Looks/image1.outputs:out"));
+    EXPECT_TRUE(validateConnection("transmittance:r", "/Looks/image2.outputs:r"));
+    EXPECT_TRUE(validateConnection("transmittance:b", "/Looks/image1.outputs:g"));
 }
