@@ -93,7 +93,9 @@ void readPrimLocation(
         readMaterial(stage, interface, aiMaterialAPI);
     }
 
-    const UsdAiAOV aov(prim);
+    // Sadly, this is not a feasible approach.
+    // I'm leaving the code here as a reference.
+    /*const UsdAiAOV aov(prim);
     if (aov) {
         const auto grp = readAOV(aov);
         if (grp.isValid()) {
@@ -104,7 +106,7 @@ void readPrimLocation(
                 "arnoldGlobalStatements.Channel Definitions.outputChannels", builder.build(),
                 std::string(), true, "/root");
         }
-    }
+    }*/
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
