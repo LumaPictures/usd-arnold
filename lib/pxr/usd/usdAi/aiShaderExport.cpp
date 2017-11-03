@@ -486,7 +486,18 @@ AiShaderExport::export_material(const char* material_name, AtNode* surf_shader, 
     auto material = UsdAiMaterialAPI(UsdShadeMaterial::Define(m_stage, material_path));
 
     if (surf_shader != nullptr) {
-        auto surf_path = export_arnold_node(surf_shader, m_shaders_scope);
+        // We are looking at two cases here. If we are exporting from maya, the surface shader
+        // is mostly a MayaShadingEngine with the same name as the material. In that case
+        // we have to put the surface shader below the material, because both prims
+        // are concrete types. In other cases, we need to put the shader outside
+        // the material's scope, because it might be shared between multiple
+        // materials.
+        SdfPath surf_path;
+        if (strcmp(AiNodeGetName(surf_shader), material_name) == 0) {
+            surf_path = export_arnold_node(surf_shader, material_path);
+        } else {
+            surf_path = export_arnold_node(surf_shader, m_shaders_scope);
+        }
         if (!surf_path.IsEmpty()) {
             auto rel = material.CreateSurfaceRel();
             rel.AddTarget(surf_path);
