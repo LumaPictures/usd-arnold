@@ -10,7 +10,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 void readPrimLocation(
     FnKat::GeolibCookInterface& interface,
     FnKat::GroupAttribute opArgs,
-    PxrUsdKatanaUsdInPrivateData* privateData);
+    const PxrUsdKatanaUsdInPrivateData& privateData);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

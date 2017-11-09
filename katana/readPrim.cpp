@@ -72,10 +72,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 void readPrimLocation(
     FnKat::GeolibCookInterface& interface,
     FnKat::GroupAttribute opArgs,
-    PxrUsdKatanaUsdInPrivateData* privateData) {
-    // privateData can be a nullptr!
-    if (privateData == nullptr) { return; }
-    const auto prim = privateData->GetUsdPrim();
+    const PxrUsdKatanaUsdInPrivateData& privateData) {
+    const auto prim = privateData.GetUsdPrim();
     // As of 0.8.2 this function is also called on the root: "/"
     if (!prim.IsValid() || !prim.GetPrimPath().IsPrimPath()) { return; }
 

@@ -14,12 +14,8 @@
 PXR_NAMESPACE_USING_DIRECTIVE
 
 PXRUSDKATANA_USDIN_PLUGIN_DECLARE(AiProceduralOp)
-
-#if PXR_MINOR_VERSION > 8 || (PXR_MINOR_VERSION == 8 && PXR_PATCH_VERSION > 1)
+DEFINE_GEOLIBOP_PLUGIN(AiProceduralOp)
 PXRUSDKATANA_USDIN_PLUGIN_DEFINE(AiProceduralOp, privateData, opArgs, interface)
-#else
-PXRUSDKATANA_USDIN_PLUGIN_DEFINE(AiProceduralOp, privateData, interface)
-#endif
 {
     PxrUsdKatanaAttrMap attrs;
 
@@ -29,7 +25,13 @@ PXRUSDKATANA_USDIN_PLUGIN_DEFINE(AiProceduralOp, privateData, interface)
     attrs.toInterface(interface);
 }
 
-DEFINE_GEOLIBOP_PLUGIN(AiProceduralOp)
+PXRUSDKATANA_USDIN_PLUGIN_DECLARE(UsdArnold_LocationDecorator)
+DEFINE_GEOLIBOP_PLUGIN(UsdArnold_LocationDecorator);
+PXRUSDKATANA_USDIN_PLUGIN_DEFINE(UsdArnold_LocationDecorator,
+    privateData, opArgs, interface)
+{
+    readPrimLocation(interface, opArgs, privateData);
+}
 
 void registerPlugins()
 {
@@ -38,5 +40,5 @@ void registerPlugins()
     PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiProcedural>("AiProceduralOp");
     PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiVolume>("AiProceduralOp");
 
-    PxrUsdKatanaUsdInPluginRegistry::RegisterLocationDecoratorFnc(readPrimLocation);
+    PxrUsdKatanaUsdInPluginRegistry::RegisterLocationDecoratorOp("UsdArnold_LocationDecorator");
 }
