@@ -35,10 +35,10 @@ PXRUSDKATANA_USDIN_PLUGIN_DEFINE(UsdArnold_LocationDecorator,
 
 void registerPlugins()
 {
-    REGISTER_PLUGIN(AiProceduralOp, "AiProceduralOp", 0, 1);
-
+    USD_OP_REGISTER_PLUGIN(AiProceduralOp, "AiProceduralOp", 0, 1);
     PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiProcedural>("AiProceduralOp");
     PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiVolume>("AiProceduralOp");
 
+    USD_OP_REGISTER_PLUGIN(UsdArnold_LocationDecorator, "UsdArnold_LocationDecorator", 0, 1);
     PxrUsdKatanaUsdInPluginRegistry::RegisterLocationDecoratorOp("UsdArnold_LocationDecorator");
 }
