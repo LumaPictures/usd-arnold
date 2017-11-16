@@ -8,7 +8,9 @@
 
 #include <pxr/usd/usdAi/aiNodeAPI.h>
 #include <pxr/usd/usdAi/aiProcedural.h>
+#ifndef ARNOLD5
 #include <pxr/usd/usdAi/aiVolume.h>
+#endif
 
 #include <FnAttribute/FnDataBuilder.h>
 #include <FnLogging/FnLogging.h>
@@ -30,6 +32,7 @@ readAiProcedural(
 
     const double currentTime = data.GetUsdInArgs()->GetCurrentTime();
 
+#ifndef ARNOLD5
     // This plugin is registered for both AiProcedural and AiVolume, so check
     // which one we're dealing with, since the handling is slightly different.
     if (procedural.GetPrim().IsA<UsdAiVolume>()) {
@@ -45,10 +48,14 @@ readAiProcedural(
             stepAttr.Get<float>(&stepSize, currentTime);
         }
         attrs.set("geometry.step_size", FnKat::FloatAttribute(stepSize));
-    } else {
+    } else
+#endif
+    {
         attrs.set("type", FnKat::StringAttribute("renderer procedural"));
     }
 
+// Check how to define this for Arnold 5 / KtoA 2
+#ifndef ARNOLD5
     // Read the DSO value.
     if (UsdAttribute dsoAttr = procedural.GetDsoAttr()) {
         // Not sure if this check is actually necessary, but this attribute
@@ -60,6 +67,16 @@ readAiProcedural(
                       FnKat::StringAttribute(dso));
         }
     }
+#else
+    if (auto idAttr = procedural.GetIdAttr()) {
+        if (idAttr.HasValue()) {
+            std::string id;
+            idAttr.Get<std::string>(&id);
+            attrs.set("rendererProcedural.node",
+                      FnKat::StringAttribute(id));
+        }
+    }
+#endif
 
     // Read all parameters in the "user:" namespace and convert their values to
     // attributes in the "rendererProcedural.args" group attribute.
