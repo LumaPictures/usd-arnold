@@ -21,7 +21,7 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/usd/usdAi/aiVolume.h"
+#include "pxr/usd/usdAi/aiVolumeProcedural.h"
 #include "pxr/usd/usd/schemaBase.h"
 
 #include "pxr/usd/sdf/primSpec.h"
@@ -50,14 +50,7 @@ WRAP_CUSTOM;
 
         
 static UsdAttribute
-_CreateFilenameAttr(UsdAiVolume &self,
-                                      object defaultVal, bool writeSparsely) {
-    return self.CreateFilenameAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Asset), writeSparsely);
-}
-        
-static UsdAttribute
-_CreateStepSizeAttr(UsdAiVolume &self,
+_CreateStepSizeAttr(UsdAiVolumeProcedural &self,
                                       object defaultVal, bool writeSparsely) {
     return self.CreateStepSizeAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
@@ -65,12 +58,12 @@ _CreateStepSizeAttr(UsdAiVolume &self,
 
 } // anonymous namespace
 
-void wrapUsdAiVolume()
+void wrapUsdAiVolumeProcedural()
 {
-    typedef UsdAiVolume This;
+    typedef UsdAiVolumeProcedural This;
 
-    class_<This, bases<UsdGeomBoundable> >
-        cls("AiVolume");
+    class_<This, bases<UsdAiProcedural> >
+        cls("AiVolumeProcedural");
 
     cls
         .def(init<UsdPrim>(arg("prim")))
@@ -95,13 +88,6 @@ void wrapUsdAiVolume()
 
         .def(!self)
 
-        
-        .def("GetFilenameAttr",
-             &This::GetFilenameAttr)
-        .def("CreateFilenameAttr",
-             &_CreateFilenameAttr,
-             (arg("defaultValue")=object(),
-              arg("writeSparsely")=false))
         
         .def("GetStepSizeAttr",
              &This::GetStepSizeAttr)

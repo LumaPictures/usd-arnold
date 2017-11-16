@@ -34,7 +34,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 TF_REGISTRY_FUNCTION(TfType)
 {
     TfType::Define<UsdAiVolume,
-        TfType::Bases< UsdAiProcedural > >();
+        TfType::Bases< UsdGeomBoundable > >();
     
     // Register the usd prim typename as an alias under UsdSchemaBase. This
     // enables one to call
@@ -98,6 +98,23 @@ UsdAiVolume::_GetTfType() const
 }
 
 UsdAttribute
+UsdAiVolume::GetFilenameAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->filename);
+}
+
+UsdAttribute
+UsdAiVolume::CreateFilenameAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->filename,
+                       SdfValueTypeNames->Asset,
+                       /* custom = */ false,
+                       SdfVariabilityVarying,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
 UsdAiVolume::GetStepSizeAttr() const
 {
     return GetPrim().GetAttribute(UsdAiTokens->step_size);
@@ -131,11 +148,12 @@ const TfTokenVector&
 UsdAiVolume::GetSchemaAttributeNames(bool includeInherited)
 {
     static TfTokenVector localNames = {
+        UsdAiTokens->filename,
         UsdAiTokens->step_size,
     };
     static TfTokenVector allNames =
         _ConcatenateAttributeNames(
-            UsdAiProcedural::GetSchemaAttributeNames(true),
+            UsdGeomBoundable::GetSchemaAttributeNames(true),
             localNames);
 
     if (includeInherited)

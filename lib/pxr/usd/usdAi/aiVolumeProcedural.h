@@ -21,14 +21,14 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#ifndef USDAI_GENERATED_AIPROCEDURAL_H
-#define USDAI_GENERATED_AIPROCEDURAL_H
+#ifndef USDAI_GENERATED_AIVOLUMEPROCEDURAL_H
+#define USDAI_GENERATED_AIVOLUMEPROCEDURAL_H
 
-/// \file usdAi/aiProcedural.h
+/// \file usdAi/aiVolumeProcedural.h
 
 #include "pxr/pxr.h"
 #include "pxr/usd/usdAi/api.h"
-#include "pxr/usd/usdGeom/boundable.h"
+#include "pxr/usd/usdAi/aiProcedural.h"
 #include "pxr/usd/usd/prim.h"
 #include "pxr/usd/usd/stage.h"
 #include "pxr/usd/usdAi/tokens.h"
@@ -47,23 +47,16 @@ PXR_NAMESPACE_OPEN_SCOPE
 class SdfAssetPath;
 
 // -------------------------------------------------------------------------- //
-// AIPROCEDURAL                                                               //
+// AIVOLUMEPROCEDURAL                                                         //
 // -------------------------------------------------------------------------- //
 
-/// \class UsdAiProcedural
+/// \class UsdAiVolumeProcedural
 ///
-/// Represents an Arnold procedural shape node.
-/// We don't inherit from Shader but define our own
-/// id parameter to avoid issues with code that check
-/// if a certan prim inherit from shader.
-/// 
+/// Handling of custom volume procedurals.
+/// We inherit from AiProcedural, because the parameters are
+/// essentially the same, except the additional step_size parameter.
 ///
-/// For any described attribute \em Fallback \em Value or \em Allowed \em Values below
-/// that are text/tokens, the actual token is published and defined in \ref UsdAiTokens.
-/// So to set an attribute to the value "rightHanded", use UsdAiTokens->rightHanded
-/// as the value.
-///
-class UsdAiProcedural : public UsdGeomBoundable
+class UsdAiVolumeProcedural : public UsdAiProcedural
 {
 public:
     /// Compile-time constant indicating whether or not this class corresponds
@@ -72,26 +65,26 @@ public:
     /// a non-empty typeName.
     static const bool IsConcrete = true;
 
-    /// Construct a UsdAiProcedural on UsdPrim \p prim .
-    /// Equivalent to UsdAiProcedural::Get(prim.GetStage(), prim.GetPath())
+    /// Construct a UsdAiVolumeProcedural on UsdPrim \p prim .
+    /// Equivalent to UsdAiVolumeProcedural::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
     /// an invalid \p prim
-    explicit UsdAiProcedural(const UsdPrim& prim=UsdPrim())
-        : UsdGeomBoundable(prim)
+    explicit UsdAiVolumeProcedural(const UsdPrim& prim=UsdPrim())
+        : UsdAiProcedural(prim)
     {
     }
 
-    /// Construct a UsdAiProcedural on the prim held by \p schemaObj .
-    /// Should be preferred over UsdAiProcedural(schemaObj.GetPrim()),
+    /// Construct a UsdAiVolumeProcedural on the prim held by \p schemaObj .
+    /// Should be preferred over UsdAiVolumeProcedural(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
-    explicit UsdAiProcedural(const UsdSchemaBase& schemaObj)
-        : UsdGeomBoundable(schemaObj)
+    explicit UsdAiVolumeProcedural(const UsdSchemaBase& schemaObj)
+        : UsdAiProcedural(schemaObj)
     {
     }
 
     /// Destructor.
     USDAI_API
-    virtual ~UsdAiProcedural();
+    virtual ~UsdAiVolumeProcedural();
 
     /// Return a vector of names of all pre-declared attributes for this schema
     /// class and all its ancestor classes.  Does not include attributes that
@@ -100,17 +93,17 @@ public:
     static const TfTokenVector &
     GetSchemaAttributeNames(bool includeInherited=true);
 
-    /// Return a UsdAiProcedural holding the prim adhering to this
+    /// Return a UsdAiVolumeProcedural holding the prim adhering to this
     /// schema at \p path on \p stage.  If no prim exists at \p path on
     /// \p stage, or if the prim at that path does not adhere to this schema,
     /// return an invalid schema object.  This is shorthand for the following:
     ///
     /// \code
-    /// UsdAiProcedural(stage->GetPrimAtPath(path));
+    /// UsdAiVolumeProcedural(stage->GetPrimAtPath(path));
     /// \endcode
     ///
     USDAI_API
-    static UsdAiProcedural
+    static UsdAiVolumeProcedural
     Get(const UsdStagePtr &stage, const SdfPath &path);
 
     /// Attempt to ensure a \a UsdPrim adhering to this schema at \p path
@@ -136,7 +129,7 @@ public:
     /// the opinion at the current EditTarget.
     ///
     USDAI_API
-    static UsdAiProcedural
+    static UsdAiVolumeProcedural
     Define(const UsdStagePtr &stage, const SdfPath &path);
 
 private:
@@ -153,54 +146,25 @@ private:
 
 public:
     // --------------------------------------------------------------------- //
-    // ID 
+    // STEPSIZE 
     // --------------------------------------------------------------------- //
-    /// The id is an identifier for the type of the procedural. 
-    /// Arnold 5 generates a separate node for each procedural.
-    /// 
+    /// Sampling step size inside the volume.
+    /// 0 means equal to the smallest axis of each voxel.
     ///
-    /// \n  C++ Type: TfToken
-    /// \n  Usd Type: SdfValueTypeNames->Token
-    /// \n  Variability: SdfVariabilityUniform
-    /// \n  Fallback Value: No Fallback
-    USDAI_API
-    UsdAttribute GetIdAttr() const;
-
-    /// See GetIdAttr(), and also 
-    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
-    /// If specified, author \p defaultValue as the attribute's default,
-    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
-    /// the default for \p writeSparsely is \c false.
-    USDAI_API
-    UsdAttribute CreateIdAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
-
-public:
-    // --------------------------------------------------------------------- //
-    // DATA 
-    // --------------------------------------------------------------------- //
-    /// This string parameter is used to pass parameters that are
-    /// parsed by the procedural program and can be used for its
-    /// creation/initialization.
-    /// 
-    /// The format of this string is not standard and is dictated by
-    /// the particular implementation of each procedural program. A
-    /// better and more compact way of passing parameters and data to
-    /// the procedural is through user data.
-    ///
-    /// \n  C++ Type: std::string
-    /// \n  Usd Type: SdfValueTypeNames->String
+    /// \n  C++ Type: float
+    /// \n  Usd Type: SdfValueTypeNames->Float
     /// \n  Variability: SdfVariabilityVarying
-    /// \n  Fallback Value: 
+    /// \n  Fallback Value: 0.0
     USDAI_API
-    UsdAttribute GetDataAttr() const;
+    UsdAttribute GetStepSizeAttr() const;
 
-    /// See GetDataAttr(), and also 
+    /// See GetStepSizeAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateDataAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateStepSizeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // ===================================================================== //

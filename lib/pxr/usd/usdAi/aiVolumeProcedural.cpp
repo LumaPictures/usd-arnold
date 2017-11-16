@@ -21,7 +21,7 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/usd/usdAi/aiProcedural.h"
+#include "pxr/usd/usdAi/aiVolumeProcedural.h"
 #include "pxr/usd/usd/schemaRegistry.h"
 #include "pxr/usd/usd/typed.h"
 
@@ -33,58 +33,58 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<UsdAiProcedural,
-        TfType::Bases< UsdGeomBoundable > >();
+    TfType::Define<UsdAiVolumeProcedural,
+        TfType::Bases< UsdAiProcedural > >();
     
     // Register the usd prim typename as an alias under UsdSchemaBase. This
     // enables one to call
-    // TfType::Find<UsdSchemaBase>().FindDerivedByName("AiProcedural")
-    // to find TfType<UsdAiProcedural>, which is how IsA queries are
+    // TfType::Find<UsdSchemaBase>().FindDerivedByName("AiVolumeProcedural")
+    // to find TfType<UsdAiVolumeProcedural>, which is how IsA queries are
     // answered.
-    TfType::AddAlias<UsdSchemaBase, UsdAiProcedural>("AiProcedural");
+    TfType::AddAlias<UsdSchemaBase, UsdAiVolumeProcedural>("AiVolumeProcedural");
 }
 
 /* virtual */
-UsdAiProcedural::~UsdAiProcedural()
+UsdAiVolumeProcedural::~UsdAiVolumeProcedural()
 {
 }
 
 /* static */
-UsdAiProcedural
-UsdAiProcedural::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdAiVolumeProcedural
+UsdAiVolumeProcedural::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
-        return UsdAiProcedural();
+        return UsdAiVolumeProcedural();
     }
-    return UsdAiProcedural(stage->GetPrimAtPath(path));
+    return UsdAiVolumeProcedural(stage->GetPrimAtPath(path));
 }
 
 /* static */
-UsdAiProcedural
-UsdAiProcedural::Define(
+UsdAiVolumeProcedural
+UsdAiVolumeProcedural::Define(
     const UsdStagePtr &stage, const SdfPath &path)
 {
-    static TfToken usdPrimTypeName("AiProcedural");
+    static TfToken usdPrimTypeName("AiVolumeProcedural");
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
-        return UsdAiProcedural();
+        return UsdAiVolumeProcedural();
     }
-    return UsdAiProcedural(
+    return UsdAiVolumeProcedural(
         stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* static */
 const TfType &
-UsdAiProcedural::_GetStaticTfType()
+UsdAiVolumeProcedural::_GetStaticTfType()
 {
-    static TfType tfType = TfType::Find<UsdAiProcedural>();
+    static TfType tfType = TfType::Find<UsdAiVolumeProcedural>();
     return tfType;
 }
 
 /* static */
 bool 
-UsdAiProcedural::_IsTypedSchema()
+UsdAiVolumeProcedural::_IsTypedSchema()
 {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
@@ -92,39 +92,22 @@ UsdAiProcedural::_IsTypedSchema()
 
 /* virtual */
 const TfType &
-UsdAiProcedural::_GetTfType() const
+UsdAiVolumeProcedural::_GetTfType() const
 {
     return _GetStaticTfType();
 }
 
 UsdAttribute
-UsdAiProcedural::GetIdAttr() const
+UsdAiVolumeProcedural::GetStepSizeAttr() const
 {
-    return GetPrim().GetAttribute(UsdAiTokens->infoId);
+    return GetPrim().GetAttribute(UsdAiTokens->step_size);
 }
 
 UsdAttribute
-UsdAiProcedural::CreateIdAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiVolumeProcedural::CreateStepSizeAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->infoId,
-                       SdfValueTypeNames->Token,
-                       /* custom = */ false,
-                       SdfVariabilityUniform,
-                       defaultValue,
-                       writeSparsely);
-}
-
-UsdAttribute
-UsdAiProcedural::GetDataAttr() const
-{
-    return GetPrim().GetAttribute(UsdAiTokens->data);
-}
-
-UsdAttribute
-UsdAiProcedural::CreateDataAttr(VtValue const &defaultValue, bool writeSparsely) const
-{
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->data,
-                       SdfValueTypeNames->String,
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->step_size,
+                       SdfValueTypeNames->Float,
                        /* custom = */ false,
                        SdfVariabilityVarying,
                        defaultValue,
@@ -145,15 +128,14 @@ _ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
 
 /*static*/
 const TfTokenVector&
-UsdAiProcedural::GetSchemaAttributeNames(bool includeInherited)
+UsdAiVolumeProcedural::GetSchemaAttributeNames(bool includeInherited)
 {
     static TfTokenVector localNames = {
-        UsdAiTokens->infoId,
-        UsdAiTokens->data,
+        UsdAiTokens->step_size,
     };
     static TfTokenVector allNames =
         _ConcatenateAttributeNames(
-            UsdGeomBoundable::GetSchemaAttributeNames(true),
+            UsdAiProcedural::GetSchemaAttributeNames(true),
             localNames);
 
     if (includeInherited)

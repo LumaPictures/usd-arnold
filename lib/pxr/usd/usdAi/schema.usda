@@ -465,13 +465,20 @@ class AiShader "AiShader" (
 }
 
 class AiProcedural "AiProcedural" (
-    doc = """Represents an Arnold procedural shape node."""
+    doc = """Represents an Arnold procedural shape node.
+             We don't inherit from Shader but define our own
+             id parameter to avoid issues with code that check
+             if a certan prim inherit from shader.
+    """
     inherits = </Boundable>
 ) {
-    uniform string dso (
-        doc = """A procedural can point to ass, obj, and ply filetypes, or to a
-                 dll or so, which will be recognized as a compiled procedural
-                 program."""
+    uniform token info:id (
+        doc = """The id is an identifier for the type of the procedural. 
+                 Arnold 5 generates a separate node for each procedural.
+        """
+        customData = {
+            string apiName = "id"
+        }
     )
 
     string data = "" (
@@ -484,27 +491,37 @@ class AiProcedural "AiProcedural" (
                  better and more compact way of passing parameters and data to
                  the procedural is through user data."""
     )
+}
 
-    uniform bool loat_at_init = false (
-        doc = """Whether to force the loading of the procedural during the
-                 initialization process."""
+class AiVolumeProcedural "AiVolumeProcedural" (
+    doc = """Handling of custom volume procedurals.
+             We inherit from AiProcedural, because the parameters are
+             essentially the same, except the additional step_size parameter."""
+    inherits = </AiProcedural>
+) {
+    float step_size = 0 (
+        doc = """Sampling step size inside the volume.
+                 0 means equal to the smallest axis of each voxel."""
         customData = {
-            string apiName = "loadAtInit"
+            string apiName = "stepSize"
         }
     )
 }
 
 class AiVolume "AiVolume" (
     doc = """Represents an Arnold volume node.
-
-             This class inherits AiProcedural because Arnold's volume node has
-             essentially the same parameters as the procedural node, except for
-             a couple of slight variations."""
-    inherits = </AiProcedural>
+             This node is designed to handle OpenVDB files, so we don't
+             inherit from AiProcedural.
+    """
+    inherits = </Boundable>
 ) {
+    asset filename = @@ (
+        doc = "Asset path to the file containg the volume data."
+    )
+
     float step_size = 0 (
         doc = """Sampling step size inside the volume.
-                 I think 0 means automatic."""
+                 0 means equal to the smallest axis of each voxel."""
         customData = {
             string apiName = "stepSize"
         }

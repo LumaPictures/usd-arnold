@@ -99,14 +99,14 @@ PXR_NAMESPACE_OPEN_SCOPE
     (data) \
     (dataType) \
     (driver) \
-    (dso) \
     (edge_length) \
+    (filename) \
     (filter) \
     (flatness) \
     ((fLOAT, "FLOAT")) \
+    ((infoId, "info:id")) \
     ((iNT, "INT")) \
     (linear) \
-    (loat_at_init) \
     ((lPE, "LPE")) \
     ((mATRIX, "MATRIX")) \
     (name) \
@@ -208,14 +208,14 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \li <b>data</b> - UsdAiProcedural
 /// \li <b>dataType</b> - UsdAiAOV
 /// \li <b>driver</b> - UsdAiAOV
-/// \li <b>dso</b> - UsdAiProcedural
 /// \li <b>edge_length</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_metricAttr()
+/// \li <b>filename</b> - UsdAiVolume
 /// \li <b>filter</b> - UsdAiAOV
 /// \li <b>flatness</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_metricAttr()
 /// \li <b>fLOAT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
+/// \li <b>infoId</b> - UsdAiProcedural
 /// \li <b>iNT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>linear</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_typeAttr(), Possible value for UsdAiShapeAPI::GetAiTransform_typeAttr(), Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
-/// \li <b>loat_at_init</b> - UsdAiProcedural
 /// \li <b>lPE</b> - UsdAiAOV
 /// \li <b>mATRIX</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>name</b> - UsdAiAOV
@@ -233,7 +233,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// \li <b>rotate_about_origin</b> - Possible value for UsdAiShapeAPI::GetAiTransform_typeAttr()
 /// \li <b>size</b> - UsdAiFilter
 /// \li <b>smooth</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
-/// \li <b>step_size</b> - UsdAiVolume
+/// \li <b>step_size</b> - UsdAiVolume, UsdAiVolumeProcedural
 /// \li <b>uINT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
 /// \li <b>userPrefix</b> - The attribute prefix used to qualify user parameters on nodes using the AiNodeAPI.
 /// \li <b>vECTOR</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
