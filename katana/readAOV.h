@@ -4,14 +4,24 @@
 #include <pxr/pxr.h>
 
 #include <pxr/usd/usd/prim.h>
-#include <FnAttribute/FnAttribute.h>
-
+#include <pxr/usd/usdShade/shader.h>
 #include <pxr/usd/usdAi/aiAOV.h>
+
+#include <FnLogging/FnLogging.h>
+
+#include <usdKatana/attrMap.h>
+#include <usdKatana/usdInPrivateData.h>
+#include <usdKatana/utils.h>
+
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-// Given a prim, return a new GroupAttribute to setup an AOV
-FnKat::Attribute readAOV(const UsdAiAOV& aov);
+
+void readAiAOV(
+    const UsdAiAOV& aov,
+    const PxrUsdKatanaUsdInPrivateData& data,
+    PxrUsdKatanaAttrMap& attrs);
+
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

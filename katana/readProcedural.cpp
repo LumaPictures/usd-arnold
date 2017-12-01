@@ -13,13 +13,11 @@
 #endif
 
 #include <FnAttribute/FnDataBuilder.h>
-#include <FnLogging/FnLogging.h>
 
 #include "arnoldHelpers.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-FnLogSetup("readAiProcedural");
 
 void
 readAiProcedural(

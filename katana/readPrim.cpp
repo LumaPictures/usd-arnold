@@ -9,7 +9,6 @@
 #include <usdKatana/utils.h>
 
 #include "arnoldHelpers.h"
-#include "readAOV.h"
 #include "readMaterial.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -90,21 +89,6 @@ void readPrimLocation(
         UsdAiMaterialAPI aiMaterialAPI(prim);
         readMaterial(stage, interface, aiMaterialAPI);
     }
-
-    // Sadly, this is not a feasible approach.
-    // I'm leaving the code here as a reference.
-    /*const UsdAiAOV aov(prim);
-    if (aov) {
-        const auto grp = readAOV(aov);
-        if (grp.isValid()) {
-            // The easiest way here is to run the AttributeSet op.
-            FnKat::GroupBuilder builder;
-            builder.set(aov.GetPath().GetName(), grp);
-            interface.extendAttr(
-                "arnoldGlobalStatements.Channel Definitions.outputChannels", builder.build(),
-                std::string(), true, "/root");
-        }
-    }*/
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
