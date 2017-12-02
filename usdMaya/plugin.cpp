@@ -16,25 +16,42 @@ public:
     }
 
     ~ArnoldShadingModeExporter() {
-
-    }
-
-    void DoExport(const UsdStageRefPtr& stage,
-                  const PxrUsdMayaUtil::ShapeSet& bindableRoots,
-                  bool mergeTransformAndShape,
-                  bool stripNamespaces,
-                  const SdfPath& overrideRootPath,
-                  const std::string& parentScope,
-                  const PxrUsdMayaUtil::MDagPathMap<SdfPath>::Type& dagPathToUsdMap) override {
-        ArnoldShaderExport ai(stage, UsdTimeCode::Default(), parentScope, dagPathToUsdMap);
-        if (bindableRoots.empty()) {
-            for (MItDependencyNodes iter(MFn::kShadingEngine); !iter.isDone(); iter.next()) {
-                MObject obj = iter.thisNode();
-                const auto exportedShader = ai.export_shading_engine(obj);
-            }
+        if (ai != nullptr)
+        {
+            delete ai;
         }
-        ai.setup_shaders();
     }
+
+    void PreExport(const PxrUsdMayaShadingModeExportContext& context) override
+    {
+        ai = new ArnoldShaderExport(
+                context.GetUsdStage(),
+                UsdTimeCode::Default(),
+                context.GetParentScope(),
+                context.GetDagPathToUsdMap());
+    }
+
+    void Export(const PxrUsdMayaShadingModeExportContext& context,
+                UsdShadeMaterial * const mat,
+                SdfPathSet * const boundPrimPaths) override
+    {
+        if (ai != nullptr)
+        {
+            ai->export_shading_engine(context.GetShadingEngine());
+        }
+    }
+
+    void PostExport(const PxrUsdMayaShadingModeExportContext& context) override
+    {
+        if (ai != nullptr)
+        {
+            ai->setup_shaders();
+            delete ai;
+        }
+    }
+
+private:
+    ArnoldShaderExport* ai;
 };
 
 TF_REGISTRY_FUNCTION_WITH_TAG(PxrUsdMayaShadingModeExportContext, arnold) {
