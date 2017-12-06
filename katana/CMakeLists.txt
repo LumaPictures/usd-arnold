@@ -17,7 +17,7 @@ file(GLOB FNPLUGINSYSTEM_SRC ${KATANA_API_SOURCE_DIR}/FnPluginSystem/*.cpp)
 file(GLOB FNLOGGING_SRC ${KATANA_API_SOURCE_DIR}/FnLogging/client/*.cpp)
 file(GLOB PYSTRING_SRC ${KATANA_API_SOURCE_DIR}/pystring/*.cpp)
 
-link_directories(${KATANA_API_BASE_DIR}/bin/Geolib3/internal/CEL)
+link_directories(${KATANA_API_BASE_DIR}/bin)
 
 file(GLOB SRC *.cpp)
 set(API_SRC
