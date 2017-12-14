@@ -28,16 +28,14 @@ FnLogSetup("readAOV");
 
 // NOTE: The driver and filter are currently stored as `AiShader` prims, hence
 // the name (and behavior) of this function.
-static void
-_readChildShaderParams(
+static std::string
+_readChildShaderPrim(
     const UsdShadeShader& shaderSchema,
-    FnKat::GroupBuilder& outputBuilder)
+    FnKat::GroupBuilder& paramsBuilder)
 {
     TfToken id;
     shaderSchema.GetIdAttr().Get(&id);
-    outputBuilder.set("type", FnKat::StringAttribute(id.GetString()));
 
-    FnKat::GroupBuilder paramsBuilder;
     std::vector<UsdShadeInput> shaderInputs = shaderSchema.GetInputs();
     TF_FOR_ALL(shaderInputIter, shaderInputs) {
         UsdShadeInput shaderInput = *shaderInputIter;
@@ -50,7 +48,7 @@ _readChildShaderParams(
         }
     }
 
-    outputBuilder.set("parameters", paramsBuilder.build());
+    return id.GetString();
 }
 
 
@@ -84,9 +82,11 @@ readAiAOV(
             }
             if (UsdShadeShader driverSchema = UsdShadeShader(
                     data.GetUsdInArgs()->GetStage()->GetPrimAtPath(driverTargets[0]))) {
-                FnKat::GroupBuilder driverBuilder;
-                _readChildShaderParams(driverSchema, driverBuilder);
-                aovBuilder.set("driver", driverBuilder.build());
+                FnKat::GroupBuilder driverParamsBuilder;
+                const std::string driverType = _readChildShaderPrim(
+                    driverSchema, driverParamsBuilder);
+                aovBuilder.set("driver", FnKat::StringAttribute(driverType));
+                aovBuilder.set("driverParameters", driverParamsBuilder.build());
             }
         }
     }
@@ -101,9 +101,11 @@ readAiAOV(
             }
             if (UsdShadeShader filterSchema = UsdShadeShader(
                     data.GetUsdInArgs()->GetStage()->GetPrimAtPath(filterTargets[0]))) {
-                FnKat::GroupBuilder filterBuilder;
-                _readChildShaderParams(filterSchema, filterBuilder);
-                aovBuilder.set("filter", filterBuilder.build());
+                FnKat::GroupBuilder filterParamsBuilder;
+                const std::string filterType =_readChildShaderPrim(
+                    filterSchema, filterParamsBuilder);
+                aovBuilder.set("filter", FnKat::StringAttribute(filterType));
+                aovBuilder.set("filterParameters", filterParamsBuilder.build());
             }
         }
     }
