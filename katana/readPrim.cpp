@@ -77,7 +77,7 @@ void readPrimLocation(
     if (!prim.IsValid() || !prim.GetPrimPath().IsPrimPath()) { return; }
 
     static const std::string statementsName("arnoldStatements");
-        updateOrCreateAttr(interface, statementsName, getArnoldStatementsGroup(prim));
+    updateOrCreateAttr(interface, statementsName, getArnoldStatementsGroup(prim));
 
     auto stage = prim.GetStage();
     if (stage == nullptr) { return; }

@@ -134,7 +134,7 @@ getArnoldStatementsGroup(const UsdPrim& prim) {
         {&UsdAiShapeAPI::GetAiSubdivAdaptiveErrorAttr, "subdiv_adaptive_error", 0.0f},
         {&UsdAiShapeAPI::GetAiDispPaddingAttr, "disp_padding", 0.0f},
         {&UsdAiShapeAPI::GetAiDispHeightAttr, "disp_height", 1.0f},
-        {&UsdAiShapeAPI::GetAiDispZeroValueAttr, "disp_zero_value", 0.0f},
+        {&UsdAiShapeAPI::GetAiDispZeroValueAttr, "zero_value", 0.0f},
         {&UsdAiShapeAPI::GetAiRayBiasAttr, "ray_bias", 0.000001f},
     };
 
