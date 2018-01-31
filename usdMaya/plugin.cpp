@@ -16,10 +16,7 @@ public:
     }
 
     ~ArnoldShadingModeExporter() {
-        if (ai != nullptr)
-        {
-            delete ai;
-        }
+        delete ai;
     }
 
     void PreExport(const PxrUsdMayaShadingModeExportContext& context) override
@@ -47,6 +44,7 @@ public:
         {
             ai->setup_shaders();
             delete ai;
+            ai = nullptr;
         }
     }
 
