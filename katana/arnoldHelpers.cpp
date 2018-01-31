@@ -2,6 +2,9 @@
 
 #include <pxr/usd/usdAi/aiShapeAPI.h>
 
+#include <pxr/usd/usdGeom/basisCurves.h>
+#include <pxr/usd/usdGeom/tokens.h>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
@@ -162,6 +165,40 @@ getArnoldStatementsGroup(const UsdPrim& prim) {
     // default values. It requires special handling, because one of the values
     // is named auto. The way USD generates tokens, it collides with the c++ auto
     // keyword, so we had to name it auto_.
+
+    // To support width and parameter interpolation for basis curves we have
+    // to check if the value of the type and the basis on the BasisCurve to
+    // setup arnoldStatements.curve_basis.
+
+    UsdGeomBasisCurves basisCurves(prim);
+
+    if (basisCurves) {
+        TfToken type;
+        basisCurves.GetTypeAttr().Get(&type);
+
+        std::string curveBasis;
+
+        if (type == UsdGeomTokens->linear) {
+            curveBasis = "linear";
+        } else {
+            TfToken basis;
+            basisCurves.GetBasisAttr().Get(&basis);
+            if (basis == UsdGeomTokens->bezier) {
+                curveBasis = "bezier";
+            } else if (basis == UsdGeomTokens->bspline) {
+                curveBasis = "b-spline";
+            } else if (basis == UsdGeomTokens->catmullRom) {
+                curveBasis = "catmull-rom";
+            } else {
+                TF_WARN("Can't translate basis type %s on %s, falling back to linear.",
+                        basis.data(), prim.GetPath().GetString().c_str());
+                curveBasis = "linear";
+            }
+        }
+
+        builder.set("curve_basis", FnKat::StringAttribute(curveBasis));
+        needToBuild = true;
+    }
 
     return needToBuild ? builder.build() : FnKat::Attribute();
 }
