@@ -58,5 +58,9 @@ if (BUILD_USD_KATANA_PLUGIN)
     add_subdirectory(katana)
 endif ()
 
+if (BUILD_USD_HOUDINI_PLUGIN)
+    add_subdirectory(houdini)
+endif ()
+
 install(FILES README.md DESTINATION .)
 install(FILES LICENSE.md DESTINATION .)

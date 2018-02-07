@@ -30,6 +30,7 @@ option(PXR_ENABLE_NAMESPACES "Enable C++ namespaces." ON)
 option(BUILD_USD_PLUGIN "Building the usd plugin." OFF)
 option(BUILD_USD_MAYA_PLUGIN "Building the usd maya plugin." OFF)
 option(BUILD_USD_KATANA_PLUGIN "Building the usd katana plugin." OFF)
+option(BUILD_USD_HOUDINI_PLUGIN "Building the usd houdini plugin." OFF)
 # --
 
 option(PXR_SYMLINK_HEADER_FILES "Symlink the header files from, ie, pxr/base/lib/tf to CMAKE_DIR/pxr/base/tf, instead of copying; ensures that you may edit the header file in either location, and improves experience in IDEs which find normally the \"copied\" header, ie, CLion; has no effect on windows" OFF)
