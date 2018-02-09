@@ -38,6 +38,18 @@ namespace {
         aiShader.CreateIdAttr().Set(TfToken(aiTypeName));
         return outShaderPath;
     }
+
+    OP_Node*
+    findFirstChildrenOfType(OP_Node* op, const char* type) {
+        const auto nchildren = op->getNchildren();
+        for (auto cid = decltype(nchildren){0}; cid < nchildren; ++cid) {
+            auto* ch = op->getChild(cid);
+            if (ch->getOperator()->getName() == "arnold_material") {
+                return ch;
+            }
+        }
+        return nullptr;
+    }
 }
 
 TF_REGISTRY_FUNCTION_WITH_TAG(GusdShadingModeRegistry, rib) {
@@ -74,16 +86,9 @@ TF_REGISTRY_FUNCTION_WITH_TAG(GusdShadingModeRegistry, rib) {
 
                 // We have to find the output node, HtoA simply looks for the first
                 // vop node with the type of arnold_material.
-                const auto nchildren = shop->getNchildren();
-                VOP_Node* vop = nullptr;
-                for (auto cid = decltype(nchildren){0}; cid < nchildren; ++cid) {
-                    auto* ch = shop->getChild(cid);
-                    vop = ch->castToVOPNode();
-                    if (vop != nullptr && vop->getOperator()->getName() == "arnold_material") {
-                        break;
-                    }
-                    vop = nullptr;
-                }
+                static constexpr auto arnoldMaterialTypeName = "arnold_material";
+                auto* possibleArnoldMaterial = findFirstChildrenOfType(shop, arnoldMaterialTypeName);
+                auto* vop = possibleArnoldMaterial == nullptr ? nullptr : possibleArnoldMaterial->castToVOPNode();
 
                 if (vop == nullptr) { continue; }
 
