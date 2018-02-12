@@ -11,10 +11,7 @@
 #include "readAOV.h"
 #include "readProcedural.h"
 #include "readPrim.h"
-
-#ifdef ARNOLD5
 #include "readVolume.h"
-#endif
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
@@ -30,8 +27,6 @@ PXRUSDKATANA_USDIN_PLUGIN_DEFINE(AiProceduralOp, privateData, opArgs, interface)
     attrs.toInterface(interface);
 }
 
-#ifdef ARNOLD5
-
 PXRUSDKATANA_USDIN_PLUGIN_DECLARE(AiVolumeOp)
 DEFINE_GEOLIBOP_PLUGIN(AiVolumeOp)
 PXRUSDKATANA_USDIN_PLUGIN_DEFINE(AiVolumeOp, privateData, opArgs, interface)
@@ -43,8 +38,6 @@ PXRUSDKATANA_USDIN_PLUGIN_DEFINE(AiVolumeOp, privateData, opArgs, interface)
 
     attrs.toInterface(interface);
 }
-
-#endif
 
 PXRUSDKATANA_USDIN_PLUGIN_DECLARE(AiAOVOp)
 DEFINE_GEOLIBOP_PLUGIN(AiAOVOp)
@@ -73,12 +66,8 @@ void registerPlugins()
 {
     USD_OP_REGISTER_PLUGIN(AiProceduralOp, "AiProceduralOp", 0, 1);
     PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiProcedural>("AiProceduralOp");
-#ifdef ARNOLD5
     USD_OP_REGISTER_PLUGIN(AiVolumeOp, "AiVolumeOp", 0, 1);
     PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiVolume>("AiVolumeOp");
-#else
-    PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiVolume>("AiProceduralOp");
-#endif
     USD_OP_REGISTER_PLUGIN(AiAOVOp, "AiAOVOp", 0, 1);
     PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiAOV>("AiAOVOp");
 

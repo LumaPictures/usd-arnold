@@ -35,10 +35,6 @@ target_include_directories(${PLUGIN_NAME} PRIVATE ${USD_HOUDINI_INCLUDE_DIR})
 target_include_directories(${PLUGIN_NAME} PRIVATE ${HOUDINI_INCLUDE_DIRS})
 target_link_libraries(${PLUGIN_NAME} PRIVATE dl tf gf sdf usd usdGeom ${USD_ARNOLD_LIBRARY} gusd)
 
-if (ARNOLD_VERSION_ARCH_NUM VERSION_GREATER "4")
-    target_compile_definitions(${PLUGIN_NAME} PRIVATE "-DARNOLD5")
-endif ()
-
 add_subdirectory(scripts)
 
 install(TARGETS ${PLUGIN_NAME}

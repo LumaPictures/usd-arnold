@@ -1,5 +1,3 @@
-#ifdef ARNOLD5
-
 #include "readVolume.h"
 
 #include <usdKatana/attrMap.h>
@@ -83,5 +81,3 @@ readVolume(
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif

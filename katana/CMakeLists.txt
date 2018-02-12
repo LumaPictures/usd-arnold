@@ -38,9 +38,5 @@ target_include_directories(${PLUGIN_NAME} PRIVATE ${KATANA_API_INCLUDE_DIR})
 target_include_directories(${PLUGIN_NAME} PRIVATE ${USD_KATANA_INCLUDE_DIR})
 target_link_libraries(${PLUGIN_NAME} CEL ${OPENEXR_LIBRARIES} dl tf gf sdf usd usdGeom ${USD_ARNOLD_LIBRARY} usdKatana)
 
-if (ARNOLD_VERSION_ARCH_NUM VERSION_GREATER "4")
-    target_compile_definitions(${PLUGIN_NAME} PRIVATE "-DARNOLD5")
-endif ()
-
 install(TARGETS ${PLUGIN_NAME}
         DESTINATION Ops)

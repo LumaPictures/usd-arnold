@@ -8,9 +8,7 @@
 
 #include <pxr/usd/usdAi/aiNodeAPI.h>
 #include <pxr/usd/usdAi/aiProcedural.h>
-#ifndef ARNOLD5
 #include <pxr/usd/usdAi/aiVolume.h>
-#endif
 
 #include <FnAttribute/FnDataBuilder.h>
 
@@ -30,42 +28,8 @@ readAiProcedural(
 
     const double currentTime = data.GetUsdInArgs()->GetCurrentTime();
 
-#ifndef ARNOLD5
-    // This plugin is registered for both AiProcedural and AiVolume, so check
-    // which one we're dealing with, since the handling is slightly different.
-    if (procedural.GetPrim().IsA<UsdAiVolume>()) {
-        attrs.set("type", FnKat::StringAttribute("volume"));
-        attrs.set("geometry.type", FnKat::StringAttribute("volumedso"));
-        // TODO: Find a way to check if the "bound" attribute is already set.
-        // The current plugin system doesn't give prim reader plugins any way to
-        // access the ``GeolibCookInterface`` from the base PxrUsdIn op.
-        attrs.set("rendererProcedural.autoBounds", FnAttribute::IntAttribute(1));
+    attrs.set("type", FnKat::StringAttribute("renderer procedural"));
 
-        float stepSize = 0;
-        if (UsdAttribute stepAttr = UsdAiVolume(procedural).GetStepSizeAttr()) {
-            stepAttr.Get<float>(&stepSize, currentTime);
-        }
-        attrs.set("geometry.step_size", FnKat::FloatAttribute(stepSize));
-    } else
-#endif
-    {
-        attrs.set("type", FnKat::StringAttribute("renderer procedural"));
-    }
-
-// Check how to define this for Arnold 5 / KtoA 2
-#ifndef ARNOLD5
-    // Read the DSO value.
-    if (UsdAttribute dsoAttr = procedural.GetDsoAttr()) {
-        // Not sure if this check is actually necessary, but this attribute
-        // doesn't have a default value in the schema, so let's play it safe.
-        if (dsoAttr.HasValue()) {
-            std::string dso;
-            dsoAttr.Get<std::string>(&dso);
-            attrs.set("rendererProcedural.procedural",
-                      FnKat::StringAttribute(dso));
-        }
-    }
-#else
     if (auto idAttr = procedural.GetIdAttr()) {
         if (idAttr.HasValue()) {
             std::string id;
@@ -74,7 +38,6 @@ readAiProcedural(
                       FnKat::StringAttribute(id));
         }
     }
-#endif
 
     // Read all parameters in the "user:" namespace and convert their values to
     // attributes in the "rendererProcedural.args" group attribute.

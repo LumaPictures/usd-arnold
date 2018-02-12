@@ -74,7 +74,6 @@ getArnoldStatementsGroup(const UsdPrim& prim) {
     // Sadly std::array needs the size passed as a parameter, so a static const
     // std::vector will do the same in our case.
     static const std::vector<_attributeDefinition<bool>> boolAttrs = {
-#ifdef ARNOLD5
         {&UsdAiShapeAPI::GetAiVisibleToCameraAttr, "visibility.AI_RAY_CAMERA", true},
         {&UsdAiShapeAPI::GetAiVisibleToShadowAttr, "visibility.AI_RAY_SHADOW", true},
         {&UsdAiShapeAPI::GetAiVisibleToDiffuseTransmitAttr, "visibility.AI_RAY_DIFFUSE_TRANSMIT", true},
@@ -99,29 +98,6 @@ getArnoldStatementsGroup(const UsdPrim& prim) {
         {&UsdAiShapeAPI::GetAiAutobumpVisibleToDiffuseReflectAttr, "autobump_visibility.AI_RAY_DIFFUSE_REFLECT", true},
         {&UsdAiShapeAPI::GetAiAutobumpVisibleToSpecularReflectAttr, "autobump_visibility.AI_RAY_SPECULAR_REFLECT", true},
         {&UsdAiShapeAPI::GetAiAutobumpVisibleToSubsurfaceAttr, "autobump_visibility.AI_RAY_SUBSURFACE", true},
-#else
-        {&UsdAiShapeAPI::GetAiVisibleToCameraAttr, "visibility.AI_RAY_CAMERA", true},
-        {&UsdAiShapeAPI::GetAiVisibleToShadowAttr, "visibility.AI_RAY_SHADOW", true},
-        {&UsdAiShapeAPI::GetAiVisibleToReflectionAttr, "visibility.AI_RAY_REFLECTED", true},
-        {&UsdAiShapeAPI::GetAiVisibleToRefractionAttr, "visibility.AI_RAY_REFRACTED", true},
-        {&UsdAiShapeAPI::GetAiVisibleToSubsurfaceAttr, "visibility.AI_RAY_SUBSURFACE", true},
-        {&UsdAiShapeAPI::GetAiVisibleToDiffuseAttr, "visibility.AI_RAY_DIFFUSE", true},
-        {&UsdAiShapeAPI::GetAiVisibleToGlossyAttr, "visibility.AI_RAY_GLOSSY", true},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToCameraAttr, "sidedness.AI_RAY_CAMERA", true},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToShadowAttr, "sidedness.AI_RAY_SHADOW", true},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToReflectionAttr, "sidedness.AI_RAY_REFLECTED", true},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToRefractionAttr, "sidedness.AI_RAY_REFRACTED", true},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToSubsurfaceAttr, "sidedness.AI_RAY_SUBSURFACE", true},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToDiffuseAttr, "sidedness.AI_RAY_DIFFUSE", true},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToGlossyAttr, "sidedness.AI_RAY_GLOSSY", true},
-        {&UsdAiShapeAPI::GetAiAutobumpVisibleToCameraAttr, "autobump_visibility.AI_RAY_CAMERA", true},
-        {&UsdAiShapeAPI::GetAiAutobumpVisibleToShadowAttr, "autobump_visibility.AI_RAY_SHADOW", true},
-        {&UsdAiShapeAPI::GetAiAutobumpVisibleToReflectionAttr, "autobump_visibility.AI_RAY_REFLECTED", true},
-        {&UsdAiShapeAPI::GetAiAutobumpVisibleToRefractionAttr, "autobump_visibility.AI_RAY_REFRACTED", true},
-        {&UsdAiShapeAPI::GetAiAutobumpVisibleToSubsurfaceAttr, "autobump_visibility.AI_RAY_SUBSURFACE", true},
-        {&UsdAiShapeAPI::GetAiAutobumpVisibleToDiffuseAttr, "autobump_visibility.AI_RAY_DIFFUSE", true},
-        {&UsdAiShapeAPI::GetAiAutobumpVisibleToGlossyAttr, "autobump_visibility.AI_RAY_GLOSSY", true},
-#endif
         // Non visibility attributes where the pattern still applies.
         {&UsdAiShapeAPI::GetAiOpaqueAttr, "opaque", true},
         {&UsdAiShapeAPI::GetAiReceiveShadowsAttr, "receive_shadows", true},
@@ -150,9 +126,7 @@ getArnoldStatementsGroup(const UsdPrim& prim) {
         {&UsdAiShapeAPI::GetAiSubdivAdaptiveMetricAttr, "subdiv_adaptive_metric", TfToken("auto_")},
         {&UsdAiShapeAPI::GetAiSubdivAdaptiveSpaceAttr, "subdiv_adaptive_space", TfToken("raster")},
         {&UsdAiShapeAPI::GetAiSubdivUVSmoothingAttr, "subdiv_uv_smoothing", TfToken("pin_corners")},
-#ifdef ARNOLD5
         {&UsdAiShapeAPI::GetAiTransformTypeAttr, "transform_type", TfToken("rotate_about_center")},
-#endif
     };
 
     auto needToBuild = handleAttributes(boolAttrs, shapeAPI, builder);

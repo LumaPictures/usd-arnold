@@ -5,8 +5,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-#ifdef ARNOLD5
-
 class PxrUsdKatanaAttrMap;
 class PxrUsdKatanaUsdInPrivateData;
 class UsdAiVolume;
@@ -17,8 +15,6 @@ readVolume(
     const UsdAiVolume& procedural,
     const PxrUsdKatanaUsdInPrivateData& data,
     PxrUsdKatanaAttrMap& attrs);
-
-#endif
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
