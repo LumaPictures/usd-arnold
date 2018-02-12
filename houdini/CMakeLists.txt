@@ -21,7 +21,7 @@ target_include_directories(${PLUGIN_NAME} PRIVATE ${USD_INCLUDE_DIR})
 target_include_directories(${PLUGIN_NAME} PRIVATE ${USD_ARNOLD_INCLUDE_DIR})
 target_include_directories(${PLUGIN_NAME} PRIVATE ${USD_HOUDINI_INCLUDE_DIR})
 target_include_directories(${PLUGIN_NAME} PRIVATE ${HOUDINI_INCLUDE_DIRS})
-target_link_libraries(${PLUGIN_NAME} PRIVATE dl tf gf sdf usd usdGeom ${USD_ARNOLD_LIBRARY} gusd)
+target_link_libraries(${PLUGIN_NAME} PRIVATE dl tf gf sdf usd usdGeom ${USD_ARNOLD_LIBRARY} gusd ${HOUDINI_LIBRARIES})
 target_compile_definitions(${PLUGIN_NAME} PRIVATE
                            _GNU_SOURCE LINUX AMD64 SIZEOF_VOID_P=8
                            FBX_ENABLED=1 OPENCL_ENABLED=1 OPENVDB_ENABLED=1
