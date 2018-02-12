@@ -39,5 +39,7 @@ if (ARNOLD_VERSION_ARCH_NUM VERSION_GREATER "4")
     target_compile_definitions(${PLUGIN_NAME} PRIVATE "-DARNOLD5")
 endif ()
 
+add_subdirectory(scripts)
+
 install(TARGETS ${PLUGIN_NAME}
         DESTINATION plugin)
