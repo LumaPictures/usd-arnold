@@ -28,9 +28,9 @@ target_compile_definitions(${PLUGIN_NAME} PRIVATE
                            MAKING_DSO SESI_LITTLE_ENDIAN ENABLE_THREADS USE_PTHREADS
                            _REENTRANT _FILE_OFFSET_BITS=64 GCC4 GCC3)
 target_compile_definitions(${PLUGIN_NAME} PRIVATE
-                           "HOUDINI_API_VERSION=${HOUDINI_MAJOR_VERSION}${HOUDINI_MINOR_VERSION}"
-                           "VERSION=${HOUDINI_VERSION}"
-                           "HOUDINI_DOT_VERSION=${HOUDINI_BUILD_VERSION}")
+                           HOUDINI_API_VERSION=${HOUDINI_MAJOR_VERSION}${HOUDINI_MINOR_VERSION}
+                           VERSION=${HOUDINI_VERSION}
+                           HOUDINI_DOT_VERSION=${HOUDINI_BUILD_VERSION})
 target_compile_options(${PLUGIN_NAME} PRIVATE
                        -fpermissive -Wall -Wno-parentheses -Wno-sign-compare
                        -Wno-reorder -Wno-uninitialized -Wunused -Wno-unused-parameter
