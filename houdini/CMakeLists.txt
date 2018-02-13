@@ -36,7 +36,5 @@ target_compile_options(${PLUGIN_NAME} PRIVATE
                        -Wno-reorder -Wno-uninitialized -Wunused -Wno-unused-parameter
                        -Wno-unused-local-typedefs -Wno-empty-body -fno-strict-aliasing)
 
-add_subdirectory(scripts)
-
 install(TARGETS ${PLUGIN_NAME}
         DESTINATION plugin)
