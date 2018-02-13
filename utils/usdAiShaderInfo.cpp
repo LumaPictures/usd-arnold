@@ -10,7 +10,7 @@ usage usdAiShaderInfo
         [-h] [--cout]
         [--usd FILENAME]
         [--meta DIR|FILE]
-        [--load DIR|FILE]
+        [--load DIR]
 
 Print Arnold node information into a USD file or to the standard output.
 
@@ -21,7 +21,7 @@ optional arguments:
  --cout     Print the node information to the cout using ascii encoding.
  --usd      Output the node information into a USD file.
  --meta     Load metadata file or all the .mtd files in a directory.
- --load     Load the shader file or all the shaders from the directory.
+ --load     Load the shaders from a directory.
 )VOGON";
 
 int main(int argc, char* argv[]) {
@@ -60,8 +60,45 @@ int main(int argc, char* argv[]) {
     if (outFile.empty()) { cout = true; }
 
     AiBegin();
+    AiMsgSetConsoleFlags(AI_LOG_NONE);
     const auto* arnoldPluginPath = getenv("ARNOLD_PLUGIN_PATH");
     if (arnoldPluginPath != nullptr) { AiLoadPlugins(arnoldPluginPath); }
+
+    for (const auto& plugin: getFlagValues("--load")) {
+        AiLoadPlugins(plugin.c_str());
+    }
+
+    auto* nentryIter = AiUniverseGetNodeEntryIterator(AI_NODE_ALL);
+
+    while (!AiNodeEntryIteratorFinished(nentryIter)) {
+        const auto* nentry = AiNodeEntryIteratorGetNext(nentryIter);
+
+        auto* metaIter = AiNodeEntryGetMetaDataIterator(nentry);
+
+        while (!AiMetaDataIteratorFinished(metaIter)) {
+
+        }
+
+        AiMetaDataIteratorDestroy(metaIter);
+
+        auto paramIter = AiNodeEntryGetParamIterator(nentry);
+
+        while (!AiParamIteratorFinished(paramIter)) {
+            const auto* pentry = AiParamIteratorGetNext(paramIter);
+
+            metaIter = AiNodeEntryGetMetaDataIterator(nentry, AiParamGetName(pentry));
+
+            while (!AiMetaDataIteratorFinished(metaIter)) {
+
+            }
+
+            AiMetaDataIteratorDestroy(metaIter);
+        }
+
+        AiParamIteratorDestroy(paramIter);
+    }
+
+    AiNodeEntryIteratorDestroy(nentryIter);
 
     AiEnd();
 
