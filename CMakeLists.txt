@@ -44,6 +44,7 @@ if (BUILD_USD_PLUGIN)
         find_package(GTest REQUIRED)
     endif ()
     add_subdirectory(lib/pxr/usd/usdAi)
+    add_subdirectory(utils)
 endif ()
 
 if (BUILD_USD_MAYA_PLUGIN)

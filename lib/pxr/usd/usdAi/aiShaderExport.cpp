@@ -402,11 +402,13 @@ SdfPath
 AiShaderExport::export_arnold_node(const AtNode* arnold_node, const SdfPath& parent_path,
                                    const std::set<std::string>* exportable_params) {
     if (arnold_node == nullptr) {
+        std::cerr << "Arnold node is zero " << std::endl;
         return SdfPath();
     }
     const auto nentry = AiNodeGetNodeEntry(arnold_node);
     const auto entry_type = AiNodeEntryGetType(nentry);
     if (entry_type != AI_NODE_SHADER && entry_type != AI_NODE_DRIVER && entry_type != AI_NODE_FILTER) {
+        std::cerr << "Arnold node is the incorrect type " << std::endl;
         return SdfPath();
     }
     const auto it = m_shader_to_usd_path.find(arnold_node);
@@ -415,6 +417,7 @@ AiShaderExport::export_arnold_node(const AtNode* arnold_node, const SdfPath& par
     }
     std::string node_name(AiNodeGetName(arnold_node));
     if (node_name.empty()) {
+        std::cerr << "Node name is empty " << std::endl;
         // TODO: raise error
         return SdfPath();
     }
