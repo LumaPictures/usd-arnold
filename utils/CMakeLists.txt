@@ -1,7 +1,12 @@
 set(SHADER_INFO usdAiShaderInfo)
 
+find_package(OpenEXR REQUIRED)
+find_package(Boost REQUIRED)
+find_package(Arnold REQUIRED)
+
 add_executable(${SHADER_INFO} usdAiShaderInfo.cpp)
 set_target_properties(${SHADER_INFO} PROPERTIES INSTALL_RPATH_USE_LINK_PATH ON)
+set_target_properties(${SHADER_INFO} PROPERTIES INSTALL_RPATH "$ORIGIN/../lib")
 target_include_directories(${SHADER_INFO} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
 target_include_directories(${SHADER_INFO} PRIVATE ${USD_INCLUDE_DIR})
 target_include_directories(${SHADER_INFO} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}../lib)
