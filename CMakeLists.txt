@@ -47,7 +47,7 @@ if (BUILD_USD_PLUGIN)
 endif ()
 
 if (BUILD_USD_MAYA_PLUGIN)
-    add_subdirectory(usdMaya)
+    add_subdirectory(maya)
 endif ()
 
 if (BUILD_USD_KATANA_PLUGIN)
