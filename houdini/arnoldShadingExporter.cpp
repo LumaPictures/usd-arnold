@@ -9,6 +9,8 @@
 #include <pxr/usd/usdAi/aiMaterialAPI.h>
 #include <pxr/usd/usdAi/aiShader.h>
 
+#include <ai.h>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
@@ -60,6 +62,7 @@ TF_REGISTRY_FUNCTION_WITH_TAG(GusdShadingModeRegistry, rib) {
             const SdfPath& looksPath,
             const GusdShadingModeRegistry::HouMaterialMap& houMaterialMap,
             const std::string& shaderOutDir) {
+
             for (const auto& assignment: houMaterialMap) {
                 // Initially we only care about assigned shops.
                 auto* shop = opNode->findSHOPNode(assignment.first.c_str());
