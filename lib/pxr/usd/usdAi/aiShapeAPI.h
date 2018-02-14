@@ -96,6 +96,11 @@ public:
     /// a non-empty typeName.
     static const bool IsConcrete = false;
 
+    /// Compile-time constant indicating whether or not this class inherits from
+    /// UsdTyped. Types which inherit from UsdTyped can impart a typename on a
+    /// UsdPrim.
+    static const bool IsTyped = false;
+
     /// Construct a UsdAiShapeAPI on UsdPrim \p prim .
     /// Equivalent to UsdAiShapeAPI::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
@@ -137,6 +142,16 @@ public:
     static UsdAiShapeAPI
     Get(const UsdStagePtr &stage, const SdfPath &path);
 
+
+    /// Mark this schema class as applied to the prim at \p path in the 
+    /// current EditTarget. This information is stored in the apiSchemas
+    /// metadata on prims.  
+    ///
+    /// \sa UsdPrim::GetAppliedSchemas()
+    ///
+    USDAI_API
+    static UsdAiShapeAPI 
+    Apply(const UsdStagePtr &stage, const SdfPath &path);
 
 private:
     // needs to invoke _GetStaticTfType.

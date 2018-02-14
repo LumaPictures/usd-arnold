@@ -35,105 +35,17 @@
 
 #include "pxr/pxr.h"
 #include "pxr/usd/usdAi/api.h"
-#include "pxr/base/tf/staticTokens.h"
+#include "pxr/base/tf/staticData.h"
+#include "pxr/base/tf/token.h"
+#include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-/// \hideinitializer
-#define USDAI_TOKENS \
-    ((aiAov, "ai:aov")) \
-    ((aiAutobump_visibilityCamera, "ai:autobump_visibility:camera")) \
-    ((aiAutobump_visibilityDiffuse_reflect, "ai:autobump_visibility:diffuse_reflect")) \
-    ((aiAutobump_visibilityDiffuse_transmit, "ai:autobump_visibility:diffuse_transmit")) \
-    ((aiAutobump_visibilityShadow, "ai:autobump_visibility:shadow")) \
-    ((aiAutobump_visibilitySpecular_reflect, "ai:autobump_visibility:specular_reflect")) \
-    ((aiAutobump_visibilitySpecular_transmit, "ai:autobump_visibility:specular_transmit")) \
-    ((aiAutobump_visibilitySubsurface, "ai:autobump_visibility:subsurface")) \
-    ((aiAutobump_visibilityVolume, "ai:autobump_visibility:volume")) \
-    ((aiDisp_autobump, "ai:disp_autobump")) \
-    ((aiDisp_height, "ai:disp_height")) \
-    ((aiDisp_padding, "ai:disp_padding")) \
-    ((aiDisp_zero_value, "ai:disp_zero_value")) \
-    ((aiDisplacement, "ai:displacement")) \
-    ((aiLight_group, "ai:light_group")) \
-    ((aiMatte, "ai:matte")) \
-    ((aiOpaque, "ai:opaque")) \
-    ((aiRay_bias, "ai:ray_bias")) \
-    ((aiReceive_shadows, "ai:receive_shadows")) \
-    ((aiSelf_shadows, "ai:self_shadows")) \
-    ((aiShadow_group, "ai:shadow_group")) \
-    ((aiSidednessCamera, "ai:sidedness:camera")) \
-    ((aiSidednessDiffuse_reflect, "ai:sidedness:diffuse_reflect")) \
-    ((aiSidednessDiffuse_transmit, "ai:sidedness:diffuse_transmit")) \
-    ((aiSidednessShadow, "ai:sidedness:shadow")) \
-    ((aiSidednessSpecular_reflect, "ai:sidedness:specular_reflect")) \
-    ((aiSidednessSpecular_transmit, "ai:sidedness:specular_transmit")) \
-    ((aiSidednessSubsurface, "ai:sidedness:subsurface")) \
-    ((aiSidednessVolume, "ai:sidedness:volume")) \
-    ((aiSmoothing, "ai:smoothing")) \
-    ((aiSubdiv_adaptive_error, "ai:subdiv_adaptive_error")) \
-    ((aiSubdiv_adaptive_metric, "ai:subdiv_adaptive_metric")) \
-    ((aiSubdiv_adaptive_space, "ai:subdiv_adaptive_space")) \
-    ((aiSubdiv_dicing_camera, "ai:subdiv_dicing_camera")) \
-    ((aiSubdiv_iterations, "ai:subdiv_iterations")) \
-    ((aiSubdiv_smooth_derivs, "ai:subdiv_smooth_derivs")) \
-    ((aiSubdiv_type, "ai:subdiv_type")) \
-    ((aiSubdiv_uv_smoothing, "ai:subdiv_uv_smoothing")) \
-    ((aiSurface, "ai:surface")) \
-    ((aiTransform_type, "ai:transform_type")) \
-    ((aiUse_light_group, "ai:use_light_group")) \
-    ((aiUse_shadow_group, "ai:use_shadow_group")) \
-    ((aiVisibilityCamera, "ai:visibility:camera")) \
-    ((aiVisibilityDiffuse_reflect, "ai:visibility:diffuse_reflect")) \
-    ((aiVisibilityDiffuse_transmit, "ai:visibility:diffuse_transmit")) \
-    ((aiVisibilityShadow, "ai:visibility:shadow")) \
-    ((aiVisibilitySpecular_reflect, "ai:visibility:specular_reflect")) \
-    ((aiVisibilitySpecular_transmit, "ai:visibility:specular_transmit")) \
-    ((aiVisibilitySubsurface, "ai:visibility:subsurface")) \
-    ((aiVisibilityVolume, "ai:visibility:volume")) \
-    ((aRRAY, "ARRAY")) \
-    (auto_) \
-    ((bOOL, "BOOL")) \
-    ((bYTE, "BYTE")) \
-    (catclark) \
-    (data) \
-    (dataType) \
-    (driver) \
-    (edge_length) \
-    (filename) \
-    (filter) \
-    (flatness) \
-    ((fLOAT, "FLOAT")) \
-    ((infoId, "info:id")) \
-    ((iNT, "INT")) \
-    (linear) \
-    ((lPE, "LPE")) \
-    ((mATRIX, "MATRIX")) \
-    (name) \
-    ((nODE, "NODE")) \
-    (none) \
-    (object) \
-    (path) \
-    (pin_borders) \
-    (pin_corners) \
-    ((pOINTER, "POINTER")) \
-    (raster) \
-    ((rGB, "RGB")) \
-    ((rGBA, "RGBA")) \
-    (rotate_about_center) \
-    (rotate_about_origin) \
-    (size) \
-    (smooth) \
-    (step_size) \
-    ((uINT, "UINT")) \
-    ((userPrefix, "user:")) \
-    ((vECTOR, "VECTOR")) \
-    ((vECTOR2, "VECTOR2"))
 
-/// \anchor UsdAiTokens
+/// \class UsdAiTokensType
 ///
-/// <b>UsdAiTokens</b> provides static, efficient TfToken's for
-/// use in all public USD API
+/// \link UsdAiTokens \endlink provides static, efficient
+/// \link TfToken TfTokens\endlink for use in all public USD API.
 ///
 /// These tokens are auto-generated from the module's schema, representing
 /// property names, for when you need to fetch an attribute or relationship
@@ -141,104 +53,376 @@ PXR_NAMESPACE_OPEN_SCOPE
 /// manner, and allow the compiler to verify that you spelled the name
 /// correctly.
 ///
-/// UsdAiTokens also contains all of the \em allowedTokens values declared
-/// for schema builtin attributes of 'token' scene description type.
+/// UsdAiTokens also contains all of the \em allowedTokens values
+/// declared for schema builtin attributes of 'token' scene description type.
 /// Use UsdAiTokens like so:
 ///
 /// \code
-///     gprim.GetVisibilityAttr().Set(UsdAiTokens->invisible);
+///     gprim.GetMyTokenValuedAttr().Set(UsdAiTokens->aiAov);
 /// \endcode
+struct UsdAiTokensType {
+    USDAI_API UsdAiTokensType();
+    /// \brief "ai:aov"
+    /// 
+    /// UsdAiLightAPI
+    const TfToken aiAov;
+    /// \brief "ai:autobump_visibility:camera"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiAutobump_visibilityCamera;
+    /// \brief "ai:autobump_visibility:diffuse_reflect"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiAutobump_visibilityDiffuse_reflect;
+    /// \brief "ai:autobump_visibility:diffuse_transmit"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiAutobump_visibilityDiffuse_transmit;
+    /// \brief "ai:autobump_visibility:shadow"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiAutobump_visibilityShadow;
+    /// \brief "ai:autobump_visibility:specular_reflect"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiAutobump_visibilitySpecular_reflect;
+    /// \brief "ai:autobump_visibility:specular_transmit"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiAutobump_visibilitySpecular_transmit;
+    /// \brief "ai:autobump_visibility:subsurface"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiAutobump_visibilitySubsurface;
+    /// \brief "ai:autobump_visibility:volume"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiAutobump_visibilityVolume;
+    /// \brief "ai:disp_autobump"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiDisp_autobump;
+    /// \brief "ai:disp_height"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiDisp_height;
+    /// \brief "ai:disp_padding"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiDisp_padding;
+    /// \brief "ai:disp_zero_value"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiDisp_zero_value;
+    /// \brief "ai:displacement"
+    /// 
+    /// UsdAiMaterialAPI
+    const TfToken aiDisplacement;
+    /// \brief "ai:light_group"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiLight_group;
+    /// \brief "ai:matte"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiMatte;
+    /// \brief "ai:opaque"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiOpaque;
+    /// \brief "ai:ray_bias"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiRay_bias;
+    /// \brief "ai:receive_shadows"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiReceive_shadows;
+    /// \brief "ai:self_shadows"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSelf_shadows;
+    /// \brief "ai:shadow_group"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiShadow_group;
+    /// \brief "ai:sidedness:camera"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSidednessCamera;
+    /// \brief "ai:sidedness:diffuse_reflect"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSidednessDiffuse_reflect;
+    /// \brief "ai:sidedness:diffuse_transmit"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSidednessDiffuse_transmit;
+    /// \brief "ai:sidedness:shadow"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSidednessShadow;
+    /// \brief "ai:sidedness:specular_reflect"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSidednessSpecular_reflect;
+    /// \brief "ai:sidedness:specular_transmit"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSidednessSpecular_transmit;
+    /// \brief "ai:sidedness:subsurface"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSidednessSubsurface;
+    /// \brief "ai:sidedness:volume"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSidednessVolume;
+    /// \brief "ai:smoothing"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSmoothing;
+    /// \brief "ai:subdiv_adaptive_error"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSubdiv_adaptive_error;
+    /// \brief "ai:subdiv_adaptive_metric"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSubdiv_adaptive_metric;
+    /// \brief "ai:subdiv_adaptive_space"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSubdiv_adaptive_space;
+    /// \brief "ai:subdiv_dicing_camera"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSubdiv_dicing_camera;
+    /// \brief "ai:subdiv_iterations"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSubdiv_iterations;
+    /// \brief "ai:subdiv_smooth_derivs"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSubdiv_smooth_derivs;
+    /// \brief "ai:subdiv_type"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSubdiv_type;
+    /// \brief "ai:subdiv_uv_smoothing"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiSubdiv_uv_smoothing;
+    /// \brief "ai:surface"
+    /// 
+    /// UsdAiMaterialAPI
+    const TfToken aiSurface;
+    /// \brief "ai:transform_type"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiTransform_type;
+    /// \brief "ai:use_light_group"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiUse_light_group;
+    /// \brief "ai:use_shadow_group"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiUse_shadow_group;
+    /// \brief "ai:visibility:camera"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiVisibilityCamera;
+    /// \brief "ai:visibility:diffuse_reflect"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiVisibilityDiffuse_reflect;
+    /// \brief "ai:visibility:diffuse_transmit"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiVisibilityDiffuse_transmit;
+    /// \brief "ai:visibility:shadow"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiVisibilityShadow;
+    /// \brief "ai:visibility:specular_reflect"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiVisibilitySpecular_reflect;
+    /// \brief "ai:visibility:specular_transmit"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiVisibilitySpecular_transmit;
+    /// \brief "ai:visibility:subsurface"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiVisibilitySubsurface;
+    /// \brief "ai:visibility:volume"
+    /// 
+    /// UsdAiShapeAPI
+    const TfToken aiVisibilityVolume;
+    /// \brief "ARRAY"
+    /// 
+    /// Possible value for UsdAiAOV::GetDataTypeAttr()
+    const TfToken aRRAY;
+    /// \brief "auto_"
+    /// 
+    /// Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_metricAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_adaptive_metricAttr()
+    const TfToken auto_;
+    /// \brief "BOOL"
+    /// 
+    /// Possible value for UsdAiAOV::GetDataTypeAttr()
+    const TfToken bOOL;
+    /// \brief "BYTE"
+    /// 
+    /// Possible value for UsdAiAOV::GetDataTypeAttr()
+    const TfToken bYTE;
+    /// \brief "catclark"
+    /// 
+    /// Possible value for UsdAiShapeAPI::GetAiSubdiv_typeAttr()
+    const TfToken catclark;
+    /// \brief "data"
+    /// 
+    /// UsdAiProcedural
+    const TfToken data;
+    /// \brief "dataType"
+    /// 
+    /// UsdAiAOV
+    const TfToken dataType;
+    /// \brief "driver"
+    /// 
+    /// UsdAiAOV
+    const TfToken driver;
+    /// \brief "edge_length"
+    /// 
+    /// Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_metricAttr()
+    const TfToken edge_length;
+    /// \brief "filename"
+    /// 
+    /// UsdAiVolume
+    const TfToken filename;
+    /// \brief "filter"
+    /// 
+    /// UsdAiAOV
+    const TfToken filter;
+    /// \brief "flatness"
+    /// 
+    /// Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_metricAttr()
+    const TfToken flatness;
+    /// \brief "FLOAT"
+    /// 
+    /// Possible value for UsdAiAOV::GetDataTypeAttr()
+    const TfToken fLOAT;
+    /// \brief "info:id"
+    /// 
+    /// UsdAiProcedural
+    const TfToken infoId;
+    /// \brief "INT"
+    /// 
+    /// Possible value for UsdAiAOV::GetDataTypeAttr()
+    const TfToken iNT;
+    /// \brief "linear"
+    /// 
+    /// Possible value for UsdAiShapeAPI::GetAiSubdiv_typeAttr(), Possible value for UsdAiShapeAPI::GetAiTransform_typeAttr(), Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
+    const TfToken linear;
+    /// \brief "LPE"
+    /// 
+    /// UsdAiAOV
+    const TfToken lPE;
+    /// \brief "MATRIX"
+    /// 
+    /// Possible value for UsdAiAOV::GetDataTypeAttr()
+    const TfToken mATRIX;
+    /// \brief "name"
+    /// 
+    /// UsdAiAOV
+    const TfToken name;
+    /// \brief "NODE"
+    /// 
+    /// Possible value for UsdAiAOV::GetDataTypeAttr()
+    const TfToken nODE;
+    /// \brief "none"
+    /// 
+    /// Possible value for UsdAiShapeAPI::GetAiSubdiv_typeAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_typeAttr()
+    const TfToken none;
+    /// \brief "object"
+    /// 
+    /// Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_spaceAttr()
+    const TfToken object;
+    /// \brief "path"
+    /// 
+    /// UsdAiDriver
+    const TfToken path;
+    /// \brief "pin_borders"
+    /// 
+    /// Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
+    const TfToken pin_borders;
+    /// \brief "pin_corners"
+    /// 
+    /// Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
+    const TfToken pin_corners;
+    /// \brief "POINTER"
+    /// 
+    /// Possible value for UsdAiAOV::GetDataTypeAttr()
+    const TfToken pOINTER;
+    /// \brief "raster"
+    /// 
+    /// Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_spaceAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_adaptive_spaceAttr()
+    const TfToken raster;
+    /// \brief "RGB"
+    /// 
+    /// Possible value for UsdAiAOV::GetDataTypeAttr()
+    const TfToken rGB;
+    /// \brief "RGBA"
+    /// 
+    /// Possible value for UsdAiAOV::GetDataTypeAttr(), Default value for UsdAiAOV::GetDataTypeAttr()
+    const TfToken rGBA;
+    /// \brief "rotate_about_center"
+    /// 
+    /// Possible value for UsdAiShapeAPI::GetAiTransform_typeAttr(), Default value for UsdAiShapeAPI::GetAiTransform_typeAttr()
+    const TfToken rotate_about_center;
+    /// \brief "rotate_about_origin"
+    /// 
+    /// Possible value for UsdAiShapeAPI::GetAiTransform_typeAttr()
+    const TfToken rotate_about_origin;
+    /// \brief "size"
+    /// 
+    /// UsdAiFilter
+    const TfToken size;
+    /// \brief "smooth"
+    /// 
+    /// Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
+    const TfToken smooth;
+    /// \brief "step_size"
+    /// 
+    /// UsdAiVolume, UsdAiVolumeProcedural
+    const TfToken step_size;
+    /// \brief "UINT"
+    /// 
+    /// Possible value for UsdAiAOV::GetDataTypeAttr()
+    const TfToken uINT;
+    /// \brief "user:"
+    /// 
+    /// The attribute prefix used to qualify user parameters on nodes using the AiNodeAPI.
+    const TfToken userPrefix;
+    /// \brief "VECTOR"
+    /// 
+    /// Possible value for UsdAiAOV::GetDataTypeAttr()
+    const TfToken vECTOR;
+    /// \brief "VECTOR2"
+    /// 
+    /// Possible value for UsdAiAOV::GetDataTypeAttr()
+    const TfToken vECTOR2;
+    /// A vector of all of the tokens listed above.
+    const std::vector<TfToken> allTokens;
+};
+
+/// \var UsdAiTokens
 ///
-/// The tokens are:
-/// \li <b>aiAov</b> - UsdAiLightAPI
-/// \li <b>aiAutobump_visibilityCamera</b> - UsdAiShapeAPI
-/// \li <b>aiAutobump_visibilityDiffuse_reflect</b> - UsdAiShapeAPI
-/// \li <b>aiAutobump_visibilityDiffuse_transmit</b> - UsdAiShapeAPI
-/// \li <b>aiAutobump_visibilityShadow</b> - UsdAiShapeAPI
-/// \li <b>aiAutobump_visibilitySpecular_reflect</b> - UsdAiShapeAPI
-/// \li <b>aiAutobump_visibilitySpecular_transmit</b> - UsdAiShapeAPI
-/// \li <b>aiAutobump_visibilitySubsurface</b> - UsdAiShapeAPI
-/// \li <b>aiAutobump_visibilityVolume</b> - UsdAiShapeAPI
-/// \li <b>aiDisp_autobump</b> - UsdAiShapeAPI
-/// \li <b>aiDisp_height</b> - UsdAiShapeAPI
-/// \li <b>aiDisp_padding</b> - UsdAiShapeAPI
-/// \li <b>aiDisp_zero_value</b> - UsdAiShapeAPI
-/// \li <b>aiDisplacement</b> - UsdAiMaterialAPI
-/// \li <b>aiLight_group</b> - UsdAiShapeAPI
-/// \li <b>aiMatte</b> - UsdAiShapeAPI
-/// \li <b>aiOpaque</b> - UsdAiShapeAPI
-/// \li <b>aiRay_bias</b> - UsdAiShapeAPI
-/// \li <b>aiReceive_shadows</b> - UsdAiShapeAPI
-/// \li <b>aiSelf_shadows</b> - UsdAiShapeAPI
-/// \li <b>aiShadow_group</b> - UsdAiShapeAPI
-/// \li <b>aiSidednessCamera</b> - UsdAiShapeAPI
-/// \li <b>aiSidednessDiffuse_reflect</b> - UsdAiShapeAPI
-/// \li <b>aiSidednessDiffuse_transmit</b> - UsdAiShapeAPI
-/// \li <b>aiSidednessShadow</b> - UsdAiShapeAPI
-/// \li <b>aiSidednessSpecular_reflect</b> - UsdAiShapeAPI
-/// \li <b>aiSidednessSpecular_transmit</b> - UsdAiShapeAPI
-/// \li <b>aiSidednessSubsurface</b> - UsdAiShapeAPI
-/// \li <b>aiSidednessVolume</b> - UsdAiShapeAPI
-/// \li <b>aiSmoothing</b> - UsdAiShapeAPI
-/// \li <b>aiSubdiv_adaptive_error</b> - UsdAiShapeAPI
-/// \li <b>aiSubdiv_adaptive_metric</b> - UsdAiShapeAPI
-/// \li <b>aiSubdiv_adaptive_space</b> - UsdAiShapeAPI
-/// \li <b>aiSubdiv_dicing_camera</b> - UsdAiShapeAPI
-/// \li <b>aiSubdiv_iterations</b> - UsdAiShapeAPI
-/// \li <b>aiSubdiv_smooth_derivs</b> - UsdAiShapeAPI
-/// \li <b>aiSubdiv_type</b> - UsdAiShapeAPI
-/// \li <b>aiSubdiv_uv_smoothing</b> - UsdAiShapeAPI
-/// \li <b>aiSurface</b> - UsdAiMaterialAPI
-/// \li <b>aiTransform_type</b> - UsdAiShapeAPI
-/// \li <b>aiUse_light_group</b> - UsdAiShapeAPI
-/// \li <b>aiUse_shadow_group</b> - UsdAiShapeAPI
-/// \li <b>aiVisibilityCamera</b> - UsdAiShapeAPI
-/// \li <b>aiVisibilityDiffuse_reflect</b> - UsdAiShapeAPI
-/// \li <b>aiVisibilityDiffuse_transmit</b> - UsdAiShapeAPI
-/// \li <b>aiVisibilityShadow</b> - UsdAiShapeAPI
-/// \li <b>aiVisibilitySpecular_reflect</b> - UsdAiShapeAPI
-/// \li <b>aiVisibilitySpecular_transmit</b> - UsdAiShapeAPI
-/// \li <b>aiVisibilitySubsurface</b> - UsdAiShapeAPI
-/// \li <b>aiVisibilityVolume</b> - UsdAiShapeAPI
-/// \li <b>aRRAY</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
-/// \li <b>auto_</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_metricAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_adaptive_metricAttr()
-/// \li <b>bOOL</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
-/// \li <b>bYTE</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
-/// \li <b>catclark</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_typeAttr()
-/// \li <b>data</b> - UsdAiProcedural
-/// \li <b>dataType</b> - UsdAiAOV
-/// \li <b>driver</b> - UsdAiAOV
-/// \li <b>edge_length</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_metricAttr()
-/// \li <b>filename</b> - UsdAiVolume
-/// \li <b>filter</b> - UsdAiAOV
-/// \li <b>flatness</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_metricAttr()
-/// \li <b>fLOAT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
-/// \li <b>infoId</b> - UsdAiProcedural
-/// \li <b>iNT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
-/// \li <b>linear</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_typeAttr(), Possible value for UsdAiShapeAPI::GetAiTransform_typeAttr(), Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
-/// \li <b>lPE</b> - UsdAiAOV
-/// \li <b>mATRIX</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
-/// \li <b>name</b> - UsdAiAOV
-/// \li <b>nODE</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
-/// \li <b>none</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_typeAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_typeAttr()
-/// \li <b>object</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_spaceAttr()
-/// \li <b>path</b> - UsdAiDriver
-/// \li <b>pin_borders</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
-/// \li <b>pin_corners</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
-/// \li <b>pOINTER</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
-/// \li <b>raster</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_spaceAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_adaptive_spaceAttr()
-/// \li <b>rGB</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
-/// \li <b>rGBA</b> - Possible value for UsdAiAOV::GetDataTypeAttr(), Default value for UsdAiAOV::GetDataTypeAttr()
-/// \li <b>rotate_about_center</b> - Possible value for UsdAiShapeAPI::GetAiTransform_typeAttr(), Default value for UsdAiShapeAPI::GetAiTransform_typeAttr()
-/// \li <b>rotate_about_origin</b> - Possible value for UsdAiShapeAPI::GetAiTransform_typeAttr()
-/// \li <b>size</b> - UsdAiFilter
-/// \li <b>smooth</b> - Possible value for UsdAiShapeAPI::GetAiSubdiv_uv_smoothingAttr()
-/// \li <b>step_size</b> - UsdAiVolume, UsdAiVolumeProcedural
-/// \li <b>uINT</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
-/// \li <b>userPrefix</b> - The attribute prefix used to qualify user parameters on nodes using the AiNodeAPI.
-/// \li <b>vECTOR</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
-/// \li <b>vECTOR2</b> - Possible value for UsdAiAOV::GetDataTypeAttr()
-TF_DECLARE_PUBLIC_TOKENS(UsdAiTokens, USDAI_API, USDAI_TOKENS);
+/// A global variable with static, efficient \link TfToken TfTokens\endlink
+/// for use in all public USD API.  \sa UsdAiTokensType
+extern USDAI_API TfStaticData<UsdAiTokensType> UsdAiTokens;
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

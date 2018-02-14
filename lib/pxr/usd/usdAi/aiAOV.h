@@ -70,6 +70,11 @@ public:
     /// a non-empty typeName.
     static const bool IsConcrete = true;
 
+    /// Compile-time constant indicating whether or not this class inherits from
+    /// UsdTyped. Types which inherit from UsdTyped can impart a typename on a
+    /// UsdPrim.
+    static const bool IsTyped = true;
+
     /// Construct a UsdAiAOV on UsdPrim \p prim .
     /// Equivalent to UsdAiAOV::Get(prim.GetStage(), prim.GetPath())
     /// for a \em valid \p prim, but will not immediately throw an error for
