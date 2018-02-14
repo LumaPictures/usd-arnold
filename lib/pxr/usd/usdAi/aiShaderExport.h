@@ -37,6 +37,30 @@ public:
                           uint8_t arnold_param_type, bool user);
     void collapse_shaders();
 
+public:
+    // Utility functions and definitions.
+    struct ParamConversion {
+        const SdfValueTypeName& type;
+        std::function<VtValue(const AtNode*, const char*)> f;
+
+        // TODO: see if move works in this case.
+        ParamConversion(const SdfValueTypeName& _type, std::function<VtValue(const AtNode*, const char*)> _f) :
+            type(_type), f(std::move(_f)) { }
+    };
+
+    static const ParamConversion*
+    get_param_conversion(uint8_t type);
+
+    struct DefaultValueConversion {
+        const SdfValueTypeName& type;
+        std::function<VtValue(const AtParamEntry*)> f;
+
+        DefaultValueConversion(const SdfValueTypeName& _type, std::function<VtValue(const AtParamEntry*)> _f) :
+            type(_type), f(std::move(_f)) { }
+    };
+
+    static const DefaultValueConversion*
+    get_default_value_conversion(uint8_t type);
 protected:
     const UsdStagePtr m_stage;
     SdfPath m_shaders_scope;
