@@ -48,6 +48,13 @@ namespace {
 // fwd decl.
 WRAP_CUSTOM;
 
+        
+static UsdAttribute
+_CreateNodeEntryTypeAttr(UsdAiNodeAPI &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateNodeEntryTypeAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
+}
 
 } // anonymous namespace
 
@@ -89,6 +96,13 @@ void wrapUsdAiNodeAPI()
 
         .def(!self)
 
+        
+        .def("GetNodeEntryTypeAttr",
+             &This::GetNodeEntryTypeAttr)
+        .def("CreateNodeEntryTypeAttr",
+             &_CreateNodeEntryTypeAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
 
     ;
 

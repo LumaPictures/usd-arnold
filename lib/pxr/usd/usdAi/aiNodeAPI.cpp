@@ -128,13 +128,46 @@ UsdAiNodeAPI::_GetTfType() const
     return _GetStaticTfType();
 }
 
+UsdAttribute
+UsdAiNodeAPI::GetNodeEntryTypeAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->infoNode_entry_type);
+}
+
+UsdAttribute
+UsdAiNodeAPI::CreateNodeEntryTypeAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->infoNode_entry_type,
+                       SdfValueTypeNames->Token,
+                       /* custom = */ false,
+                       SdfVariabilityUniform,
+                       defaultValue,
+                       writeSparsely);
+}
+
+namespace {
+static inline TfTokenVector
+_ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
+{
+    TfTokenVector result;
+    result.reserve(left.size() + right.size());
+    result.insert(result.end(), left.begin(), left.end());
+    result.insert(result.end(), right.begin(), right.end());
+    return result;
+}
+}
+
 /*static*/
 const TfTokenVector&
 UsdAiNodeAPI::GetSchemaAttributeNames(bool includeInherited)
 {
-    static TfTokenVector localNames;
+    static TfTokenVector localNames = {
+        UsdAiTokens->infoNode_entry_type,
+    };
     static TfTokenVector allNames =
-        UsdSchemaBase::GetSchemaAttributeNames(true);
+        _ConcatenateAttributeNames(
+            UsdSchemaBase::GetSchemaAttributeNames(true),
+            localNames);
 
     if (includeInherited)
         return allNames;

@@ -3,6 +3,7 @@
 #include <pxr/usd/usd/stage.h>
 #include <pxr/usd/usd/prim.h>
 
+#include <pxr/usd/usdAi/aiNodeAPI.h>
 #include <pxr/usd/usdAi/aiShader.h>
 #include <pxr/usd/usdAi/aiShaderExport.h>
 
@@ -178,8 +179,8 @@ int main(int argc, char* argv[]) {
 
         const auto nodeType = AiNodeEntryGetType(nentry);
 
-        prim.CreateAttribute(TfToken("info:node_type"), SdfValueTypeNames->Token, false).
-            Set(getNodeTypeToken(nodeType));
+        UsdAiNodeAPI nodeAPI(prim);
+        nodeAPI.CreateNodeEntryTypeAttr().Set(getNodeTypeToken(nodeType));
 
         auto* metaIter = AiNodeEntryGetMetaDataIterator(nentry);
 

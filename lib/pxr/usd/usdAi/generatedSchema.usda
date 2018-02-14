@@ -8,6 +8,11 @@ class "AiNodeAPI" (
              interface for getting and setting user parameters."""
 )
 {
+    uniform token info:node_entry_type (
+        doc = """The node entry type identifies the type of the node entry for each arnold node.
+                 Like, camera, shape, procedural, shader, filter, driver, etc.
+        """
+    )
 }
 
 class "AiShapeAPI" (

@@ -128,6 +128,7 @@ void wrapUsdAiTokens()
     _AddToken(cls, "flatness", UsdAiTokens->flatness);
     _AddToken(cls, "fLOAT", UsdAiTokens->fLOAT);
     _AddToken(cls, "infoId", UsdAiTokens->infoId);
+    _AddToken(cls, "infoNode_entry_type", UsdAiTokens->infoNode_entry_type);
     _AddToken(cls, "iNT", UsdAiTokens->iNT);
     _AddToken(cls, "linear", UsdAiTokens->linear);
     _AddToken(cls, "lPE", UsdAiTokens->lPE);

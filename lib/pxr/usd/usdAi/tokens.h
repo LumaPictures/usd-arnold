@@ -318,6 +318,10 @@ struct UsdAiTokensType {
     /// 
     /// UsdAiProcedural
     const TfToken infoId;
+    /// \brief "info:node_entry_type"
+    /// 
+    /// UsdAiNodeAPI
+    const TfToken infoNode_entry_type;
     /// \brief "INT"
     /// 
     /// Possible value for UsdAiAOV::GetDataTypeAttr()

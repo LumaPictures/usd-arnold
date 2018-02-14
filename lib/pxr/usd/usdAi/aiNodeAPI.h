@@ -31,6 +31,7 @@
 #include "pxr/usd/usd/schemaBase.h"
 #include "pxr/usd/usd/prim.h"
 #include "pxr/usd/usd/stage.h"
+#include "pxr/usd/usdAi/tokens.h"
 
 #include "pxr/base/vt/value.h"
 
@@ -53,6 +54,11 @@ class SdfAssetPath;
 ///
 /// API for handling prims as Arnold nodes. Provides a consistent
 /// interface for getting and setting user parameters.
+///
+/// For any described attribute \em Fallback \em Value or \em Allowed \em Values below
+/// that are text/tokens, the actual token is published and defined in \ref UsdAiTokens.
+/// So to set an attribute to the value "rightHanded", use UsdAiTokens->rightHanded
+/// as the value.
 ///
 class UsdAiNodeAPI : public UsdSchemaBase
 {
@@ -131,6 +137,29 @@ private:
     // override SchemaBase virtuals.
     USDAI_API
     virtual const TfType &_GetTfType() const;
+
+public:
+    // --------------------------------------------------------------------- //
+    // NODEENTRYTYPE 
+    // --------------------------------------------------------------------- //
+    /// The node entry type identifies the type of the node entry for each arnold node.
+    /// Like, camera, shape, procedural, shader, filter, driver, etc.
+    /// 
+    ///
+    /// \n  C++ Type: TfToken
+    /// \n  Usd Type: SdfValueTypeNames->Token
+    /// \n  Variability: SdfVariabilityUniform
+    /// \n  Fallback Value: No Fallback
+    USDAI_API
+    UsdAttribute GetNodeEntryTypeAttr() const;
+
+    /// See GetNodeEntryTypeAttr(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
+    /// If specified, author \p defaultValue as the attribute's default,
+    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
+    /// the default for \p writeSparsely is \c false.
+    USDAI_API
+    UsdAttribute CreateNodeEntryTypeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // ===================================================================== //
