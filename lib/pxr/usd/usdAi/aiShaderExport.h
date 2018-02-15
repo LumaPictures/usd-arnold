@@ -3,7 +3,9 @@
 
 #include "pxr/usd/usdAi/aiShader.h"
 
-#include <ai.h>
+class AtNode;
+class AtParamEntry;
+class AtParamValue;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -53,9 +55,12 @@ public:
 
     struct DefaultValueConversion {
         const SdfValueTypeName& type;
-        std::function<VtValue(const AtParamEntry*)> f;
+        std::function<VtValue(const AtParamValue&, const AtParamEntry*)> f;
 
-        DefaultValueConversion(const SdfValueTypeName& _type, std::function<VtValue(const AtParamEntry*)> _f) :
+        // The signature is pretty heavy here. The reason for that is simple
+        // when dealing with metadatas, we don't have a valid AtParamEntry structure.
+        // So we have to make all the behavior optional, otherwise we would need to duplicate functions.
+        DefaultValueConversion(const SdfValueTypeName& _type, std::function<VtValue(const AtParamValue&, const AtParamEntry*)> _f) :
             type(_type), f(std::move(_f)) { }
     };
 

@@ -36,6 +36,10 @@ def "GLOBAL" (
 class "AiNodeAPI" (
     doc = """API for handling prims as Arnold nodes. Provides a consistent
              interface for getting and setting user parameters."""
+    customData = {
+        string extraIncludes = """
+class AtMetaDataEntry;"""
+    }
 ) {
     uniform token info:node_entry_type (
         doc = """The node entry type identifies the type of the node entry for each arnold node.

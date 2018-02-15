@@ -14,6 +14,9 @@
 #include <string>
 #include <vector>
 
+#include <sys/stat.h>
+#include <dirent.h>
+
 PXR_NAMESPACE_USING_DIRECTIVE
 
 namespace {
@@ -119,6 +122,24 @@ optional arguments:
  --load     Load the shaders from a directory.
 )VOGON";
 
+enum StatResult {
+    IS_DIR,
+    IS_FILE,
+    IS_UNSUPPORTED
+};
+
+StatResult checkPath(const char* p) {
+    struct stat s;
+    if (stat(p, &s) == 0) {
+        if (s.st_mode & S_IFDIR) {
+            return IS_DIR;
+        } else if (s.st_mode & S_IFREG) {
+            return IS_FILE;
+        }
+    }
+    return IS_UNSUPPORTED;
+}
+
 }
 
 int main(int argc, char* argv[]) {
@@ -169,6 +190,26 @@ int main(int argc, char* argv[]) {
         AiLoadPlugins(plugin.c_str());
     }
 
+    // TODO: check for the file extension.
+    for (const auto& plugin: getFlagValues("--meta")) {
+        const auto result = checkPath(plugin.c_str());
+        if (result == IS_DIR) {
+            auto* d = opendir(plugin.c_str());
+            if (d != nullptr) {
+                for (struct dirent* de = nullptr; (de = readdir(d)) != nullptr;) {
+                    if (strcmp(de->d_name, ".") == 0) { continue; }
+                    if (strcmp(de->d_name, "..") == 0) { continue; }
+                    std::stringstream ss; ss << plugin << "/" << de->d_name;
+                    if (checkPath(ss.str().c_str()) == IS_FILE) {
+                        AiMetaDataLoadFile(ss.str().c_str());
+                    }
+                }
+            }
+        } else if (result == IS_FILE) {
+            AiMetaDataLoadFile(plugin.c_str());
+        }
+    }
+
     auto* nentryIter = AiUniverseGetNodeEntryIterator(AI_NODE_ALL);
 
     while (!AiNodeEntryIteratorFinished(nentryIter)) {
@@ -183,14 +224,14 @@ int main(int argc, char* argv[]) {
         UsdAiNodeAPI nodeAPI(prim);
         nodeAPI.CreateNodeEntryTypeAttr().Set(getNodeTypeToken(nodeType));
 
-        auto* metaIter = AiNodeEntryGetMetaDataIterator(nentry);
+        /*auto* metaIter = AiNodeEntryGetMetaDataIterator(nentry);
 
         while (!AiMetaDataIteratorFinished(metaIter)) {
             const auto* mentry = AiMetaDataIteratorGetNext(metaIter);
             const auto mentryType = getEntryType(mentry);
         }
 
-        AiMetaDataIteratorDestroy(metaIter);
+        AiMetaDataIteratorDestroy(metaIter);*/
 
         auto paramIter = AiNodeEntryGetParamIterator(nentry);
 
@@ -205,15 +246,15 @@ int main(int argc, char* argv[]) {
                 conversion->type, false);
 
             if (conversion->f != nullptr) {
-                attr.Set(conversion->f(pentry));
+                attr.Set(conversion->f(*AiParamGetDefault(pentry), pentry));
             }
 
             attr.SetMetadata(UsdAiTokens->paramType, UsdAiNodeAPI::GetParamTypeTokenFromType(pentryType));
 
-            metaIter = AiNodeEntryGetMetaDataIterator(nentry, AiParamGetName(pentry));
+            auto* metaIter = AiNodeEntryGetMetaDataIterator(nentry, AiParamGetName(pentry));
 
             while (!AiMetaDataIteratorFinished(metaIter)) {
-                const auto* mentry = AiMetaDataIteratorGetNext(metaIter);
+                nodeAPI.AddMetadataToAttribute(attr, AiMetaDataIteratorGetNext(metaIter));
             }
 
             AiMetaDataIteratorDestroy(metaIter);

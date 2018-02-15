@@ -13,8 +13,9 @@
 #include "pxr/usd/usdShade/input.h"
 #include "pxr/usd/usdShade/connectableAPI.h"
 
-#include <tbb/tick_count.h>
+#include <ai.h>
 
+#include <tbb/tick_count.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -98,23 +99,23 @@ const std::unordered_map<uint8_t, AiShaderExport::ParamConversion> param_convers
 };
 
 const std::unordered_map<uint8_t, AiShaderExport::DefaultValueConversion> default_value_conversion_map = {
-    {AI_TYPE_BYTE, {SdfValueTypeNames->UChar, [](const AtParamEntry* pe) -> VtValue { return VtValue(AiParamGetDefault(pe)->BYTE()); }}},
-    {AI_TYPE_INT, {SdfValueTypeNames->Int, [](const AtParamEntry* pe) -> VtValue { return VtValue(AiParamGetDefault(pe)->INT()); }}},
-    {AI_TYPE_UINT, {SdfValueTypeNames->UInt, [](const AtParamEntry* pe) -> VtValue { return VtValue(AiParamGetDefault(pe)->UINT()); }}},
-    {AI_TYPE_BOOLEAN, {SdfValueTypeNames->Bool, [](const AtParamEntry* pe) -> VtValue { return VtValue(AiParamGetDefault(pe)->BOOL()); }}},
-    {AI_TYPE_FLOAT, {SdfValueTypeNames->Float, [](const AtParamEntry* pe) -> VtValue { return VtValue(AiParamGetDefault(pe)->FLT()); }}},
-    {AI_TYPE_RGB, {SdfValueTypeNames->Color3f, [](const AtParamEntry* pe) -> VtValue { const auto& v = AiParamGetDefault(pe)->RGB(); return VtValue(GfVec3f(v.r, v.g, v.b)); }}},
-    {AI_TYPE_RGBA, {SdfValueTypeNames->Color4f, [](const AtParamEntry* pe) -> VtValue { const auto& v = AiParamGetDefault(pe)->RGBA(); return VtValue(GfVec4f(v.r, v.g, v.b, v.a)); }}},
-    {AI_TYPE_VECTOR, {SdfValueTypeNames->Vector3f, [](const AtParamEntry* pe) -> VtValue { const auto& v = AiParamGetDefault(pe)->VEC(); return VtValue(GfVec3f(v.x, v.y, v.z)); }}},
-    {AI_TYPE_VECTOR2, {SdfValueTypeNames->Float2, [](const AtParamEntry* pe) -> VtValue { const auto& v = AiParamGetDefault(pe)->VEC2(); return VtValue(GfVec2f(v.x, v.y)); }}},
-    {AI_TYPE_STRING, {SdfValueTypeNames->String, [](const AtParamEntry* pe) -> VtValue { return VtValue(AiParamGetDefault(pe)->STR().c_str()); }}},
+    {AI_TYPE_BYTE, {SdfValueTypeNames->UChar, [](const AtParamValue& pv, const AtParamEntry*) -> VtValue { return VtValue(pv.BYTE()); }}},
+    {AI_TYPE_INT, {SdfValueTypeNames->Int, [](const AtParamValue& pv, const AtParamEntry*) -> VtValue { return VtValue(pv.INT()); }}},
+    {AI_TYPE_UINT, {SdfValueTypeNames->UInt, [](const AtParamValue& pv, const AtParamEntry*) -> VtValue { return VtValue(pv.UINT()); }}},
+    {AI_TYPE_BOOLEAN, {SdfValueTypeNames->Bool, [](const AtParamValue& pv, const AtParamEntry*) -> VtValue { return VtValue(pv.BOOL()); }}},
+    {AI_TYPE_FLOAT, {SdfValueTypeNames->Float, [](const AtParamValue& pv, const AtParamEntry*) -> VtValue { return VtValue(pv.FLT()); }}},
+    {AI_TYPE_RGB, {SdfValueTypeNames->Color3f, [](const AtParamValue& pv, const AtParamEntry*) -> VtValue { const auto& v = pv.RGB(); return VtValue(GfVec3f(v.r, v.g, v.b)); }}},
+    {AI_TYPE_RGBA, {SdfValueTypeNames->Color4f, [](const AtParamValue& pv, const AtParamEntry*) -> VtValue { const auto& v = pv.RGBA(); return VtValue(GfVec4f(v.r, v.g, v.b, v.a)); }}},
+    {AI_TYPE_VECTOR, {SdfValueTypeNames->Vector3f, [](const AtParamValue& pv, const AtParamEntry*) -> VtValue { const auto& v = pv.VEC(); return VtValue(GfVec3f(v.x, v.y, v.z)); }}},
+    {AI_TYPE_VECTOR2, {SdfValueTypeNames->Float2, [](const AtParamValue& pv, const AtParamEntry*) -> VtValue { const auto& v = pv.VEC2(); return VtValue(GfVec2f(v.x, v.y)); }}},
+    {AI_TYPE_STRING, {SdfValueTypeNames->String, [](const AtParamValue& pv, const AtParamEntry*) -> VtValue { return VtValue(pv.STR().c_str()); }}},
     {AI_TYPE_NODE, {SdfValueTypeNames->String, nullptr}},
     {AI_TYPE_CLOSURE, {SdfValueTypeNames->String, nullptr}},
-    {AI_TYPE_MATRIX, {SdfValueTypeNames->Matrix4d, [](const AtParamEntry* pe) -> VtValue { return VtValue(ConvertMatrix(*AiParamGetDefault(pe)->pMTX())); }}},
-    {AI_TYPE_ENUM, {SdfValueTypeNames->String, [](const AtParamEntry* pe) -> VtValue {
+    {AI_TYPE_MATRIX, {SdfValueTypeNames->Matrix4d, [](const AtParamValue& pv, const AtParamEntry*) -> VtValue { return VtValue(ConvertMatrix(*pv.pMTX())); }}},
+    {AI_TYPE_ENUM, {SdfValueTypeNames->String, [](const AtParamValue& pv, const AtParamEntry* pe) -> VtValue {
         if (pe == nullptr) { return VtValue(""); }
         const auto enums = AiParamGetEnum(pe);
-        return VtValue(GetEnum(enums, AiParamGetDefault(pe)->INT()));
+        return VtValue(GetEnum(enums, pv.INT()));
     }}},
 };
 

@@ -33,6 +33,8 @@
 #include "pxr/usd/usd/stage.h"
 #include "pxr/usd/usdAi/tokens.h"
 
+class AtMetaDataEntry;
+
 #include "pxr/base/vt/value.h"
 
 #include "pxr/base/gf/vec3d.h"
@@ -184,6 +186,28 @@ public:
 
     // Return all attributes in the "user:" namespace.
     std::vector<UsdAttribute> GetUserAttributes() const;
+
+    // Return all "metadata" for a given attribute.
+    // Since it's not trivial to define metadata names dynamically,
+    // we need to prefix the metadata with the attribute's name.
+    std::vector<UsdAttribute> GetMetadataForAttribute(const UsdAttribute& attr) const;
+
+    // Add metadata to usd attribute, the automated way.
+    // We are using a pointer here, in case Solid Angle decides
+    // to hide the interface in the future.
+    void AddMetadataToAttribute(
+        const UsdAttribute& attr,
+        const AtMetaDataEntry* meta) const;
+
+    // Adding new, dynamic metadata to an existing attribute.
+    UsdAttribute AddMetadataToAttribute(
+        const UsdAttribute& attr,
+        const TfToken& name,
+        const SdfValueTypeName& typeName,
+        const VtValue& value) const;
+
+    // Getting the metadata name from the parameter name.
+    static TfToken GetMetadataNameFromAttr(const UsdAttribute& attr);
 
     // Returns a token from AtNodeEntry's GetType.
     static TfToken GetNodeEntryTokenFromType(int nodeEntryType);

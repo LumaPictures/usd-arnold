@@ -186,7 +186,10 @@ PXR_NAMESPACE_CLOSE_SCOPE
 // ===================================================================== //
 // --(BEGIN CUSTOM CODE)--
 
+#include "pxr/usd/usdAi/aiShaderExport.h"
 #include "pxr/usd/usdAi/tokens.h"
+#include <ai.h>
+#include <initializer_list>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -210,20 +213,63 @@ std::vector<UsdAttribute>
 UsdAiNodeAPI::GetUserAttributes() const
 {
     std::vector<UsdAttribute> result;
-    std::vector<UsdAttribute> attrs = GetPrim().GetAttributes();
 
-    TF_FOR_ALL(attrIter, attrs) {
-        const UsdAttribute& attr = *attrIter;
-        if (TfStringStartsWith(attr.GetName().GetString(),
+    for (const auto& it: GetPrim().GetAttributes()) {
+        if (TfStringStartsWith(it.GetName().GetString(),
                                UsdAiTokens->userPrefix)) {
-            result.push_back(attr);
+            result.push_back(it);
         }
     }
     return result;
 }
 
-#include <ai.h>
-#include <initializer_list>
+void
+UsdAiNodeAPI::AddMetadataToAttribute(
+    const UsdAttribute& attr,
+    const AtMetaDataEntry* meta) const {
+    if (meta == nullptr) { return; }
+    const auto* meta_conversion = AiShaderExport::get_default_value_conversion(meta->type);
+    if (meta_conversion == nullptr) { return; }
+    auto value = meta_conversion->f == nullptr ? VtValue() : meta_conversion->f(meta->value, nullptr);
+    AddMetadataToAttribute(attr, TfToken(meta->name.c_str()), meta_conversion->type, value).
+        SetMetadata(UsdAiTokens->paramType, GetParamTypeTokenFromType(meta->type));
+}
+
+UsdAttribute
+UsdAiNodeAPI::AddMetadataToAttribute(
+    const UsdAttribute& attr,
+    const TfToken& name,
+    const SdfValueTypeName& typeName,
+    const VtValue& value) const {
+    auto metaName = name.GetString();
+    std::replace(metaName.begin(), metaName.end(), '.', ':');
+    metaName = attr.GetName().GetString() + ":" + metaName;
+    auto metaAttr = GetPrim().CreateAttribute(TfToken(metaName), typeName, false, SdfVariabilityUniform);
+    metaAttr.Set(value);
+    return metaAttr;
+}
+
+TfToken
+UsdAiNodeAPI::GetMetadataNameFromAttr(const UsdAttribute& attr) {
+    auto name = attr.GetName().GetString();
+    const auto colorPos = name.find(':');
+    if (colorPos == std::string::npos) { return TfToken(name); }
+    name = name.substr(colorPos + 1);
+    std::replace(name.begin(), name.end(), ':', '.');
+    return TfToken(name);
+}
+
+std::vector<UsdAttribute>
+UsdAiNodeAPI::GetMetadataForAttribute(const UsdAttribute& attr) const {
+    const auto attrName = attr.GetName();
+    std::vector<UsdAttribute> result;
+    for (const auto& it: GetPrim().GetAttributes()) {
+        if (TfStringStartsWith(it.GetName(), TfToken(attrName.GetString() + ":"))) {
+            result.push_back(it);
+        }
+    }
+    return result;
+}
 
 namespace {
 // C here is a bit ugly, but well... No typeclasses or traits, yet!
