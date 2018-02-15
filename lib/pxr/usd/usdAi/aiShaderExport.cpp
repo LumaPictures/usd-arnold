@@ -123,7 +123,7 @@ const std::unordered_map<uint8_t, AiShaderExport::DefaultValueConversion> defaul
     {AI_TYPE_NODE, {SdfValueTypeNames->String, nullptr}},
     {AI_TYPE_MATRIX, {SdfValueTypeNames->Matrix4d, [](const AtParamValue& pv, const AtParamEntry*) -> VtValue { return VtValue(ConvertMatrix(*pv.pMTX())); }}},
     {AI_TYPE_ENUM, {SdfValueTypeNames->String, [](const AtParamValue& pv, const AtParamEntry* pe) -> VtValue {
-        if (pe == nullptr) { return VtValue(); }
+        if (pe == nullptr) { return VtValue(""); }
         const auto enums = AiParamGetEnum(pe);
         return VtValue(GetEnum(enums, pv.INT()));
     }}},
