@@ -226,10 +226,12 @@ UsdAiNodeAPI::GetUserAttributes() const
 #include <initializer_list>
 
 namespace {
-template <typename I, typename V> std::vector<std::tuple<I, V>>
+// C here is a bit ugly, but well... No typeclasses or traits, yet!
+// TODO: improve this, so type deductions work better!
+template <typename C, typename I, typename V> std::vector<std::tuple<I, V>>
 _getSortedTupleVector(
-    const std::initializer_list<std::tuple<I, V>>& list,
-    const std::function<bool(const I&, const I&)> sf = [](const I& a, const I& b) -> bool { return a < b; }) {
+    const C& list,
+    std::function<bool(const I&, const I&)> sf = [](const I& a, const I& b) -> bool { return a < b; }) {
     std::vector<std::tuple<I, V>> ret(list);
     std::sort(ret.begin(), ret.end(),
               [&sf](const std::tuple<I, V>& a, const std::tuple<I, V>& b) -> bool {
@@ -264,7 +266,7 @@ V _getValueFromSortedTupleVector(
 };
 
 const auto _nodeEntryTypeToToken =
-    _getSortedTupleVector<int, TfToken>(
+    _getSortedTupleVector<std::initializer_list<std::tuple<int, TfToken>>, int, TfToken>(
         {
             _m(AI_NODE_UNDEFINED, _undefinedToken),
             _m(AI_NODE_OPTIONS, TfToken("options")),
@@ -283,7 +285,7 @@ const auto _nodeEntryTypeToToken =
         });
 
 const auto _paramTypeToToken =
-    _getSortedTupleVector<int, TfToken>(
+    _getSortedTupleVector<std::initializer_list<std::tuple<int, TfToken>>, int, TfToken>(
         {
             _m(AI_TYPE_BYTE, TfToken("byte")),
             _m(AI_TYPE_INT, TfToken("int")),
@@ -310,12 +312,20 @@ const auto _paramTypeToToken =
 template <typename A, typename B> inline std::vector<std::tuple<B, A>>
 _flipTupleVector(const std::vector<std::tuple<A, B>>& v) {
     std::vector<std::tuple<B, A>> ret;
+    ret.reserve(v.size());
+    for (const auto& it: v) {
+        ret.emplace_back(std::get<1>(it), std::get<0>(it));
+    }
     return ret;
 }
 
+auto _tokenSort = [](const TfToken& a, const TfToken& b) -> bool {
+    return TfToken::LTTokenFunctor()(a, b);
+};
+
 // TODO: sort Tokens.
-const auto _tokenToNodeEntryType = _flipTupleVector(_nodeEntryTypeToToken);
-const auto _tokenToParamType = _flipTupleVector(_paramTypeToToken);
+const auto _tokenToNodeEntryType = _getSortedTupleVector<std::vector<std::tuple<TfToken, int>>, TfToken, int>(_flipTupleVector(_nodeEntryTypeToToken), _tokenSort);
+const auto _tokenToParamType = _getSortedTupleVector<std::vector<std::tuple<TfToken, int>>, TfToken, int>(_flipTupleVector(_paramTypeToToken), _tokenSort);
 }
 
 TfToken
@@ -325,7 +335,7 @@ UsdAiNodeAPI::GetNodeEntryTokenFromType(int nodeEntryType) {
 
 int
 UsdAiNodeAPI::GetNodeEntryTypeFromToken(const TfToken& nodeEntryTypeName) {
-    return 0;
+    return _getValueFromSortedTupleVector(_tokenToNodeEntryType, nodeEntryTypeName, AI_NODE_UNDEFINED);
 }
 
 TfToken
@@ -335,7 +345,7 @@ UsdAiNodeAPI::GetParamTypeTokenFromType(int paramEntryType) {
 
 int
 UsdAiNodeAPI::GetParamTypeFromToken(const TfToken& paramEntryTypeName) {
-    return 0;
+    return _getValueFromSortedTupleVector(_tokenToParamType, paramEntryTypeName, AI_TYPE_UNDEFINED);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
