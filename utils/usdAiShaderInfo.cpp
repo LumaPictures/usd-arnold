@@ -6,6 +6,7 @@
 #include <pxr/usd/usdAi/aiNodeAPI.h>
 #include <pxr/usd/usdAi/aiShader.h>
 #include <pxr/usd/usdAi/aiShaderExport.h>
+#include <pxr/usd/usdAi/tokens.h>
 
 #include <algorithm>
 #include <iostream>
@@ -207,8 +208,7 @@ int main(int argc, char* argv[]) {
                 attr.Set(conversion->f(pentry));
             }
 
-            const static TfToken idToken("param_type");
-            attr.SetMetadata(idToken, getParamTypeToken(pentryType));
+            attr.SetMetadata(UsdAiTokens->paramType, UsdAiNodeAPI::GetParamTypeTokenFromType(pentryType));
 
             metaIter = AiNodeEntryGetMetaDataIterator(nentry, AiParamGetName(pentry));
 

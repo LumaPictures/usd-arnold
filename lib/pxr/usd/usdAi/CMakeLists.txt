@@ -134,6 +134,14 @@ if (PXR_ENABLE_PYTHON_SUPPORT)
 except:
     from pkgutil import extend_path
     __path__ = extend_path(__path__, __name__)
-\")"
-    )
+\")")
 endif (PXR_ENABLE_PYTHON_SUPPORT)
+
+install(
+    CODE
+    "FILE(WRITE \"${CMAKE_INSTALL_PREFIX}/share/usd/plugins/plugInfo.json\"
+    \"
+{
+    \\\"Includes\\\": [ \\\"*/resources/\\\" ]
+}
+    \")")

@@ -184,6 +184,18 @@ public:
 
     // Return all attributes in the "user:" namespace.
     std::vector<UsdAttribute> GetUserAttributes() const;
+
+    // Returns a token from AtNodeEntry's GetType.
+    static TfToken GetNodeEntryTokenFromType(int nodeEntryType);
+
+    // Returns a node entry type from a TfToken.
+    static int GetNodeEntryTypeFromToken(const TfToken& nodeEntryTypeName);
+
+    // Returns a token from AtParamEntry's GetType.
+    static TfToken GetParamTypeTokenFromType(int paramEntryType);
+
+    // Returns a param type from a TfToken.
+    static int GetParamTypeFromToken(const TfToken& paramEntryTypeName);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

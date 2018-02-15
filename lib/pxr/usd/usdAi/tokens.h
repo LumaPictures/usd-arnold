@@ -354,6 +354,10 @@ struct UsdAiTokensType {
     /// 
     /// Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_spaceAttr()
     const TfToken object;
+    /// \brief "paramType"
+    /// 
+    /// Stores the arnold parameter type for a parameter when remapping is non-trivial.
+    const TfToken paramType;
     /// \brief "path"
     /// 
     /// UsdAiDriver

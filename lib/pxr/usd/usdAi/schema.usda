@@ -23,6 +23,10 @@ def "GLOBAL" (
                 string doc = """The attribute prefix used to qualify user
                                 parameters on nodes using the AiNodeAPI."""
             }
+            dictionary paramType = {
+                string doc = """Stores the arnold parameter type for a parameter
+                                when remapping is non-trivial."""
+            }
         }
     }
 )

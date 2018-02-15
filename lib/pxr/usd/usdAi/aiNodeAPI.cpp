@@ -222,4 +222,120 @@ UsdAiNodeAPI::GetUserAttributes() const
     return result;
 }
 
+#include <ai.h>
+#include <initializer_list>
+
+namespace {
+template <typename I, typename V> std::vector<std::tuple<I, V>>
+_getSortedTupleVector(
+    const std::initializer_list<std::tuple<I, V>>& list,
+    const std::function<bool(const I&, const I&)> sf = [](const I& a, const I& b) -> bool { return a < b; }) {
+    std::vector<std::tuple<I, V>> ret(list);
+    std::sort(ret.begin(), ret.end(),
+              [&sf](const std::tuple<I, V>& a, const std::tuple<I, V>& b) -> bool {
+                  return sf(std::get<0>(a), std::get<0>(b));
+              });
+    return ret;
+}
+
+// No function alias with using
+template <typename... Args> auto
+_m(Args&& ... args) -> decltype(std::make_tuple(std::forward<Args>(args)...)) {
+    return std::make_tuple(std::forward<Args>(args)...);
+}
+
+static const TfToken _undefinedToken("undefined");
+
+template <typename I, typename V> inline
+V _getValueFromSortedTupleVector(
+    const std::vector<std::tuple<I, V>>& v,
+    const I& i, const V& dv,
+    const std::function<bool(const I&, const I&)>& sf = [](const I& a, const I& b) -> bool { return a < b; }) {
+    const auto it = std::lower_bound(
+        v.begin(), v.end(),
+        _m(i, dv), [&sf](const std::tuple<I, V>& a, const std::tuple<I, V>& b) -> bool {
+            return sf(std::get<0>(a), std::get<0>(b));
+        });
+
+    if (it == v.end() || std::get<0>(*it) != i) {
+        return dv;
+    }
+    return std::get<1>(*it);
+};
+
+const auto _nodeEntryTypeToToken =
+    _getSortedTupleVector<int, TfToken>(
+        {
+            _m(AI_NODE_UNDEFINED, _undefinedToken),
+            _m(AI_NODE_OPTIONS, TfToken("options")),
+            _m(AI_NODE_CAMERA, TfToken("camera")),
+            _m(AI_NODE_LIGHT, TfToken("light")),
+            _m(AI_NODE_SHAPE, TfToken("shape")),
+            _m(AI_NODE_SHADER, TfToken("shader")),
+            _m(AI_NODE_OVERRIDE, TfToken("override")),
+            _m(AI_NODE_DRIVER, TfToken("driver")),
+            _m(AI_NODE_FILTER, TfToken("filter")),
+            _m(AI_NODE_COLOR_MANAGER, TfToken("color_manager")),
+            _m(AI_NODE_SHAPE_PROCEDURAL, TfToken("procedural")),
+            _m(AI_NODE_SHAPE_VOLUME, TfToken("volume")),
+            _m(AI_NODE_SHAPE_IMPLICIT, TfToken("implicit")),
+            _m(AI_NODE_ALL, TfToken("all")),
+        });
+
+const auto _paramTypeToToken =
+    _getSortedTupleVector<int, TfToken>(
+        {
+            _m(AI_TYPE_BYTE, TfToken("byte")),
+            _m(AI_TYPE_INT, TfToken("int")),
+            _m(AI_TYPE_UINT, TfToken("uint")),
+            _m(AI_TYPE_BOOLEAN, TfToken("boolean")),
+            _m(AI_TYPE_FLOAT, TfToken("float")),
+            _m(AI_TYPE_RGB, TfToken("rgb")),
+            _m(AI_TYPE_RGBA, TfToken("rgba")),
+            _m(AI_TYPE_VECTOR, TfToken("vector")),
+            _m(AI_TYPE_VECTOR2, TfToken("vector2")),
+            _m(AI_TYPE_STRING, TfToken("string")),
+            _m(AI_TYPE_POINTER, TfToken("pointer")),
+            _m(AI_TYPE_NODE, TfToken("node")),
+            _m(AI_TYPE_ARRAY, TfToken("array")),
+            _m(AI_TYPE_MATRIX, TfToken("matrix")),
+            _m(AI_TYPE_ENUM, TfToken("enum")),
+            _m(AI_TYPE_CLOSURE, TfToken("closure")),
+            _m(AI_TYPE_USHORT, TfToken("ushort")),
+            _m(AI_TYPE_HALF, TfToken("half")),
+            _m(AI_TYPE_UNDEFINED, TfToken("undefined")),
+            _m(AI_TYPE_NONE, TfToken("none"))
+        });
+
+template <typename A, typename B> inline std::vector<std::tuple<B, A>>
+_flipTupleVector(const std::vector<std::tuple<A, B>>& v) {
+    std::vector<std::tuple<B, A>> ret;
+    return ret;
+}
+
+// TODO: sort Tokens.
+const auto _tokenToNodeEntryType = _flipTupleVector(_nodeEntryTypeToToken);
+const auto _tokenToParamType = _flipTupleVector(_paramTypeToToken);
+}
+
+TfToken
+UsdAiNodeAPI::GetNodeEntryTokenFromType(int nodeEntryType) {
+    return _getValueFromSortedTupleVector(_nodeEntryTypeToToken, nodeEntryType, _undefinedToken);
+}
+
+int
+UsdAiNodeAPI::GetNodeEntryTypeFromToken(const TfToken& nodeEntryTypeName) {
+    return 0;
+}
+
+TfToken
+UsdAiNodeAPI::GetParamTypeTokenFromType(int paramEntryType) {
+    return _getValueFromSortedTupleVector(_paramTypeToToken, paramEntryType, _undefinedToken);
+}
+
+int
+UsdAiNodeAPI::GetParamTypeFromToken(const TfToken& paramEntryTypeName) {
+    return 0;
+}
+
 PXR_NAMESPACE_CLOSE_SCOPE

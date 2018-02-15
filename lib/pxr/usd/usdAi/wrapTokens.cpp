@@ -137,6 +137,7 @@ void wrapUsdAiTokens()
     _AddToken(cls, "nODE", UsdAiTokens->nODE);
     _AddToken(cls, "none", UsdAiTokens->none);
     _AddToken(cls, "object", UsdAiTokens->object);
+    _AddToken(cls, "paramType", UsdAiTokens->paramType);
     _AddToken(cls, "path", UsdAiTokens->path);
     _AddToken(cls, "pin_borders", UsdAiTokens->pin_borders);
     _AddToken(cls, "pin_corners", UsdAiTokens->pin_corners);

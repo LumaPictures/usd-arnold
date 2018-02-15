@@ -5,6 +5,17 @@
     "Plugins": [
         {
             "Info": {
+                "SdfMetadata": {
+                    "paramType": {
+                        "appliesTo": [
+                            "attributes"
+                        ], 
+                        "default": "undefined", 
+                        "displayGroup": "Arnold", 
+                        "documentation": "Arnold type identifier.", 
+                        "type": "token"
+                    }
+                }, 
                 "Types": {
                     "UsdAiAOV": {
                         "alias": {
