@@ -95,8 +95,8 @@ const std::unordered_map<uint8_t, AiShaderExport::ParamConversion> param_convers
     {AI_TYPE_VECTOR, {SdfValueTypeNames->Vector3f, [](const AtNode* no, const char* na) -> VtValue { const auto v = AiNodeGetVec(no, na); return VtValue(GfVec3f(v.x, v.y, v.z)); }}},
     {AI_TYPE_VECTOR2, {SdfValueTypeNames->Float2, [](const AtNode* no, const char* na) -> VtValue { const auto v = AiNodeGetVec2(no, na); return VtValue(GfVec2f(v.x, v.y)); }}},
     {AI_TYPE_STRING, {SdfValueTypeNames->String, [](const AtNode* no, const char* na) -> VtValue { return VtValue(AiNodeGetStr(no, na).c_str()); }}},
+    {AI_TYPE_POINTER, {SdfValueTypeNames->String, nullptr}},
     {AI_TYPE_NODE, {SdfValueTypeNames->String, nullptr}},
-    {AI_TYPE_CLOSURE, {SdfValueTypeNames->String, nullptr}},
     {AI_TYPE_MATRIX, {SdfValueTypeNames->Matrix4d, [](const AtNode* no, const char* na) -> VtValue { return VtValue(NodeGetMatrix(no, na)); }}},
     {AI_TYPE_ENUM, {SdfValueTypeNames->String, [](const AtNode* no, const char* na) -> VtValue {
         const auto* nentry = AiNodeGetNodeEntry(no);
@@ -106,6 +106,9 @@ const std::unordered_map<uint8_t, AiShaderExport::ParamConversion> param_convers
         const auto enums = AiParamGetEnum(pentry);
         return VtValue(GetEnum(enums, AiNodeGetInt(no, na)));
     }}},
+    {AI_TYPE_CLOSURE, {SdfValueTypeNames->String, nullptr}},
+    {AI_TYPE_USHORT, {SdfValueTypeNames->UInt, [](const AtNode* no, const char* na) -> VtValue { return VtValue(AiNodeGetUInt(no, na)); }}},
+    {AI_TYPE_HALF, {SdfValueTypeNames->Half, [](const AtNode* no, const char* na) -> VtValue { return VtValue(AiNodeGetFlt(no, na)); }}},
 };
 
 const std::unordered_map<uint8_t, AiShaderExport::DefaultValueConversion> default_value_conversion_map = {
