@@ -6,13 +6,22 @@
         {
             "Info": {
                 "SdfMetadata": {
+                    "elemType": {
+                        "appliesTo": [
+                            "attributes"
+                        ], 
+                        "default": "undefined", 
+                        "displayGroup": "Arnold", 
+                        "documentation": "Arnold array element type identifier.", 
+                        "type": "token"
+                    }, 
                     "paramType": {
                         "appliesTo": [
                             "attributes"
                         ], 
                         "default": "undefined", 
                         "displayGroup": "Arnold", 
-                        "documentation": "Arnold type identifier.", 
+                        "documentation": "Arnold parameter type identifier.", 
                         "type": "token"
                     }
                 }, 

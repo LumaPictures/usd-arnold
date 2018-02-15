@@ -123,6 +123,7 @@ void wrapUsdAiTokens()
     _AddToken(cls, "dataType", UsdAiTokens->dataType);
     _AddToken(cls, "driver", UsdAiTokens->driver);
     _AddToken(cls, "edge_length", UsdAiTokens->edge_length);
+    _AddToken(cls, "elemType", UsdAiTokens->elemType);
     _AddToken(cls, "filename", UsdAiTokens->filename);
     _AddToken(cls, "filter", UsdAiTokens->filter);
     _AddToken(cls, "flatness", UsdAiTokens->flatness);

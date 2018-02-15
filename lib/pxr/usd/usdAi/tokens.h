@@ -298,6 +298,10 @@ struct UsdAiTokensType {
     /// 
     /// Possible value for UsdAiShapeAPI::GetAiSubdiv_adaptive_metricAttr()
     const TfToken edge_length;
+    /// \brief "elemType"
+    /// 
+    /// Stores the arnold parameter type for an array.
+    const TfToken elemType;
     /// \brief "filename"
     /// 
     /// UsdAiVolume
@@ -356,7 +360,7 @@ struct UsdAiTokensType {
     const TfToken object;
     /// \brief "paramType"
     /// 
-    /// Stores the arnold parameter type for a parameter when remapping is non-trivial.
+    /// Stores the arnold parameter type for a parameter.
     const TfToken paramType;
     /// \brief "path"
     /// 

@@ -24,8 +24,10 @@ def "GLOBAL" (
                                 parameters on nodes using the AiNodeAPI."""
             }
             dictionary paramType = {
-                string doc = """Stores the arnold parameter type for a parameter
-                                when remapping is non-trivial."""
+                string doc = """Stores the arnold parameter type for a parameter."""
+            }
+            dictionary elemType = {
+                string doc = """Stores the arnold parameter type for an array."""
             }
         }
     }

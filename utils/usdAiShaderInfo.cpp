@@ -155,19 +155,38 @@ int main(int argc, char* argv[]) {
 
         while (!AiParamIteratorFinished(paramIter)) {
             const auto* pentry = AiParamIteratorGetNext(paramIter);
-            const auto pentryType = AiParamGetType(pentry);
+            const auto paramType = AiParamGetType(pentry);
 
-            const auto* conversion = AiShaderExport::get_default_value_conversion(pentryType);
-            if (conversion == nullptr) { continue; }
-            auto attr = prim.CreateAttribute(
-                TfToken(AiParamGetName(pentry).c_str()),
-                conversion->type, false);
+            UsdAttribute attr;
+            if (paramType == AI_TYPE_ARRAY) {
+                const auto* defaultValue = AiParamGetDefault(pentry);
+                if (defaultValue == nullptr) { continue; }
+                const auto* array = defaultValue->ARRAY();
+                if (array == nullptr) { continue; }
+                const auto elemType = AiArrayGetType(array);
+                const auto* conversion = AiShaderExport::get_array_conversion(elemType);
+                if (conversion == nullptr) { continue; }
+                attr = prim.CreateAttribute(
+                    TfToken(AiParamGetName(pentry).c_str()),
+                    conversion->type, false);
 
-            if (conversion->f != nullptr) {
-                attr.Set(conversion->f(*AiParamGetDefault(pentry), pentry));
+                if (conversion->f != nullptr) {
+                    attr.Set(conversion->f(array));
+                }
+                attr.SetMetadata(UsdAiTokens->elemType, UsdAiNodeAPI::GetParamTypeTokenFromType(elemType));
+            } else {
+                const auto* conversion = AiShaderExport::get_default_value_conversion(paramType);
+                if (conversion == nullptr) { continue; }
+                attr = prim.CreateAttribute(
+                    TfToken(AiParamGetName(pentry).c_str()),
+                    conversion->type, false);
+
+                if (conversion->f != nullptr) {
+                    attr.Set(conversion->f(*AiParamGetDefault(pentry), pentry));
+                }
             }
 
-            attr.SetMetadata(UsdAiTokens->paramType, UsdAiNodeAPI::GetParamTypeTokenFromType(pentryType));
+            attr.SetMetadata(UsdAiTokens->paramType, UsdAiNodeAPI::GetParamTypeTokenFromType(paramType));
 
             auto* metaIter = AiNodeEntryGetMetaDataIterator(nentry, AiParamGetName(pentry));
 

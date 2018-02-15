@@ -6,6 +6,7 @@
 class AtNode;
 class AtParamEntry;
 class AtParamValue;
+class AtArray;
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -66,6 +67,17 @@ public:
 
     static const DefaultValueConversion*
     get_default_value_conversion(uint8_t type);
+
+    struct ArrayConversion {
+        const SdfValueTypeName& type;
+        std::function<VtValue(const AtArray*)> f;
+
+        ArrayConversion(const SdfValueTypeName& _type, std::function<VtValue(const AtArray*)> _f) :
+        type(_type), f(std::move(_f)) { }
+    };
+
+    static const ArrayConversion*
+    get_array_conversion(uint8_t type);
 protected:
     const UsdStagePtr m_stage;
     SdfPath m_shaders_scope;
