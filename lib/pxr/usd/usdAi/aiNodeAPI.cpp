@@ -252,7 +252,7 @@ template <typename I, typename V> inline
 V _getValueFromSortedTupleVector(
     const std::vector<std::tuple<I, V>>& v,
     const I& i, const V& dv,
-    const std::function<bool(const I&, const I&)>& sf = [](const I& a, const I& b) -> bool { return a < b; }) {
+    std::function<bool(const I&, const I&)> sf = [](const I& a, const I& b) -> bool { return a < b; }) {
     const auto it = std::lower_bound(
         v.begin(), v.end(),
         _m(i, dv), [&sf](const std::tuple<I, V>& a, const std::tuple<I, V>& b) -> bool {
