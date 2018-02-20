@@ -2,6 +2,7 @@
 // The plugin works without this.
 
 #include <SYS/SYS_Version.h>
+#include <UT/UT_DSOVersion.h>
 #include <OP/OP_OperatorTable.h>
 
 extern "C" {
