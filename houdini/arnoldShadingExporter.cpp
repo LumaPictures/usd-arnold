@@ -90,7 +90,6 @@ UsdStagePtr getArnoldShaderDesc() {
 }
 
 TF_REGISTRY_FUNCTION_WITH_TAG(GusdShadingModeRegistry, rib) {
-    std::cerr << "Registering usd arnold houdini shading mode exporter." << std::endl;
     GusdShadingModeRegistry::getInstance().registerExporter(
         "arnold", "Arnold", [](
             OP_Node* opNode,
