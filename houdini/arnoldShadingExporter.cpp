@@ -63,7 +63,12 @@ findFirstChildrenOfType(OP_Node* op, const char* type) {
 UsdStagePtr getArnoldShaderDesc() {
     static UsdStageRefPtr shaderDescCache = nullptr;
     if (shaderDescCache == nullptr) {
-        FILE* pipe = popen("usdAiShaderInfo --cout", "r");
+        std::stringstream command; command << "usdAiShaderInfo --count";
+        auto* HTOA_PATH = getenv("HTOA_PATH");
+        if (HTOA_PATH != nullptr) {
+             command << " --meta " << HTOA_PATH << "/arnold/metadata";
+        }
+        FILE* pipe = popen(command.str().c_str(), "r");
         if (pipe != nullptr) {
             // TODO: optimize!
             std::stringstream result;
