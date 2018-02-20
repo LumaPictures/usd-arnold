@@ -74,8 +74,6 @@ UsdStagePtr getArnoldShaderDesc() {
                 }
             }
             pclose(pipe);
-            std::cerr << "Shader definitions:";
-            std::cerr << result.str() << std::endl;
             shaderDescCache = UsdStage::CreateInMemory(".usda");
             shaderDescCache->GetRootLayer()->ImportFromString(result.str());
 
@@ -87,6 +85,7 @@ UsdStagePtr getArnoldShaderDesc() {
 }
 
 TF_REGISTRY_FUNCTION_WITH_TAG(GusdShadingModeRegistry, rib) {
+    std::cerr << "Registering usd arnold houdini shading mode exporter." << std::endl;
     GusdShadingModeRegistry::getInstance().registerExporter(
         "arnold", "Arnold", [](
             OP_Node* opNode,
@@ -96,10 +95,6 @@ TF_REGISTRY_FUNCTION_WITH_TAG(GusdShadingModeRegistry, rib) {
             const std::string& shaderOutDir) {
             auto shaderDesc = getArnoldShaderDesc();
             if (shaderDesc == nullptr) { return; }
-            std::string ex;
-            shaderDesc->GetRootLayer()->ExportToString(&ex);
-            std::fstream fs("/ssd/usd/shaders.usda", std::ios::out);
-            fs << ex;
 
             for (const auto& assignment: houMaterialMap) {
                 // Initially we only care about assigned shops.
