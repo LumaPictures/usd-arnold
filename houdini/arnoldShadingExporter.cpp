@@ -3,6 +3,8 @@
 #include <VOP/VOP_Node.h>
 #include <SHOP/SHOP_Node.h>
 
+#include <pxr/usd/usd/stage.h>
+
 #include <pxr/usd/usdShade/material.h>
 #include <pxr/usd/usdShade/materialBindingAPI.h>
 
@@ -14,44 +16,74 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
-    SdfPath
-    getPathNoFirstSlashFromOp(OP_Node* op) {
-        const auto* pathStr = op->getFullPath().c_str();
-        // We got an invalid path name. Not sure if this is even possible
-        // We need to skip the first / from the path or else USD won't be able to append it.
-        return (pathStr == nullptr || pathStr[0] != '/') ? SdfPath() : SdfPath(pathStr + 1);
-    }
 
-    SdfPath
-    exportNode(const UsdStagePtr& stage, const SdfPath& looksPath, VOP_Node* vop) {
-        const auto vopTypeName = vop->getOperator()->getName();
-        const auto inShaderPath = getPathNoFirstSlashFromOp(vop);
-        if (inShaderPath.IsEmpty()) { return SdfPath(); }
-        const auto outShaderPath = looksPath.AppendPath(inShaderPath);
-        // We already exported the shader.
-        if (stage->GetPrimAtPath(outShaderPath).IsValid()) { return outShaderPath; }
-        static constexpr auto aiShaderPrefix = "arnold::";
-        static constexpr auto aiShaderPrefixLength = strlen(aiShaderPrefix);
-        // We only export arnold nodes, and they should start with arnold::
-        if (!vopTypeName.startsWith(aiShaderPrefix)) { return SdfPath(); }
-        // Yes! I know I should use substring, but that api on UT_String is so ugly.
-        const std::string aiTypeName(vopTypeName.c_str() + aiShaderPrefixLength);
-        const auto aiShader = UsdAiShader::Define(stage, outShaderPath);
-        aiShader.CreateIdAttr().Set(TfToken(aiTypeName));
-        return outShaderPath;
-    }
+SdfPath
+getPathNoFirstSlashFromOp(OP_Node* op) {
+    const auto* pathStr = op->getFullPath().c_str();
+    // We got an invalid path name. Not sure if this is even possible
+    // We need to skip the first / from the path or else USD won't be able to append it.
+    return (pathStr == nullptr || pathStr[0] != '/') ? SdfPath() : SdfPath(pathStr + 1);
+}
 
-    OP_Node*
-    findFirstChildrenOfType(OP_Node* op, const char* type) {
-        const auto nchildren = op->getNchildren();
-        for (auto cid = decltype(nchildren){0}; cid < nchildren; ++cid) {
-            auto* ch = op->getChild(cid);
-            if (ch->getOperator()->getName() == "arnold_material") {
-                return ch;
-            }
+SdfPath
+exportNode(const UsdStagePtr& stage, const SdfPath& looksPath, VOP_Node* vop) {
+    const auto vopTypeName = vop->getOperator()->getName();
+    const auto inShaderPath = getPathNoFirstSlashFromOp(vop);
+    if (inShaderPath.IsEmpty()) { return SdfPath(); }
+    const auto outShaderPath = looksPath.AppendPath(inShaderPath);
+    // We already exported the shader.
+    if (stage->GetPrimAtPath(outShaderPath).IsValid()) { return outShaderPath; }
+    static constexpr auto aiShaderPrefix = "arnold::";
+    static constexpr auto aiShaderPrefixLength = strlen(aiShaderPrefix);
+    // We only export arnold nodes, and they should start with arnold::
+    if (!vopTypeName.startsWith(aiShaderPrefix)) { return SdfPath(); }
+    // Yes! I know I should use substring, but that api on UT_String is so ugly.
+    const std::string aiTypeName(vopTypeName.c_str() + aiShaderPrefixLength);
+    const auto aiShader = UsdAiShader::Define(stage, outShaderPath);
+    aiShader.CreateIdAttr().Set(TfToken(aiTypeName));
+    return outShaderPath;
+}
+
+OP_Node*
+findFirstChildrenOfType(OP_Node* op, const char* type) {
+    const auto nchildren = op->getNchildren();
+    for (auto cid = decltype(nchildren){0}; cid < nchildren; ++cid) {
+        auto* ch = op->getChild(cid);
+        if (ch->getOperator()->getName() == "arnold_material") {
+            return ch;
         }
-        return nullptr;
     }
+    return nullptr;
+}
+
+// We need the description of all the arnold parameters. We want to avoid
+// issues with the arnold universe and multiple threads accessing / creating
+// Arnold universes so we cache the description of the shaders into a simplified
+// USD tree.
+UsdStagePtr getArnoldShaderDesc() {
+    static UsdStageRefPtr shaderDescCache = nullptr;
+    if (shaderDescCache == nullptr) {
+        FILE* pipe = popen("usdAiShaderInfo --cout", "r");
+        if (pipe != nullptr) {
+            // TODO: optimize!
+            std::stringstream result;
+            std::array<char, 128> buffer;
+            while (!feof(pipe)) {
+                if (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
+                    result << buffer.data();
+                }
+            }
+            pclose(pipe);
+            std::cerr << "Shader definitions:";
+            std::cerr << result.str() << std::endl;
+            shaderDescCache = UsdStage::CreateInMemory(".usda");
+            shaderDescCache->GetRootLayer()->ImportFromString(result.str());
+
+        }
+    }
+    return shaderDescCache;
+}
+
 }
 
 TF_REGISTRY_FUNCTION_WITH_TAG(GusdShadingModeRegistry, rib) {
@@ -62,6 +94,12 @@ TF_REGISTRY_FUNCTION_WITH_TAG(GusdShadingModeRegistry, rib) {
             const SdfPath& looksPath,
             const GusdShadingModeRegistry::HouMaterialMap& houMaterialMap,
             const std::string& shaderOutDir) {
+            auto shaderDesc = getArnoldShaderDesc();
+            if (shaderDesc == nullptr) { return; }
+            std::string ex;
+            shaderDesc->GetRootLayer()->ExportToString(&ex);
+            std::fstream fs("/ssd/usd/shaders.usda", std::ios::out);
+            fs << ex;
 
             for (const auto& assignment: houMaterialMap) {
                 // Initially we only care about assigned shops.
