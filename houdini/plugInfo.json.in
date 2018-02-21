@@ -2,9 +2,9 @@
     "Plugins": [
         {
             "Info" : {
-                "Usdhoudini" : {
+                "UsdHoudini" : {
                     "ShadingModePlugin" : {
-                        "houdiniPlugin" : "@PLUGIN_NAME@"
+                        "houdiniPlugin" : true
                     }
                 }
             },
