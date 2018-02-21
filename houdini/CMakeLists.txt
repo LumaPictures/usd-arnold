@@ -38,3 +38,9 @@ target_compile_options(${PLUGIN_NAME} PRIVATE
 
 install(TARGETS ${PLUGIN_NAME}
         DESTINATION plugin)
+
+set(PLUGINFO_OUT ${CMAKE_CURRENT_BINARY_DIR}/plugInfo.json)
+configure_file(plugInfo.json.in ${PLUGINFO_OUT})
+
+install(FILES ${PLUGINFO_OUT}
+        DESTINATION .)

@@ -1,0 +1,16 @@
+{
+    "Plugins": [
+        {
+            "Info" : {
+                "UsdHoudini" : {
+                    "ShadingModePlugin" : {
+                        "houdiniPlugin" : true
+                    }
+                }
+            },
+            "LibraryPath": "plugin/@PLUGIN_NAME@.so",
+            "Name": "@PLUGIN_NAME@",
+            "Type": "library"
+        }
+    ]
+}
