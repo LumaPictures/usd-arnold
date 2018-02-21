@@ -44,4 +44,3 @@ configure_file(plugInfo.json.in ${PLUGINFO_OUT})
 
 install(FILES ${PLUGINFO_OUT}
         DESTINATION .)
-        
