@@ -5,11 +5,15 @@
 
 #include <pxr/usd/usd/stage.h>
 
+#include "pxr/usd/usdShade/connectableAPI.h"
+#include "pxr/usd/usdShade/input.h"
 #include <pxr/usd/usdShade/material.h>
 #include <pxr/usd/usdShade/materialBindingAPI.h>
 
 #include <pxr/usd/usdAi/aiMaterialAPI.h>
+#include <pxr/usd/usdAi/aiNodeAPI.h>
 #include <pxr/usd/usdAi/aiShader.h>
+#include <pxr/usd/usdAi/tokens.h>
 
 #include <ai.h>
 
@@ -25,8 +29,35 @@ getPathNoFirstSlashFromOp(OP_Node* op) {
     return (pathStr == nullptr || pathStr[0] != '/') ? SdfPath() : SdfPath(pathStr + 1);
 }
 
+template <typename T, typename H>
+VtValue readSingleValue(const PRM_Parm* parm) {
+    T v = T{0};
+    parm->getValue(0.0f, v, 0, SYSgetSTID());
+    return VtValue(static_cast<H>(v));
+};
+
+template <>
+VtValue readSingleValue<int32, bool>(const PRM_Parm* parm) {
+    int32 v = 0;
+    parm->getValue(0.0f, v, 0, SYSgetSTID());
+    return VtValue(v != 0);
+};
+
+// All these doubles and we know the GfVecxd layouts, so
+// we just use the internal structures. Also, no traits...
+template <typename T, typename H>
+VtValue readTupleValue(const PRM_Parm* parm) {
+    T v;
+    parm->getValues(0, v.data(), SYSgetSTID());
+    return VtValue(H(v));
+};
+
 SdfPath
-exportNode(const UsdStagePtr& stage, const SdfPath& looksPath, VOP_Node* vop) {
+exportNode(const UsdStagePtr& stage, const UsdStagePtr& descStage, const SdfPath& looksPath, VOP_Node* vop) {
+    auto getShaderDesc = [&descStage] (const std::string& typeName) -> UsdPrim {
+        return descStage->GetPrimAtPath(SdfPath("/" + typeName));
+    };
+
     const auto vopTypeName = vop->getOperator()->getName();
     const auto inShaderPath = getPathNoFirstSlashFromOp(vop);
     if (inShaderPath.IsEmpty()) { return SdfPath(); }
@@ -39,8 +70,93 @@ exportNode(const UsdStagePtr& stage, const SdfPath& looksPath, VOP_Node* vop) {
     if (!vopTypeName.startsWith(aiShaderPrefix)) { return SdfPath(); }
     // Yes! I know I should use substring, but that api on UT_String is so ugly.
     const std::string aiTypeName(vopTypeName.c_str() + aiShaderPrefixLength);
-    const auto aiShader = UsdAiShader::Define(stage, outShaderPath);
+    auto aiShader = UsdAiShader::Define(stage, outShaderPath);
     aiShader.CreateIdAttr().Set(TfToken(aiTypeName));
+
+    auto desc = getShaderDesc(aiTypeName);
+    if (!desc.IsValid()) { return SdfPath(); }
+    UsdAiNodeAPI descAPI(desc);
+
+    auto getParamDesc = [&desc] (const char* paramName) -> UsdAttribute {
+        return desc.GetAttribute(TfToken(paramName));
+    };
+
+    auto getParamType = [] (const UsdAttribute& attr) -> int {
+        TfToken token;
+        if (!attr.GetMetadata(UsdAiTokens->paramType, &token)) {
+            return AI_TYPE_NONE;
+        } else {
+            return UsdAiNodeAPI::GetParamTypeFromToken(token);
+        }
+    };
+
+    struct ParmConversion {
+        SdfValueTypeName type;
+        std::function<VtValue(const PRM_Parm*)> fn;
+
+        ParmConversion(const SdfValueTypeName& _type, decltype(fn) _fn) :
+            type(_type), fn(std::move(_fn)) { }
+    };
+
+    static const std::unordered_map<int, ParmConversion> parmConversions = {
+        {AI_TYPE_BYTE, {SdfValueTypeNames->UChar, readSingleValue<int32, uint8_t>}},
+        {AI_TYPE_INT, {SdfValueTypeNames->Int, readSingleValue<int32, int32_t>}},
+        {AI_TYPE_UINT, {SdfValueTypeNames->UInt, readSingleValue<int32, uint32_t>}},
+        {AI_TYPE_BOOLEAN, {SdfValueTypeNames->Bool, readSingleValue<int32, bool>}},
+        {AI_TYPE_FLOAT, {SdfValueTypeNames->Float, readSingleValue<fpreal, float>}},
+        {AI_TYPE_RGB, {SdfValueTypeNames->Color3f, readTupleValue<GfVec3d, GfVec3f>}},
+        {AI_TYPE_RGBA, {SdfValueTypeNames->Color4f, readTupleValue<GfVec4d, GfVec4f>}},
+        {AI_TYPE_VECTOR, {SdfValueTypeNames->Vector3f, readTupleValue<GfVec3d, GfVec3f>}},
+        {AI_TYPE_VECTOR2, {SdfValueTypeNames->Float2, readTupleValue<GfVec2d, GfVec2f>}},
+        {AI_TYPE_STRING, {SdfValueTypeNames->String, nullptr}},
+        {AI_TYPE_POINTER, {SdfValueTypeNames->String, nullptr}},
+        {AI_TYPE_MATRIX, {SdfValueTypeNames->Matrix4d, nullptr}},
+        {AI_TYPE_ENUM, {SdfValueTypeNames->String, nullptr}},
+        {AI_TYPE_CLOSURE, {SdfValueTypeNames->String, nullptr}},
+        {AI_TYPE_USHORT, {SdfValueTypeNames->UInt, readSingleValue<int32, uint16_t>}},
+        {AI_TYPE_HALF, {SdfValueTypeNames->Half, readSingleValue<fpreal, GfHalf>}},
+    };
+
+    auto getParmConversion = [] (const int type) -> const ParmConversion* {
+        const auto it = parmConversions.find(type);
+        if (it == parmConversions.end()) {
+            return nullptr;
+        }
+        return &it->second;
+    };
+
+    auto isBlacklisted = [](const std::vector<UsdAttribute>& metas) -> bool {
+        for (const auto& meta: metas) {
+            const static TfToken blacklist("blacklist");
+            bool v = false;
+            if (UsdAiNodeAPI::GetMetadataNameFromAttr(meta) == blacklist
+                && meta.Get(&v) && v) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    const auto* parms = vop->getParmList();
+    const auto parmCount = parms->getEntries();
+    for (auto pid = decltype(parmCount){0}; pid < parmCount; ++pid) {
+        const auto* parm = parms->getParmPtr(pid);
+        const auto inIdx = vop->getInputFromName(parm->getToken());
+        const auto isConnected = inIdx >= 0 && vop->isConnected(inIdx, true);
+        if (isConnected || !parm->isTrueFactoryDefault()) {
+            auto paramDesc = getParamDesc(parm->getToken());
+            if (!paramDesc.IsValid()) { continue; }
+            // Checking if the param is blacklisted
+            auto metadatas = descAPI.GetMetadataForAttribute(paramDesc);
+            if (isBlacklisted(metadatas)) { continue; }
+            const auto* conversion = getParmConversion(getParamType(paramDesc));
+            if (conversion == nullptr) { continue; }
+            auto outAttr = aiShader.CreateInput(TfToken(parm->getToken()), conversion->type);
+            if (conversion->fn != nullptr) {
+                outAttr.Set(conversion->fn(parm));
+            }
+        }
+    }
     return outShaderPath;
 }
 
@@ -143,7 +259,7 @@ TF_REGISTRY_FUNCTION_WITH_TAG(GusdShadingModeRegistry, rib) {
                     const auto idx = vop->getInputFromName(materialParam.first);
                     if (!vop->isConnected(idx, true)) { continue; }
                     auto* inputVOP = vop->findSimpleInput(idx);
-                    auto inputPath = exportNode(stage, looksPath, inputVOP);
+                    auto inputPath = exportNode(stage, shaderDesc, looksPath, inputVOP);
                     if (!inputPath.IsEmpty()) {
                         ((aiMaterialAPI).*(materialParam.second))().AddTarget(inputPath);
                     }
