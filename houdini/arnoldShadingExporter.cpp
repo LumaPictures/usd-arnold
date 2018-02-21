@@ -253,7 +253,7 @@ TF_REGISTRY_FUNCTION_WITH_TAG(GusdShadingModeRegistry, rib) {
                     decltype(&UsdAiMaterialAPI::CreateSurfaceRel)>> materialParams = {
                     {"surface", &UsdAiMaterialAPI::CreateSurfaceRel},
                     {"displacement", &UsdAiMaterialAPI::CreateDisplacementRel},
-                    // {"volume", &UsdAiMaterialAPI::CreateVolumeRel} TODO: need volume relationship
+                    {"volume", &UsdAiMaterialAPI::CreateVolumeRel}
                 };
                 for (const auto& materialParam: materialParams) {
                     const auto idx = vop->getInputFromName(materialParam.first);
