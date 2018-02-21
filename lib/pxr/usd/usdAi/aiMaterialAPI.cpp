@@ -154,6 +154,19 @@ UsdAiMaterialAPI::CreateDisplacementRel() const
                        /* custom = */ false);
 }
 
+UsdRelationship
+UsdAiMaterialAPI::GetVolumeRel() const
+{
+    return GetPrim().GetRelationship(UsdAiTokens->aiVolume);
+}
+
+UsdRelationship
+UsdAiMaterialAPI::CreateVolumeRel() const
+{
+    return GetPrim().CreateRelationship(UsdAiTokens->aiVolume,
+                       /* custom = */ false);
+}
+
 /*static*/
 const TfTokenVector&
 UsdAiMaterialAPI::GetSchemaAttributeNames(bool includeInherited)

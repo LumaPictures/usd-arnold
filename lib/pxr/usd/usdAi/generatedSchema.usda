@@ -194,6 +194,7 @@ class "AiMaterialAPI" (
 {
     rel ai:displacement
     rel ai:surface
+    rel ai:volume
 }
 
 class AiShader "AiShader" (

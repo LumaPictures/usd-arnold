@@ -473,6 +473,12 @@ class "AiMaterialAPI" (
             string apiName = "displacement"
         }
     )
+
+    rel ai:volume (
+        customData = {
+            string apiName = "volume"
+        }
+    )
 }
 
 class AiShader "AiShader" (

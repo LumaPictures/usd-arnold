@@ -114,6 +114,7 @@ void wrapUsdAiTokens()
     _AddToken(cls, "aiVisibilitySpecular_transmit", UsdAiTokens->aiVisibilitySpecular_transmit);
     _AddToken(cls, "aiVisibilitySubsurface", UsdAiTokens->aiVisibilitySubsurface);
     _AddToken(cls, "aiVisibilityVolume", UsdAiTokens->aiVisibilityVolume);
+    _AddToken(cls, "aiVolume", UsdAiTokens->aiVolume);
     _AddToken(cls, "aRRAY", UsdAiTokens->aRRAY);
     _AddToken(cls, "auto_", UsdAiTokens->auto_);
     _AddToken(cls, "bOOL", UsdAiTokens->bOOL);

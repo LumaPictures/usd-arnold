@@ -161,6 +161,20 @@ public:
     UsdRelationship CreateDisplacementRel() const;
 
 public:
+    // --------------------------------------------------------------------- //
+    // VOLUME 
+    // --------------------------------------------------------------------- //
+    /// 
+    ///
+    USDAI_API
+    UsdRelationship GetVolumeRel() const;
+
+    /// See GetVolumeRel(), and also 
+    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create
+    USDAI_API
+    UsdRelationship CreateVolumeRel() const;
+
+public:
     // ===================================================================== //
     // Feel free to add custom code below this line, it will be preserved by 
     // the code generator. 

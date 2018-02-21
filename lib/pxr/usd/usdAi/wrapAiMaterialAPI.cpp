@@ -100,6 +100,11 @@ void wrapUsdAiMaterialAPI()
              &This::GetDisplacementRel)
         .def("CreateDisplacementRel",
              &This::CreateDisplacementRel)
+        
+        .def("GetVolumeRel",
+             &This::GetVolumeRel)
+        .def("CreateVolumeRel",
+             &This::CreateVolumeRel)
     ;
 
     _CustomWrapCode(cls);

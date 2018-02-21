@@ -262,6 +262,10 @@ struct UsdAiTokensType {
     /// 
     /// UsdAiShapeAPI
     const TfToken aiVisibilityVolume;
+    /// \brief "ai:volume"
+    /// 
+    /// UsdAiMaterialAPI
+    const TfToken aiVolume;
     /// \brief "ARRAY"
     /// 
     /// Possible value for UsdAiAOV::GetDataTypeAttr()
