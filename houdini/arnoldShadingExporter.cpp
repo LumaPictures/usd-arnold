@@ -5,8 +5,9 @@
 
 #include <pxr/usd/usd/stage.h>
 
-#include "pxr/usd/usdShade/connectableAPI.h"
-#include "pxr/usd/usdShade/input.h"
+#include <pxr/usd/usdShade/connectableAPI.h>
+#include <pxr/usd/usdShade/input.h>
+#include <pxr/usd/usdShade/output.h>
 #include <pxr/usd/usdShade/material.h>
 #include <pxr/usd/usdShade/materialBindingAPI.h>
 
@@ -181,6 +182,43 @@ exportNode(const UsdStagePtr& stage, const UsdStagePtr& descStage, const SdfPath
                 const auto inParamIdx = inputVop->whichOutputIs(vop, paramIdx);
                 auto inShaderPath = exportNode(stage, descStage, looksPath, inputVop);
                 if (inShaderPath.IsEmpty()) { continue; }
+                UT_String inputName;
+                inputVop->getOutputName(inputName, inParamIdx);
+                // Parameters in houdini named the same as the arnold type.
+                // Same goes for components, so we can significantly simplify the code compared
+                // to AiShaderExport.
+                static const std::unordered_map<std::string, SdfValueTypeName> inputTypes = {
+                    {"rgb", SdfValueTypeNames->Color3f},
+                    {"rgba", SdfValueTypeNames->Color4f},
+                    {"vector", SdfValueTypeNames->Vector3f},
+                    {"vector2", SdfValueTypeNames->Float2},
+                    {"string", SdfValueTypeNames->String},
+                    {"float", SdfValueTypeNames->Float},
+                    {"int", SdfValueTypeNames->Int},
+                };
+
+                static const std::unordered_set<std::string> componentNames = {
+                    "r", "g", "b", "a", "x", "y", "z"
+                };
+
+                UsdShadeConnectableAPI inAPI(stage->GetPrimAtPath(inShaderPath));
+                if (!inAPI) { continue; }
+                const auto inputType = inputTypes.find(inputName.c_str());
+                TfToken inputNameToken(inputName.c_str());
+                if (inputType != inputTypes.end()) {
+                    auto in = inAPI.GetOutput(inputNameToken);
+                    if (!in) {
+                        in = inAPI.CreateOutput(inputNameToken, inputType->second);
+                    }
+                    UsdShadeConnectableAPI::ConnectToSource(outAttr, in);
+                // All the components are float in arnold.
+                } else if (componentNames.find(inputName.c_str()) != componentNames.end()) {
+                    auto in = inAPI.GetOutput(inputNameToken);
+                    if (!in) {
+                        in = inAPI.CreateOutput(inputNameToken, SdfValueTypeNames->Float);
+                    }
+                    UsdShadeConnectableAPI::ConnectToSource(outAttr, in);
+                }
             }
         }
     }
