@@ -117,7 +117,11 @@ exportNode(const UsdStagePtr& stage, const UsdStagePtr& descStage, const SdfPath
         {AI_TYPE_VECTOR2, {SdfValueTypeNames->Float2, readTupleValue<GfVec2d, GfVec2f>}},
         {AI_TYPE_STRING, {SdfValueTypeNames->String, readStringValue}},
         {AI_TYPE_POINTER, {SdfValueTypeNames->String, nullptr}},
-        {AI_TYPE_MATRIX, {SdfValueTypeNames->Matrix4d, nullptr}},
+        {AI_TYPE_MATRIX, {SdfValueTypeNames->Matrix4d, [] (const PRM_Parm* parm) -> VtValue {
+            GfMatrix4d v;
+            parm->getValues(0.0f, v.GetArray(), SYSgetSTID());
+            return VtValue(v);
+        }}},
         {AI_TYPE_ENUM, {SdfValueTypeNames->String, readStringValue}},
         {AI_TYPE_CLOSURE, {SdfValueTypeNames->String, nullptr}},
         {AI_TYPE_USHORT, {SdfValueTypeNames->UInt, readSingleValue<int32, uint16_t>}},
@@ -230,7 +234,7 @@ findFirstChildrenOfType(OP_Node* op, const char* type) {
     const auto nchildren = op->getNchildren();
     for (auto cid = decltype(nchildren){0}; cid < nchildren; ++cid) {
         auto* ch = op->getChild(cid);
-        if (ch->getOperator()->getName() == "arnold_material") {
+        if (ch->getOperator()->getName() == type) {
             return ch;
         }
     }
