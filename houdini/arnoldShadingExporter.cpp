@@ -22,7 +22,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
 
-SdfPath
+SdfPath inline
 getPathNoFirstSlashFromOp(OP_Node* op) {
     const auto* pathStr = op->getFullPath().c_str();
     // We got an invalid path name. Not sure if this is even possible
@@ -61,6 +61,28 @@ VtValue readTupleValue(const PRM_Parm* parm) {
     return VtValue(H(getTupleValue<T>(parm)));
 };
 
+template <typename T, typename H> inline
+VtValue readSingleValues(const PRM_Parm* parm) {
+    VtArray<H> ret;
+    const auto count = parm->getMultiParmCount();
+    ret.resize(static_cast<unsigned int>(count));
+    for (auto i = decltype(count){0}; i < count; ++i) {
+        ret[i] = H(getSingleValue<T>(parm->getMultiParm(i)));
+    }
+    return VtValue(ret);
+};
+
+template <typename T, typename H> inline
+VtValue readTupleValues(const PRM_Parm* parm) {
+    VtArray<H> ret;
+    const auto count = parm->getMultiParmCount();
+    ret.resize(static_cast<unsigned int>(count));
+    for (auto i = decltype(count){0}; i < count; ++i) {
+        ret[i] = H(getTupleValue<T>(parm->getMultiParm(i)));
+    }
+    return VtValue(ret);
+};
+
 SdfPath
 exportNode(const UsdStagePtr& stage, const UsdStagePtr& descStage, const SdfPath& looksPath, VOP_Node* vop) {
     auto getShaderDesc = [&descStage] (const std::string& typeName) -> UsdPrim {
@@ -90,9 +112,9 @@ exportNode(const UsdStagePtr& stage, const UsdStagePtr& descStage, const SdfPath
         return desc.GetAttribute(TfToken(paramName));
     };
 
-    auto getParamType = [] (const UsdAttribute& attr) -> int {
+    auto getTypeMetadata = [] (const UsdAttribute& attr, const TfToken& meta) -> int {
         TfToken token;
-        if (!attr.GetMetadata(UsdAiTokens->paramType, &token)) {
+        if (!attr.GetMetadata(meta, &token)) {
             return AI_TYPE_NONE;
         } else {
             return UsdAiNodeAPI::GetParamTypeFromToken(token);
@@ -111,6 +133,18 @@ exportNode(const UsdStagePtr& stage, const UsdStagePtr& descStage, const SdfPath
         UT_String v;
         parm->getValue(0, v, 0, true, SYSgetSTID());
         return VtValue(std::string(v.c_str()));
+    };
+
+    auto readStringValues = [] (const PRM_Parm* parm) -> VtValue {
+        const auto count = parm->getMultiParmCount();
+        VtStringArray ret(static_cast<unsigned int>(count));
+        for (auto i = decltype(count){0}; i < count; ++i) {
+            UT_String v;
+            parm->getMultiParm(i)->getValue(0, v, 0, true, SYSgetSTID());
+            ret[i] = v.c_str();
+        }
+
+        return VtValue(ret);
     };
 
     static const std::unordered_map<int, ParmConversion> parmConversions = {
@@ -136,9 +170,35 @@ exportNode(const UsdStagePtr& stage, const UsdStagePtr& descStage, const SdfPath
         {AI_TYPE_HALF, {SdfValueTypeNames->Half, readSingleValue<fpreal, GfHalf>}},
     };
 
-    auto getParmConversion = [] (const int type) -> const ParmConversion* {
-        const auto it = parmConversions.find(type);
-        if (it == parmConversions.end()) {
+    static const std::unordered_map<int, ParmConversion> arrayParmConversions = {
+        {AI_TYPE_BYTE, {SdfValueTypeNames->UCharArray, readSingleValues<int32, uint8_t>}},
+        {AI_TYPE_INT, {SdfValueTypeNames->IntArray, readSingleValues<int32, int32_t>}},
+        {AI_TYPE_UINT, {SdfValueTypeNames->UIntArray, readSingleValues<int32, uint32_t>}},
+        {AI_TYPE_BOOLEAN, {SdfValueTypeNames->BoolArray, readSingleValues<int32, bool>}},
+        {AI_TYPE_FLOAT, {SdfValueTypeNames->FloatArray, readSingleValues<fpreal, float>}},
+        {AI_TYPE_RGB, {SdfValueTypeNames->Color3fArray, readTupleValues<GfVec3d, GfVec3f>}},
+        {AI_TYPE_RGBA, {SdfValueTypeNames->Color4fArray, readTupleValues<GfVec4d, GfVec4f>}},
+        {AI_TYPE_VECTOR, {SdfValueTypeNames->Vector3fArray, readTupleValues<GfVec3d, GfVec3f>}},
+        {AI_TYPE_VECTOR2, {SdfValueTypeNames->Float2Array, readTupleValues<GfVec2d, GfVec2f>}},
+        {AI_TYPE_STRING, {SdfValueTypeNames->String, readStringValues}},
+        {AI_TYPE_POINTER, {SdfValueTypeNames->String, nullptr}},
+        {AI_TYPE_MATRIX, {SdfValueTypeNames->Matrix4d, [] (const PRM_Parm* parm) -> VtValue {
+            const auto count = parm->getMultiParmCount();
+            VtMatrix4dArray ret(static_cast<unsigned int>(count));
+            for (auto i = decltype(count){0}; i < count; ++i) {
+                parm->getMultiParm(i)->getValues(0.0f, ret[i].GetArray(), SYSgetSTID());
+            }
+            return VtValue(ret);
+        }}},
+        {AI_TYPE_ENUM, {SdfValueTypeNames->StringArray, readStringValues}},
+        {AI_TYPE_CLOSURE, {SdfValueTypeNames->StringArray, nullptr}},
+        {AI_TYPE_USHORT, {SdfValueTypeNames->UIntArray, readSingleValues<int32, uint16_t>}},
+        {AI_TYPE_HALF, {SdfValueTypeNames->HalfArray, readSingleValues<fpreal, GfHalf>}},
+    };
+
+    auto getParmConversion = [] (const int type, decltype(parmConversions)& conversions) -> const ParmConversion* {
+        const auto it = conversions.find(type);
+        if (it == conversions.end()) {
             return nullptr;
         }
         return &it->second;
@@ -221,7 +281,9 @@ exportNode(const UsdStagePtr& stage, const UsdStagePtr& descStage, const SdfPath
             // Checking if the param is blacklisted
             auto metadatas = descAPI.GetMetadataForAttribute(paramDesc);
             if (isBlacklisted(metadatas)) { continue; }
-            const auto* conversion = getParmConversion(getParamType(paramDesc));
+            const auto paramType = getTypeMetadata(paramDesc, UsdAiTokens->paramType);
+            const auto conversionType = paramType == AI_TYPE_ARRAY ? getTypeMetadata(paramDesc, UsdAiTokens->elemType) : paramType;
+            const auto* conversion = getParmConversion(conversionType, parmConversions);
             if (conversion == nullptr) { continue; }
             auto outAttr = aiShader.CreateInput(TfToken(parm->getToken()), conversion->type);
             if (conversion->fn != nullptr && !isDefault) {
