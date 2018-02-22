@@ -90,9 +90,9 @@ exportNode(const UsdStagePtr& stage, const UsdStagePtr& descStage, const SdfPath
     };
 
     const auto vopTypeName = vop->getOperator()->getName();
-    const auto inShaderPath = getPathNoFirstSlashFromOp(vop);
-    if (inShaderPath.IsEmpty()) { return SdfPath(); }
-    const auto outShaderPath = looksPath.AppendPath(inShaderPath);
+    const auto vopShaderPath = getPathNoFirstSlashFromOp(vop);
+    if (vopShaderPath.IsEmpty()) { return SdfPath(); }
+    const auto outShaderPath = looksPath.AppendPath(vopShaderPath);
     // We already exported the shader.
     if (stage->GetPrimAtPath(outShaderPath).IsValid()) { return outShaderPath; }
     static constexpr auto aiShaderPrefix = "arnold::";
