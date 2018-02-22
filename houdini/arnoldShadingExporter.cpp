@@ -30,27 +30,35 @@ getPathNoFirstSlashFromOp(OP_Node* op) {
     return (pathStr == nullptr || pathStr[0] != '/') ? SdfPath() : SdfPath(pathStr + 1);
 }
 
-template <typename T, typename H>
-VtValue readSingleValue(const PRM_Parm* parm) {
-    T v = T{0};
+template <typename T> inline
+T getSingleValue(const PRM_Parm* parm) {
+    auto v = T{0};
     parm->getValue(0.0f, v, 0, SYSgetSTID());
-    return VtValue(static_cast<H>(v));
+    return v;
+}
+
+template <typename T> inline
+T getTupleValue(const PRM_Parm* parm) {
+    T v;
+    parm->getValues(0, v.data(), SYSgetSTID());
+    return v;
+}
+
+template <typename T, typename H> inline
+VtValue readSingleValue(const PRM_Parm* parm) {
+    return VtValue(static_cast<H>(getSingleValue<T>(parm)));
 };
 
-template <>
+template <> inline
 VtValue readSingleValue<int32, bool>(const PRM_Parm* parm) {
-    int32 v = 0;
-    parm->getValue(0.0f, v, 0, SYSgetSTID());
-    return VtValue(v != 0);
+    return VtValue(getSingleValue<int32>(parm) != 0);
 };
 
 // All these doubles and we know the GfVecxd layouts, so
 // we just use the internal structures. Also, no traits...
-template <typename T, typename H>
+template <typename T, typename H> inline
 VtValue readTupleValue(const PRM_Parm* parm) {
-    T v;
-    parm->getValues(0, v.data(), SYSgetSTID());
-    return VtValue(H(v));
+    return VtValue(H(getTupleValue<T>(parm)));
 };
 
 SdfPath
@@ -159,6 +167,46 @@ exportNode(const UsdStagePtr& stage, const UsdStagePtr& descStage, const SdfPath
         }
         return true;
     };
+
+    static const TfToken positionToken("position");
+    static const TfToken valueToken("value");
+    static const TfToken colorToken("color");
+    static const TfToken interpolationToken("interpolation");
+
+    // These two are special cases.
+    if (aiTypeName == "ramp_rgb") {
+        auto* parm = vop->getParmPtr("ramp");
+        if (parm != nullptr) {
+            const auto numPoints = parm->getMultiParmCount() / 3;
+            VtArray<float> positions(static_cast<unsigned int>(numPoints));
+            VtArray<GfVec3f> colors(static_cast<unsigned int>(numPoints));
+            VtArray<int> interpolations(static_cast<unsigned int>(numPoints));
+            for (auto i = decltype(numPoints){0}; i < numPoints; ++i) {
+                positions[i] = static_cast<float>(getSingleValue<double>(parm->getMultiParm(i * 3)));
+                colors[i] = GfVec3f(getTupleValue<GfVec3d>(parm->getMultiParm(i * 3 + 1)));
+                interpolations[i] = getSingleValue<int32>(parm->getMultiParm(i * 3 + 2));
+            }
+            aiShader.CreateInput(positionToken, SdfValueTypeNames->FloatArray).Set(positions);
+            aiShader.CreateInput(colorToken, SdfValueTypeNames->Color3fArray).Set(colors);
+            aiShader.CreateInput(interpolationToken, SdfValueTypeNames->IntArray).Set(interpolations);
+        }
+    } else if (aiTypeName == "ramp_float") {
+        auto* parm = vop->getParmPtr("ramp");
+        if (parm != nullptr) {
+            const auto numPoints = parm->getMultiParmCount() / 3;
+            VtArray<float> positions(static_cast<unsigned int>(numPoints));
+            VtArray<float> values(static_cast<unsigned int>(numPoints));
+            VtArray<int> interpolations(static_cast<unsigned int>(numPoints));
+            for (auto i = decltype(numPoints){0}; i < numPoints; ++i) {
+                positions[i] = static_cast<float>(getSingleValue<double>(parm->getMultiParm(i * 3)));
+                values[i] = static_cast<float>(getSingleValue<double>(parm->getMultiParm(i * 3 + 1)));
+                interpolations[i] = getSingleValue<int32>(parm->getMultiParm(i * 3 + 2));
+            }
+            aiShader.CreateInput(positionToken, SdfValueTypeNames->FloatArray).Set(positions);
+            aiShader.CreateInput(valueToken, SdfValueTypeNames->FloatArray).Set(values);
+            aiShader.CreateInput(interpolationToken, SdfValueTypeNames->IntArray).Set(interpolations);
+        }
+    }
 
     const auto* parms = vop->getParmList();
     const auto parmCount = parms->getEntries();
