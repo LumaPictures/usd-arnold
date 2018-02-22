@@ -381,7 +381,7 @@ UsdAiNodeAPI::GetNodeEntryTokenFromType(int nodeEntryType) {
 
 int
 UsdAiNodeAPI::GetNodeEntryTypeFromToken(const TfToken& nodeEntryTypeName) {
-    return _getValueFromSortedTupleVector(_tokenToNodeEntryType, nodeEntryTypeName, AI_NODE_UNDEFINED);
+    return _getValueFromSortedTupleVector<TfToken, int>(_tokenToNodeEntryType, nodeEntryTypeName, AI_NODE_UNDEFINED, _tokenSort);
 }
 
 TfToken
@@ -391,7 +391,7 @@ UsdAiNodeAPI::GetParamTypeTokenFromType(int paramEntryType) {
 
 int
 UsdAiNodeAPI::GetParamTypeFromToken(const TfToken& paramEntryTypeName) {
-    return _getValueFromSortedTupleVector(_tokenToParamType, paramEntryTypeName, AI_TYPE_UNDEFINED);
+    return _getValueFromSortedTupleVector<TfToken, int>(_tokenToParamType, paramEntryTypeName, AI_TYPE_UNDEFINED, _tokenSort);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
