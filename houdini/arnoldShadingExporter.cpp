@@ -98,6 +98,12 @@ exportNode(const UsdStagePtr& stage, const UsdStagePtr& descStage, const SdfPath
             type(_type), fn(std::move(_fn)) { }
     };
 
+    auto readStringValue = [] (const PRM_Parm* parm) -> VtValue {
+        UT_String v;
+        parm->getValue(0, v, 0, true, SYSgetSTID());
+        return VtValue(std::string(v.c_str()));
+    };
+
     static const std::unordered_map<int, ParmConversion> parmConversions = {
         {AI_TYPE_BYTE, {SdfValueTypeNames->UChar, readSingleValue<int32, uint8_t>}},
         {AI_TYPE_INT, {SdfValueTypeNames->Int, readSingleValue<int32, int32_t>}},
@@ -108,10 +114,10 @@ exportNode(const UsdStagePtr& stage, const UsdStagePtr& descStage, const SdfPath
         {AI_TYPE_RGBA, {SdfValueTypeNames->Color4f, readTupleValue<GfVec4d, GfVec4f>}},
         {AI_TYPE_VECTOR, {SdfValueTypeNames->Vector3f, readTupleValue<GfVec3d, GfVec3f>}},
         {AI_TYPE_VECTOR2, {SdfValueTypeNames->Float2, readTupleValue<GfVec2d, GfVec2f>}},
-        {AI_TYPE_STRING, {SdfValueTypeNames->String, nullptr}},
+        {AI_TYPE_STRING, {SdfValueTypeNames->String, readStringValue}},
         {AI_TYPE_POINTER, {SdfValueTypeNames->String, nullptr}},
         {AI_TYPE_MATRIX, {SdfValueTypeNames->Matrix4d, nullptr}},
-        {AI_TYPE_ENUM, {SdfValueTypeNames->String, nullptr}},
+        {AI_TYPE_ENUM, {SdfValueTypeNames->String, readStringValue}},
         {AI_TYPE_CLOSURE, {SdfValueTypeNames->String, nullptr}},
         {AI_TYPE_USHORT, {SdfValueTypeNames->UInt, readSingleValue<int32, uint16_t>}},
         {AI_TYPE_HALF, {SdfValueTypeNames->Half, readSingleValue<fpreal, GfHalf>}},
@@ -127,8 +133,8 @@ exportNode(const UsdStagePtr& stage, const UsdStagePtr& descStage, const SdfPath
 
     auto isBlacklisted = [](const std::vector<UsdAttribute>& metas) -> bool {
         for (const auto& meta: metas) {
-            const static TfToken blacklist("blacklist");
-            bool v = false;
+            const static TfToken blacklist("houdini.blacklist");
+            auto v = false;
             if (UsdAiNodeAPI::GetMetadataNameFromAttr(meta) == blacklist
                 && meta.Get(&v) && v) {
                 return true;
@@ -137,13 +143,26 @@ exportNode(const UsdStagePtr& stage, const UsdStagePtr& descStage, const SdfPath
         return false;
     };
 
+    auto isLinkable = [](const std::vector<UsdAttribute>& metas) -> bool {
+        for (const auto& meta: metas) {
+            const static TfToken linkable("linkable");
+            auto v = true;
+            if (UsdAiNodeAPI::GetMetadataNameFromAttr(meta) == linkable
+                && meta.Get(&v)) {
+                return v;
+            }
+        }
+        return true;
+    };
+
     const auto* parms = vop->getParmList();
     const auto parmCount = parms->getEntries();
     for (auto pid = decltype(parmCount){0}; pid < parmCount; ++pid) {
         const auto* parm = parms->getParmPtr(pid);
-        const auto inIdx = vop->getInputFromName(parm->getToken());
-        const auto isConnected = inIdx >= 0 && vop->isConnected(inIdx, true);
-        if (isConnected || !parm->isTrueFactoryDefault()) {
+        const auto paramIdx = vop->getInputFromName(parm->getToken());
+        const auto isConnected = paramIdx >= 0 && vop->isConnected(paramIdx, true);
+        const auto isDefault = parm->isTrueFactoryDefault();
+        if (isConnected || !isDefault) {
             auto paramDesc = getParamDesc(parm->getToken());
             if (!paramDesc.IsValid()) { continue; }
             // Checking if the param is blacklisted
@@ -152,8 +171,16 @@ exportNode(const UsdStagePtr& stage, const UsdStagePtr& descStage, const SdfPath
             const auto* conversion = getParmConversion(getParamType(paramDesc));
             if (conversion == nullptr) { continue; }
             auto outAttr = aiShader.CreateInput(TfToken(parm->getToken()), conversion->type);
-            if (conversion->fn != nullptr) {
+            if (conversion->fn != nullptr && !isDefault) {
                 outAttr.Set(conversion->fn(parm));
+            }
+
+            if (isLinkable(metadatas) && isConnected) {
+                VOP_Node* inputVop = vop->findSimpleInput(paramIdx);
+                if (inputVop == nullptr) { continue; }
+                const auto inParamIdx = inputVop->whichOutputIs(vop, paramIdx);
+                auto inShaderPath = exportNode(stage, descStage, looksPath, inputVop);
+                if (inShaderPath.IsEmpty()) { continue; }
             }
         }
     }
