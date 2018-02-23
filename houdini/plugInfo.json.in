@@ -3,9 +3,7 @@
         {
             "Info" : {
                 "UsdHoudini" : {
-                    "ShadingModePlugin" : {
-                        "houdiniPlugin" : true
-                    }
+                    "ShadingModePlugin" : true
                 }
             },
             "LibraryPath": "plugin/@PLUGIN_NAME@.so",
