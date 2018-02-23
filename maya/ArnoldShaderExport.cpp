@@ -31,9 +31,9 @@ namespace {
 
 ArnoldShaderExport::ArnoldShaderExport(const UsdStageRefPtr& _stage,
                                        const UsdTimeCode& _time_code,
-                                       const std::string& parent_scope,
+                                       const SdfPath& parent_scope,
                                        const PxrUsdMayaUtil::MDagPathMap<SdfPath>::Type& dag_to_usd) :
-    AiShaderExport(_stage, SdfPath(parent_scope), _time_code), m_dag_to_usd(dag_to_usd) {
+    AiShaderExport(_stage, parent_scope, _time_code), m_dag_to_usd(dag_to_usd) {
     const auto transform_assignment = TfGetenv("PXR_MAYA_TRANSFORM_ASSIGNMENT", "disable");
     if (transform_assignment == "common") {
         m_transform_assignment = TRANSFORM_ASSIGNMENT_COMMON;

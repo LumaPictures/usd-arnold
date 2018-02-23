@@ -1,9 +1,9 @@
 #ifndef USDMAYA_ARNOLD_SHADER_EXPORT_H
 #define USDMAYA_ARNOLD_SHADER_EXPORT_H
 
-#include "pxr/usd/usdAi/aiShaderExport.h"
+#include <pxr/usd/usdAi/aiShaderExport.h>
 
-#include "usdMaya/util.h"
+#include <usdMaya/util.h>
 
 #include <maya/MObject.h>
 #include <maya/MDagPath.h>
@@ -14,7 +14,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class ArnoldShaderExport : public AiShaderExport {
 public:
-    ArnoldShaderExport(const UsdStageRefPtr& _stage, const UsdTimeCode& _time_code, const std::string& parent_scope,
+    ArnoldShaderExport(const UsdStageRefPtr& _stage, const UsdTimeCode& _time_code, const SdfPath& parent_scope,
                        const PxrUsdMayaUtil::MDagPathMap<SdfPath>::Type& dag_to_usd);
     virtual ~ArnoldShaderExport();
 
