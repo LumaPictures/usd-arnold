@@ -268,25 +268,43 @@ exportNode(const UsdStagePtr& stage, const UsdStagePtr& descStage, const SdfPath
         }
     }
 
+    auto calculateNotDefault = [](const PRM_Parm* parm) {
+        if (!parm->isTrueFactoryDefault()) { return true; }
+        if (parm->isMultiParm()) {
+            const auto count = parm->getMultiParmCount();
+            for (auto i = decltype(count){0}; i < count; ++i) {
+                auto* nparm = parm->getMultiParm(i);
+                if (nparm != nullptr && !nparm->isTrueFactoryDefault()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+
     const auto* parms = vop->getParmList();
     const auto parmCount = parms->getEntries();
     for (auto pid = decltype(parmCount){0}; pid < parmCount; ++pid) {
         const auto* parm = parms->getParmPtr(pid);
+        if (parm == nullptr) { continue; }
+        auto paramDesc = getParamDesc(parm->getToken());
+        if (!paramDesc.IsValid()) { continue; }
+        auto metadatas = descAPI.GetMetadataForAttribute(paramDesc);
+        if (isBlacklisted(metadatas)) { continue; }
+
         const auto paramIdx = vop->getInputFromName(parm->getToken());
         const auto isConnected = paramIdx >= 0 && vop->isConnected(paramIdx, true);
-        const auto isDefault = parm->isTrueFactoryDefault();
-        if (isConnected || !isDefault) {
-            auto paramDesc = getParamDesc(parm->getToken());
-            if (!paramDesc.IsValid()) { continue; }
+        const auto notDefault = calculateNotDefault(parm);
+        if (isConnected || notDefault) {
             // Checking if the param is blacklisted
-            auto metadatas = descAPI.GetMetadataForAttribute(paramDesc);
-            if (isBlacklisted(metadatas)) { continue; }
             const auto paramType = getTypeMetadata(paramDesc, UsdAiTokens->paramType);
-            const auto conversionType = paramType == AI_TYPE_ARRAY ? getTypeMetadata(paramDesc, UsdAiTokens->elemType) : paramType;
-            const auto* conversion = getParmConversion(conversionType, parmConversions);
+            const auto isArray = paramType == AI_TYPE_ARRAY;
+            const auto conversionType = isArray ? getTypeMetadata(paramDesc, UsdAiTokens->elemType) : paramType;
+            const auto* conversion = getParmConversion(conversionType, isArray ? arrayParmConversions : parmConversions);
+
             if (conversion == nullptr) { continue; }
             auto outAttr = aiShader.CreateInput(TfToken(parm->getToken()), conversion->type);
-            if (conversion->fn != nullptr && !isDefault) {
+            if (conversion->fn != nullptr && notDefault) {
                 outAttr.Set(conversion->fn(parm));
             }
 
