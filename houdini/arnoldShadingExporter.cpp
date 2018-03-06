@@ -402,7 +402,7 @@ UsdStagePtr getArnoldShaderDesc() {
 
 }
 
-TF_REGISTRY_FUNCTION_WITH_TAG(GusdShadingModeRegistry, rib) {
+TF_REGISTRY_FUNCTION_WITH_TAG(GusdShadingModeRegistry, arnold) {
     GusdShadingModeRegistry::getInstance().registerExporter(
         "arnold", "Arnold", [](
             OP_Node* opNode,
