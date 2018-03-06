@@ -34,6 +34,15 @@ public:
     GT_PrimitiveHandle doSoftCopy() const override;
 
     const UsdGeomImageable getUsdPrim() const override { return m_volume; }
+
+    bool
+    updateFromGTPrim(
+        const GT_PrimitiveHandle& sourcePrim,
+        const UT_Matrix4D& houXform,
+        const GusdContext& ctxt,
+        GusdSimpleXformCache& xformCache) override;
+
+    bool isValid() const override { return m_volume; };
 private:
     UsdAiVolume m_volume;
 };
