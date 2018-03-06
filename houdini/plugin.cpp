@@ -12,3 +12,18 @@ extern "C" {
     }
 }
 
+#include <gusd/shadingModeRegistry.h>
+#include <gusd/primWrapper.h>
+
+#include "volumeWrapper.h"
+#include "arnoldShadingExporter.h"
+
+PXR_NAMESPACE_USING_DIRECTIVE
+
+TF_REGISTRY_FUNCTION_WITH_TAG(GusdShadingModeRegistry, arnold) {
+    GusdPrimWrapper::registerPrimDefinitionFuncForWrite(
+         GT_PRIM_VDB_VOLUME,
+         &AiVolumeWrapper::defineForWrite);
+    GusdShadingModeRegistry::getInstance().registerExporter(
+        "arnold", "Arnold", &exportArnoldShaders);
+}

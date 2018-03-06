@@ -1,9 +1,9 @@
-#include <gusd/shadingModeRegistry.h>
+#include "arnoldShadingExporter.h"
+
+#include <gusd/primWrapper.h>
 
 #include <VOP/VOP_Node.h>
 #include <SHOP/SHOP_Node.h>
-
-#include <pxr/usd/usd/stage.h>
 
 #include <pxr/usd/usdShade/connectableAPI.h>
 #include <pxr/usd/usdShade/input.h>
@@ -402,67 +402,64 @@ UsdStagePtr getArnoldShaderDesc() {
 
 }
 
-TF_REGISTRY_FUNCTION_WITH_TAG(GusdShadingModeRegistry, arnold) {
-    GusdShadingModeRegistry::getInstance().registerExporter(
-        "arnold", "Arnold", [](
-            OP_Node* opNode,
-            const UsdStagePtr& stage,
-            const SdfPath& looksPath,
-            const GusdShadingModeRegistry::HouMaterialMap& houMaterialMap,
-            const std::string& shaderOutDir) {
-            auto shaderDesc = getArnoldShaderDesc();
-            if (shaderDesc == nullptr) { return; }
+void exportArnoldShaders(
+    OP_Node* opNode,
+    const UsdStagePtr& stage,
+    const SdfPath& looksPath,
+    const GusdShadingModeRegistry::HouMaterialMap& houMaterialMap,
+    const std::string& shaderOutDir) {
+    auto shaderDesc = getArnoldShaderDesc();
+    if (shaderDesc == nullptr) { return; }
 
-            for (const auto& assignment: houMaterialMap) {
-                // Initially we only care about assigned shops.
-                auto* shop = opNode->findSHOPNode(assignment.first.c_str());
-                // We only support arnold_vopnets.
-                if (shop->getOperator()->getName() != "arnold_vopnet") { continue; }
+    for (const auto& assignment: houMaterialMap) {
+        // Initially we only care about assigned shops.
+        auto* shop = opNode->findSHOPNode(assignment.first.c_str());
+        // We only support arnold_vopnets.
+        if (shop->getOperator()->getName() != "arnold_vopnet") { continue; }
 
-                const auto shopPath = getPathNoFirstSlashFromOp(shop);
-                if (shopPath.IsEmpty()) { continue; }
-                const SdfPath materialPath = looksPath.AppendPath(shopPath);
+        const auto shopPath = getPathNoFirstSlashFromOp(shop);
+        if (shopPath.IsEmpty()) { continue; }
+        const SdfPath materialPath = looksPath.AppendPath(shopPath);
 
-                auto alreadyExported = false;
-                if (stage->GetPrimAtPath(materialPath).IsValid()) {
-                    alreadyExported = true;
-                }
-                auto shadeMaterial = UsdShadeMaterial::Define(stage, materialPath);
+        auto alreadyExported = false;
+        if (stage->GetPrimAtPath(materialPath).IsValid()) {
+            alreadyExported = true;
+        }
+        auto shadeMaterial = UsdShadeMaterial::Define(stage, materialPath);
 
-                // We are using the new material binding API, the old is deprecated.
-                for (const auto& primToBind: assignment.second) {
-                    UsdShadeMaterialBindingAPI(stage->GetPrimAtPath(primToBind)).Bind(shadeMaterial);
-                }
+        // We are using the new material binding API, the old is deprecated.
+        for (const auto& primToBind: assignment.second) {
+            UsdShadeMaterialBindingAPI(stage->GetPrimAtPath(primToBind)).Bind(shadeMaterial);
+        }
 
-                // We skip export if it's already exported by somebody else.
-                if (alreadyExported) { continue; }
+        // We skip export if it's already exported by somebody else.
+        if (alreadyExported) { continue; }
 
-                // We have to find the output node, HtoA simply looks for the first
-                // vop node with the type of arnold_material.
-                static constexpr auto arnoldMaterialTypeName = "arnold_material";
-                auto* possibleArnoldMaterial = findFirstChildrenOfType(shop, arnoldMaterialTypeName);
-                auto* vop = possibleArnoldMaterial == nullptr ? nullptr : possibleArnoldMaterial->castToVOPNode();
+        // We have to find the output node, HtoA simply looks for the first
+        // vop node with the type of arnold_material.
+        static constexpr auto arnoldMaterialTypeName = "arnold_material";
+        auto* possibleArnoldMaterial = findFirstChildrenOfType(shop, arnoldMaterialTypeName);
+        auto* vop = possibleArnoldMaterial == nullptr ? nullptr : possibleArnoldMaterial->castToVOPNode();
 
-                if (vop == nullptr) { continue; }
+        if (vop == nullptr) { continue; }
 
-                UsdAiMaterialAPI aiMaterialAPI(shadeMaterial.GetPrim());
-                static const std::vector<std::pair<const char*,
-                    decltype(&UsdAiMaterialAPI::CreateSurfaceRel)>> materialParams = {
-                    {"surface", &UsdAiMaterialAPI::CreateSurfaceRel},
-                    {"displacement", &UsdAiMaterialAPI::CreateDisplacementRel},
-                    {"volume", &UsdAiMaterialAPI::CreateVolumeRel}
-                };
-                for (const auto& materialParam: materialParams) {
-                    const auto idx = vop->getInputFromName(materialParam.first);
-                    if (!vop->isConnected(idx, true)) { continue; }
-                    auto* inputVOP = vop->findSimpleInput(idx);
-                    auto inputPath = exportNode(stage, shaderDesc, looksPath, inputVOP);
-                    if (!inputPath.IsEmpty()) {
-                        ((aiMaterialAPI).*(materialParam.second))().AddTarget(inputPath);
-                    }
-                }
+        UsdAiMaterialAPI aiMaterialAPI(shadeMaterial.GetPrim());
+        static const std::vector<std::pair<const char*,
+            decltype(&UsdAiMaterialAPI::CreateSurfaceRel)>> materialParams = {
+            {"surface", &UsdAiMaterialAPI::CreateSurfaceRel},
+            {"displacement", &UsdAiMaterialAPI::CreateDisplacementRel},
+            {"volume", &UsdAiMaterialAPI::CreateVolumeRel}
+        };
+        for (const auto& materialParam: materialParams) {
+            const auto idx = vop->getInputFromName(materialParam.first);
+            if (!vop->isConnected(idx, true)) { continue; }
+            auto* inputVOP = vop->findSimpleInput(idx);
+            auto inputPath = exportNode(stage, shaderDesc, looksPath, inputVOP);
+            if (!inputPath.IsEmpty()) {
+                ((aiMaterialAPI).*(materialParam.second))().AddTarget(inputPath);
             }
-        });
+        }
+    }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
