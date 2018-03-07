@@ -2,6 +2,8 @@
 
 #include <gusd/context.h>
 
+#include <GT/GT_PrimVDB.h>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 GT_PrimitiveHandle
@@ -56,6 +58,13 @@ AiVolumeWrapper::updateFromGTPrim(
     const GusdContext& ctxt,
     GusdSimpleXformCache& xformCache) {
     if (!isValid()) { return false; }
+
+    // This seems to be the way of doing things.
+    const auto* vdbPrim = dynamic_cast<const GT_PrimVDB*>(sourcePrim.get());
+    if (vdbPrim == nullptr) {
+        TF_WARN("[AiVolumeWrapper] Incorrect primitive type.");
+        return false;
+    }
 
     // Transform
     GfMatrix4d xform = computeTransform(
