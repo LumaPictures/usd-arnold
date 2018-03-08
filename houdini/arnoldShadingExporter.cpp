@@ -24,10 +24,13 @@ namespace {
 
 SdfPath inline
 getPathNoFirstSlashFromOp(OP_Node* op) {
-    const auto* pathStr = op->getFullPath().c_str();
-    // We got an invalid path name. Not sure if this is even possible
-    // We need to skip the first / from the path or else USD won't be able to append it.
-    return (pathStr == nullptr || pathStr[0] != '/') ? SdfPath() : SdfPath(pathStr + 1);
+    const auto* cStr = op->getFullPath().c_str();
+    if (cStr == nullptr || cStr[0] != '/') { return SdfPath(); }
+    std::string pathStr(cStr + 1);
+    
+    // We need to remove SHOP from the beginning.
+    // Alternatively we could look for the segment after the last /
+    return (pathStr.substr(0, 5) == "shop/") ? SdfPath(pathStr.substr(5)) : SdfPath(pathStr);
 }
 
 template <typename T> inline
