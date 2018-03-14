@@ -22,6 +22,14 @@ void readAiAOV(
     const PxrUsdKatanaUsdInPrivateData& data,
     PxrUsdKatanaAttrMap& attrs);
 
+UsdShadeShader
+getAOVRelationshipTarget(
+    const UsdRelationship& rel);
+
+TfToken
+readAOVChildShaderPrim(
+    const UsdShadeShader& shaderSchema,
+    FnKat::GroupBuilder& paramsBuilder);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

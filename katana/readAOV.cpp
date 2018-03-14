@@ -26,19 +26,39 @@ PXR_NAMESPACE_OPEN_SCOPE
 FnLogSetup("readAOV");
 
 
+UsdShadeShader
+getAOVRelationshipTarget(
+    const UsdRelationship& rel)
+{
+    if (rel) {
+        SdfPathVector targets;
+        rel.GetTargets(&targets);
+        if (!targets.empty()) {
+            if (targets.size() > 1) {
+                FnLogWarn("Multiple " << rel.GetBaseName() << " relationship "
+                          "targets found on AOV at:" << rel.GetPrim().GetPath());
+            }
+            if (UsdShadeShader result = UsdShadeShader(
+                    rel.GetPrim().GetStage()->GetPrimAtPath(targets[0]))) {
+                return result;
+            }
+        }
+    }
+    return UsdShadeShader();
+}
+
+
 // NOTE: The driver and filter are currently stored as `AiShader` prims, hence
 // the name (and behavior) of this function.
-static std::string
-_readChildShaderPrim(
+TfToken
+readAOVChildShaderPrim(
     const UsdShadeShader& shaderSchema,
     FnKat::GroupBuilder& paramsBuilder)
 {
     TfToken id;
     shaderSchema.GetIdAttr().Get(&id);
 
-    std::vector<UsdShadeInput> shaderInputs = shaderSchema.GetInputs();
-    TF_FOR_ALL(shaderInputIter, shaderInputs) {
-        UsdShadeInput shaderInput = *shaderInputIter;
+    for (UsdShadeInput shaderInput : shaderSchema.GetInputs()) {
         UsdAttribute shaderAttr = shaderInput.GetAttr();
         VtValue value;
         if (shaderAttr.Get(&value)) {
@@ -47,11 +67,12 @@ _readChildShaderPrim(
                 PxrUsdKatanaUtils::ConvertVtValueToKatAttr(value, true));
         }
     }
-
-    return id.GetString();
+    return id;
 }
 
 
+// TODO: This op will essentially be obsolete once AOVs are being resolved in
+// the main location decorator function.
 void
 readAiAOV(
     const UsdAiAOV& aov,
@@ -72,42 +93,24 @@ readAiAOV(
         aovBuilder.set("datatype", FnKat::StringAttribute(dataType.GetString()));
     }
 
-    if (UsdRelationship driverRel = aov.GetDriverRel()) {
-        SdfPathVector driverTargets;
-        driverRel.GetTargets(&driverTargets);
-        if (driverTargets.size() > 0) {
-            if (driverTargets.size() > 1) {
-                FnLogWarn("Multiple driver relationship targets found on AOV "
-                          "at:" << data.GetUsdPrim().GetPath());
-            }
-            if (UsdShadeShader driverSchema = UsdShadeShader(
-                    data.GetUsdInArgs()->GetStage()->GetPrimAtPath(driverTargets[0]))) {
-                FnKat::GroupBuilder driverParamsBuilder;
-                const std::string driverType = _readChildShaderPrim(
-                    driverSchema, driverParamsBuilder);
-                aovBuilder.set("driver", FnKat::StringAttribute(driverType));
-                aovBuilder.set("driverParameters", driverParamsBuilder.build());
-            }
-        }
+    if (UsdShadeShader driverSchema =
+            getAOVRelationshipTarget(aov.GetDriverRel()))
+    {
+        FnKat::GroupBuilder driverParamsBuilder;
+        const TfToken driverType = readAOVChildShaderPrim(driverSchema,
+                                                          driverParamsBuilder);
+        aovBuilder.set("driver", FnKat::StringAttribute(driverType));
+        aovBuilder.set("driverParameters", driverParamsBuilder.build());
     }
 
-    if (UsdRelationship filterRel = aov.GetFilterRel()) {
-        SdfPathVector filterTargets;
-        filterRel.GetTargets(&filterTargets);
-        if (filterTargets.size() > 0) {
-            if (filterTargets.size() > 1) {
-                FnLogWarn("Multiple filter relationship targets found on AOV "
-                          "at:" << data.GetUsdPrim().GetPath());
-            }
-            if (UsdShadeShader filterSchema = UsdShadeShader(
-                    data.GetUsdInArgs()->GetStage()->GetPrimAtPath(filterTargets[0]))) {
-                FnKat::GroupBuilder filterParamsBuilder;
-                const std::string filterType =_readChildShaderPrim(
-                    filterSchema, filterParamsBuilder);
-                aovBuilder.set("filter", FnKat::StringAttribute(filterType));
-                aovBuilder.set("filterParameters", filterParamsBuilder.build());
-            }
-        }
+    if (UsdShadeShader filterSchema =
+            getAOVRelationshipTarget(aov.GetFilterRel()))
+    {
+        FnKat::GroupBuilder filterParamsBuilder;
+        const TfToken filterType = readAOVChildShaderPrim(filterSchema,
+                                                          filterParamsBuilder);
+        aovBuilder.set("filter", FnKat::StringAttribute(filterType));
+        aovBuilder.set("filterParameters", filterParamsBuilder.build());
     }
 
     attrs.set("type", FnKat::StringAttribute("aov"));
