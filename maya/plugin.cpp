@@ -24,6 +24,7 @@ public:
         ai = new ArnoldShaderExport(
                 context.GetUsdStage(),
                 UsdTimeCode::Default(),
+                context.GetStripNamespaces(),
                 context.GetParentScope(),
                 context.GetDagPathToUsdMap());
     }

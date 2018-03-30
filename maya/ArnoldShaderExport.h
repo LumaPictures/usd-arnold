@@ -14,7 +14,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class ArnoldShaderExport : public AiShaderExport {
 public:
-    ArnoldShaderExport(const UsdStageRefPtr& _stage, const UsdTimeCode& _time_code, const SdfPath& parent_scope,
+    ArnoldShaderExport(const UsdStageRefPtr& _stage, const UsdTimeCode& _time_code,
+                       bool strip_namespaces, const SdfPath& parent_scope,
                        const PxrUsdMayaUtil::MDagPathMap<SdfPath>::Type& dag_to_usd);
     virtual ~ArnoldShaderExport();
 
@@ -31,6 +32,8 @@ private:
 public:
     SdfPath export_shading_engine(MObject obj);
     void setup_shaders();
+
+    bool m_strip_namespaces;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

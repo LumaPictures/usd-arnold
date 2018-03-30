@@ -31,9 +31,12 @@ namespace {
 
 ArnoldShaderExport::ArnoldShaderExport(const UsdStageRefPtr& _stage,
                                        const UsdTimeCode& _time_code,
+                                       bool strip_namespaces,
                                        const SdfPath& parent_scope,
                                        const PxrUsdMayaUtil::MDagPathMap<SdfPath>::Type& dag_to_usd) :
-    AiShaderExport(_stage, parent_scope, _time_code), m_dag_to_usd(dag_to_usd) {
+            AiShaderExport(_stage, parent_scope, _time_code), m_dag_to_usd(dag_to_usd),
+            m_strip_namespaces(strip_namespaces)
+{
     const auto transform_assignment = TfGetenv("PXR_MAYA_TRANSFORM_ASSIGNMENT", "disable");
     if (transform_assignment == "common") {
         m_transform_assignment = TRANSFORM_ASSIGNMENT_COMMON;
@@ -71,7 +74,32 @@ ArnoldShaderExport::export_shading_engine(MObject obj) {
         auto disp_obj = conns[0].node();
         disp_shader = mtoa_export_node(disp_obj, conns[0].partialName(false, false, false, false, false, true).asChar());
     }
-    return export_material(node.name().asChar(), surf_shader, disp_shader);
+
+    // TODO: do proper name collision detection.
+    // Note that this can happen regardless of strip_namespaces setting:
+    //   strip_namespaces = false
+    //     foo:bar > foo_bar
+    //     foo_bar > foo_bar
+    //   strip_namespaces = true
+    //     foo:bar > bar
+    //     bar     > bar
+    // However, even the "main" plugin doesn't check for clashes when strip_namespaces is
+    // false, so we're leaving this be for now...
+    MString name = node.name();
+    if (m_strip_namespaces) {
+        // drop namespaces instead of making them part of the path
+        // Could use PxrUsdMayaUtil::stripNamespaces, but it's designed for working
+        // with dag paths, and so is more complicated than we need, and also adds a
+        // leading "|"
+        int last_colon = name.rindexW(':');
+        if (last_colon != -1) {
+            name = name.substringW(last_colon + 1, name.length() - 1);
+        }
+    }
+    else {
+        name.substitute(":", "_");
+    }
+    return export_material(name.asChar(), surf_shader, disp_shader);
 }
 
 void
