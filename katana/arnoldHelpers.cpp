@@ -37,18 +37,16 @@ getArnoldAttrTypeHint(const SdfValueTypeName& scalarType)
              scalarType == SdfValueTypeNames->Vector3h ||
              scalarType == SdfValueTypeNames->Normal3f ||
              scalarType == SdfValueTypeNames->Normal3d ||
-             scalarType == SdfValueTypeNames->Normal3h) {
+             scalarType == SdfValueTypeNames->Normal3h ||
+             scalarType == SdfValueTypeNames->Point3h ||
+             scalarType == SdfValueTypeNames->Point3f ||
+             scalarType == SdfValueTypeNames->Point3d) {
         hint = "vector";
     }
     else if (scalarType == SdfValueTypeNames->Float2 ||
              scalarType == SdfValueTypeNames->Double2 ||
              scalarType == SdfValueTypeNames->Half2) {
-        hint = "point2";
-    }
-    else if (scalarType == SdfValueTypeNames->Point3h ||
-             scalarType == SdfValueTypeNames->Point3f ||
-             scalarType == SdfValueTypeNames->Point3d) {
-        hint = "point";
+        hint = "vector2";
     }
     else if (scalarType == SdfValueTypeNames->Color3h ||
              scalarType == SdfValueTypeNames->Color3f ||
