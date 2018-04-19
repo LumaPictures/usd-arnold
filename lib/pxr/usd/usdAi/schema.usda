@@ -489,38 +489,35 @@ class AiShader "AiShader" (
 }
 
 class AiProcedural "AiProcedural" (
-    doc = """Represents an Arnold procedural shape node.
-             We don't inherit from Shader but define our own
-             id parameter to avoid issues with code that check
-             if a certan prim inherit from shader.
-    """
+    doc = """Represents an Arnold procedural node, defined in terms of a scene
+             description file (.ass, .obj, or .ply)."""
     inherits = </Boundable>
 ) {
-    uniform token info:id (
-        doc = """The id is an identifier for the type of the procedural. 
-                 Arnold 5 generates a separate node for each procedural.
-        """
-        customData = {
-            string apiName = "id"
-        }
+    asset filepath (
+        doc = """The path to the scene description file."""
+    )
+}
+
+class AiProceduralNode "AiProceduralNode" (
+    doc = """Represents a custom Arnold procedural node. The node type name must
+             be supplied. Procedural arguments should be specified as attributes
+             in the `user:` namespace."""
+    inherits = </AiProcedural>
+) {
+    asset filepath = @@ (
+        doc = """Path to the DSO which defines the custom procedural node type.
+                 This is optional if the DSO will be found on the Arnold plugin
+                 path or using other means."""
     )
 
-    string data = "" (
-        doc = """This string parameter is used to pass parameters that are
-                 parsed by the procedural program and can be used for its
-                 creation/initialization.
-
-                 The format of this string is not standard and is dictated by
-                 the particular implementation of each procedural program. A
-                 better and more compact way of passing parameters and data to
-                 the procedural is through user data."""
+    uniform token nodeType (
+        doc = """The name of the custom procedural node entry to use."""
     )
 }
 
 class AiVolumeProcedural "AiVolumeProcedural" (
-    doc = """Handling of custom volume procedurals.
-             We inherit from AiProcedural, because the parameters are
-             essentially the same, except the additional step_size parameter."""
+    doc = """Handling of custom volume procedurals. The parameters are identical
+             to those of AiProcedural, with the addition of `step_size`."""
     inherits = </AiProcedural>
 ) {
     float step_size = 0 (
