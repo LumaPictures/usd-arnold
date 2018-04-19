@@ -286,10 +286,6 @@ struct UsdAiTokensType {
     /// 
     /// Possible value for UsdAiShapeAPI::GetAiSubdiv_typeAttr()
     const TfToken catclark;
-    /// \brief "data"
-    /// 
-    /// UsdAiProcedural
-    const TfToken data;
     /// \brief "dataType"
     /// 
     /// UsdAiAOV
@@ -310,6 +306,10 @@ struct UsdAiTokensType {
     /// 
     /// UsdAiVolume
     const TfToken filename;
+    /// \brief "filepath"
+    /// 
+    /// UsdAiProceduralNode, UsdAiProcedural
+    const TfToken filepath;
     /// \brief "filter"
     /// 
     /// UsdAiAOV
@@ -322,10 +322,6 @@ struct UsdAiTokensType {
     /// 
     /// Possible value for UsdAiAOV::GetDataTypeAttr()
     const TfToken fLOAT;
-    /// \brief "info:id"
-    /// 
-    /// UsdAiProcedural
-    const TfToken infoId;
     /// \brief "info:node_entry_type"
     /// 
     /// UsdAiNodeAPI
@@ -354,6 +350,10 @@ struct UsdAiTokensType {
     /// 
     /// Possible value for UsdAiAOV::GetDataTypeAttr()
     const TfToken nODE;
+    /// \brief "nodeType"
+    /// 
+    /// UsdAiProceduralNode
+    const TfToken nodeType;
     /// \brief "none"
     /// 
     /// Possible value for UsdAiShapeAPI::GetAiSubdiv_typeAttr(), Default value for UsdAiShapeAPI::GetAiSubdiv_typeAttr()

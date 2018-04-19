@@ -120,16 +120,15 @@ void wrapUsdAiTokens()
     _AddToken(cls, "bOOL", UsdAiTokens->bOOL);
     _AddToken(cls, "bYTE", UsdAiTokens->bYTE);
     _AddToken(cls, "catclark", UsdAiTokens->catclark);
-    _AddToken(cls, "data", UsdAiTokens->data);
     _AddToken(cls, "dataType", UsdAiTokens->dataType);
     _AddToken(cls, "driver", UsdAiTokens->driver);
     _AddToken(cls, "edge_length", UsdAiTokens->edge_length);
     _AddToken(cls, "elemType", UsdAiTokens->elemType);
     _AddToken(cls, "filename", UsdAiTokens->filename);
+    _AddToken(cls, "filepath", UsdAiTokens->filepath);
     _AddToken(cls, "filter", UsdAiTokens->filter);
     _AddToken(cls, "flatness", UsdAiTokens->flatness);
     _AddToken(cls, "fLOAT", UsdAiTokens->fLOAT);
-    _AddToken(cls, "infoId", UsdAiTokens->infoId);
     _AddToken(cls, "infoNode_entry_type", UsdAiTokens->infoNode_entry_type);
     _AddToken(cls, "iNT", UsdAiTokens->iNT);
     _AddToken(cls, "linear", UsdAiTokens->linear);
@@ -137,6 +136,7 @@ void wrapUsdAiTokens()
     _AddToken(cls, "mATRIX", UsdAiTokens->mATRIX);
     _AddToken(cls, "name", UsdAiTokens->name);
     _AddToken(cls, "nODE", UsdAiTokens->nODE);
+    _AddToken(cls, "nodeType", UsdAiTokens->nodeType);
     _AddToken(cls, "none", UsdAiTokens->none);
     _AddToken(cls, "object", UsdAiTokens->object);
     _AddToken(cls, "paramType", UsdAiTokens->paramType);

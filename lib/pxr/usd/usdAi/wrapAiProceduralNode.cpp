@@ -21,7 +21,7 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/usd/usdAi/aiNodeAPI.h"
+#include "pxr/usd/usdAi/aiProceduralNode.h"
 #include "pxr/usd/usd/schemaBase.h"
 
 #include "pxr/usd/sdf/primSpec.h"
@@ -50,20 +50,27 @@ WRAP_CUSTOM;
 
         
 static UsdAttribute
-_CreateNodeEntryTypeAttr(UsdAiNodeAPI &self,
+_CreateFilepathAttr(UsdAiProceduralNode &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateNodeEntryTypeAttr(
+    return self.CreateFilepathAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Asset), writeSparsely);
+}
+        
+static UsdAttribute
+_CreateNodeTypeAttr(UsdAiProceduralNode &self,
+                                      object defaultVal, bool writeSparsely) {
+    return self.CreateNodeTypeAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
 }
 
 } // anonymous namespace
 
-void wrapUsdAiNodeAPI()
+void wrapUsdAiProceduralNode()
 {
-    typedef UsdAiNodeAPI This;
+    typedef UsdAiProceduralNode This;
 
-    class_<This, bases<UsdAPISchemaBase> >
-        cls("AiNodeAPI");
+    class_<This, bases<UsdAiProcedural> >
+        cls("AiProceduralNode");
 
     cls
         .def(init<UsdPrim>(arg("prim")))
@@ -73,8 +80,8 @@ void wrapUsdAiNodeAPI()
         .def("Get", &This::Get, (arg("stage"), arg("path")))
         .staticmethod("Get")
 
-        .def("Apply", &This::Apply, (arg("prim")))
-        .staticmethod("Apply")
+        .def("Define", &This::Define, (arg("stage"), arg("path")))
+        .staticmethod("Define")
 
         .def("IsConcrete",
             static_cast<bool (*)(void)>( [](){ return This::IsConcrete; }))
@@ -83,10 +90,6 @@ void wrapUsdAiNodeAPI()
         .def("IsTyped",
             static_cast<bool (*)(void)>( [](){ return This::IsTyped; } ))
         .staticmethod("IsTyped")
-
-        .def("IsMultipleApply", 
-            static_cast<bool (*)(void)>( [](){ return This::IsMultipleApply; } ))
-        .staticmethod("IsMultipleApply")
 
         .def("GetSchemaAttributeNames",
              &This::GetSchemaAttributeNames,
@@ -101,10 +104,17 @@ void wrapUsdAiNodeAPI()
         .def(!self)
 
         
-        .def("GetNodeEntryTypeAttr",
-             &This::GetNodeEntryTypeAttr)
-        .def("CreateNodeEntryTypeAttr",
-             &_CreateNodeEntryTypeAttr,
+        .def("GetFilepathAttr",
+             &This::GetFilepathAttr)
+        .def("CreateFilepathAttr",
+             &_CreateFilepathAttr,
+             (arg("defaultValue")=object(),
+              arg("writeSparsely")=false))
+        
+        .def("GetNodeTypeAttr",
+             &This::GetNodeTypeAttr)
+        .def("CreateNodeTypeAttr",
+             &_CreateNodeTypeAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
 

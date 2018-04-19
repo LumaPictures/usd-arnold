@@ -50,17 +50,10 @@ WRAP_CUSTOM;
 
         
 static UsdAttribute
-_CreateIdAttr(UsdAiProcedural &self,
+_CreateFilepathAttr(UsdAiProcedural &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateIdAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Token), writeSparsely);
-}
-        
-static UsdAttribute
-_CreateDataAttr(UsdAiProcedural &self,
-                                      object defaultVal, bool writeSparsely) {
-    return self.CreateDataAttr(
-        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->String), writeSparsely);
+    return self.CreateFilepathAttr(
+        UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Asset), writeSparsely);
 }
 
 } // anonymous namespace
@@ -104,17 +97,10 @@ void wrapUsdAiProcedural()
         .def(!self)
 
         
-        .def("GetIdAttr",
-             &This::GetIdAttr)
-        .def("CreateIdAttr",
-             &_CreateIdAttr,
-             (arg("defaultValue")=object(),
-              arg("writeSparsely")=false))
-        
-        .def("GetDataAttr",
-             &This::GetDataAttr)
-        .def("CreateDataAttr",
-             &_CreateDataAttr,
+        .def("GetFilepathAttr",
+             &This::GetFilepathAttr)
+        .def("CreateFilepathAttr",
+             &_CreateFilepathAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
 

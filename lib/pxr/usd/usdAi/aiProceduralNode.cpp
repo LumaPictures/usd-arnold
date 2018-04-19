@@ -21,10 +21,9 @@
 // KIND, either express or implied. See the Apache License for the specific
 // language governing permissions and limitations under the Apache License.
 //
-#include "pxr/usd/usdAi/aiLightAPI.h"
+#include "pxr/usd/usdAi/aiProceduralNode.h"
 #include "pxr/usd/usd/schemaRegistry.h"
 #include "pxr/usd/usd/typed.h"
-#include "pxr/usd/usd/tokens.h"
 
 #include "pxr/usd/sdf/types.h"
 #include "pxr/usd/sdf/assetPath.h"
@@ -34,52 +33,58 @@ PXR_NAMESPACE_OPEN_SCOPE
 // Register the schema with the TfType system.
 TF_REGISTRY_FUNCTION(TfType)
 {
-    TfType::Define<UsdAiLightAPI,
-        TfType::Bases< UsdAPISchemaBase > >();
+    TfType::Define<UsdAiProceduralNode,
+        TfType::Bases< UsdAiProcedural > >();
     
+    // Register the usd prim typename as an alias under UsdSchemaBase. This
+    // enables one to call
+    // TfType::Find<UsdSchemaBase>().FindDerivedByName("AiProceduralNode")
+    // to find TfType<UsdAiProceduralNode>, which is how IsA queries are
+    // answered.
+    TfType::AddAlias<UsdSchemaBase, UsdAiProceduralNode>("AiProceduralNode");
 }
 
-TF_DEFINE_PRIVATE_TOKENS(
-    _schemaTokens,
-    (AiLightAPI)
-);
-
 /* virtual */
-UsdAiLightAPI::~UsdAiLightAPI()
+UsdAiProceduralNode::~UsdAiProceduralNode()
 {
 }
 
 /* static */
-UsdAiLightAPI
-UsdAiLightAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
+UsdAiProceduralNode
+UsdAiProceduralNode::Get(const UsdStagePtr &stage, const SdfPath &path)
 {
     if (!stage) {
         TF_CODING_ERROR("Invalid stage");
-        return UsdAiLightAPI();
+        return UsdAiProceduralNode();
     }
-    return UsdAiLightAPI(stage->GetPrimAtPath(path));
+    return UsdAiProceduralNode(stage->GetPrimAtPath(path));
 }
 
-
 /* static */
-UsdAiLightAPI
-UsdAiLightAPI::Apply(const UsdPrim &prim)
+UsdAiProceduralNode
+UsdAiProceduralNode::Define(
+    const UsdStagePtr &stage, const SdfPath &path)
 {
-    return UsdAPISchemaBase::_ApplyAPISchema<UsdAiLightAPI>(
-            prim, _schemaTokens->AiLightAPI);
+    static TfToken usdPrimTypeName("AiProceduralNode");
+    if (!stage) {
+        TF_CODING_ERROR("Invalid stage");
+        return UsdAiProceduralNode();
+    }
+    return UsdAiProceduralNode(
+        stage->DefinePrim(path, usdPrimTypeName));
 }
 
 /* static */
 const TfType &
-UsdAiLightAPI::_GetStaticTfType()
+UsdAiProceduralNode::_GetStaticTfType()
 {
-    static TfType tfType = TfType::Find<UsdAiLightAPI>();
+    static TfType tfType = TfType::Find<UsdAiProceduralNode>();
     return tfType;
 }
 
 /* static */
 bool 
-UsdAiLightAPI::_IsTypedSchema()
+UsdAiProceduralNode::_IsTypedSchema()
 {
     static bool isTyped = _GetStaticTfType().IsA<UsdTyped>();
     return isTyped;
@@ -87,22 +92,39 @@ UsdAiLightAPI::_IsTypedSchema()
 
 /* virtual */
 const TfType &
-UsdAiLightAPI::_GetTfType() const
+UsdAiProceduralNode::_GetTfType() const
 {
     return _GetStaticTfType();
 }
 
 UsdAttribute
-UsdAiLightAPI::GetAiAovAttr() const
+UsdAiProceduralNode::GetFilepathAttr() const
 {
-    return GetPrim().GetAttribute(UsdAiTokens->aiAov);
+    return GetPrim().GetAttribute(UsdAiTokens->filepath);
 }
 
 UsdAttribute
-UsdAiLightAPI::CreateAiAovAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiProceduralNode::CreateFilepathAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
-    return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiAov,
-                       SdfValueTypeNames->String,
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->filepath,
+                       SdfValueTypeNames->Asset,
+                       /* custom = */ false,
+                       SdfVariabilityVarying,
+                       defaultValue,
+                       writeSparsely);
+}
+
+UsdAttribute
+UsdAiProceduralNode::GetNodeTypeAttr() const
+{
+    return GetPrim().GetAttribute(UsdAiTokens->nodeType);
+}
+
+UsdAttribute
+UsdAiProceduralNode::CreateNodeTypeAttr(VtValue const &defaultValue, bool writeSparsely) const
+{
+    return UsdSchemaBase::_CreateAttr(UsdAiTokens->nodeType,
+                       SdfValueTypeNames->Token,
                        /* custom = */ false,
                        SdfVariabilityUniform,
                        defaultValue,
@@ -123,14 +145,15 @@ _ConcatenateAttributeNames(const TfTokenVector& left,const TfTokenVector& right)
 
 /*static*/
 const TfTokenVector&
-UsdAiLightAPI::GetSchemaAttributeNames(bool includeInherited)
+UsdAiProceduralNode::GetSchemaAttributeNames(bool includeInherited)
 {
     static TfTokenVector localNames = {
-        UsdAiTokens->aiAov,
+        UsdAiTokens->filepath,
+        UsdAiTokens->nodeType,
     };
     static TfTokenVector allNames =
         _ConcatenateAttributeNames(
-            UsdAPISchemaBase::GetSchemaAttributeNames(true),
+            UsdAiProcedural::GetSchemaAttributeNames(true),
             localNames);
 
     if (includeInherited)

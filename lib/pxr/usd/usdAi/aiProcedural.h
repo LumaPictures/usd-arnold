@@ -52,16 +52,8 @@ class SdfAssetPath;
 
 /// \class UsdAiProcedural
 ///
-/// Represents an Arnold procedural shape node.
-/// We don't inherit from Shader but define our own
-/// id parameter to avoid issues with code that check
-/// if a certan prim inherit from shader.
-/// 
-///
-/// For any described attribute \em Fallback \em Value or \em Allowed \em Values below
-/// that are text/tokens, the actual token is published and defined in \ref UsdAiTokens.
-/// So to set an attribute to the value "rightHanded", use UsdAiTokens->rightHanded
-/// as the value.
+/// Represents an Arnold procedural node, defined in terms of a scene
+/// description file (.ass, .obj, or .ply).
 ///
 class UsdAiProcedural : public UsdGeomBoundable
 {
@@ -158,54 +150,24 @@ private:
 
 public:
     // --------------------------------------------------------------------- //
-    // ID 
+    // FILEPATH 
     // --------------------------------------------------------------------- //
-    /// The id is an identifier for the type of the procedural. 
-    /// Arnold 5 generates a separate node for each procedural.
-    /// 
+    /// The path to the scene description file.
     ///
-    /// \n  C++ Type: TfToken
-    /// \n  Usd Type: SdfValueTypeNames->Token
-    /// \n  Variability: SdfVariabilityUniform
+    /// \n  C++ Type: SdfAssetPath
+    /// \n  Usd Type: SdfValueTypeNames->Asset
+    /// \n  Variability: SdfVariabilityVarying
     /// \n  Fallback Value: No Fallback
     USDAI_API
-    UsdAttribute GetIdAttr() const;
+    UsdAttribute GetFilepathAttr() const;
 
-    /// See GetIdAttr(), and also 
+    /// See GetFilepathAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateIdAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
-
-public:
-    // --------------------------------------------------------------------- //
-    // DATA 
-    // --------------------------------------------------------------------- //
-    /// This string parameter is used to pass parameters that are
-    /// parsed by the procedural program and can be used for its
-    /// creation/initialization.
-    /// 
-    /// The format of this string is not standard and is dictated by
-    /// the particular implementation of each procedural program. A
-    /// better and more compact way of passing parameters and data to
-    /// the procedural is through user data.
-    ///
-    /// \n  C++ Type: std::string
-    /// \n  Usd Type: SdfValueTypeNames->String
-    /// \n  Variability: SdfVariabilityVarying
-    /// \n  Fallback Value: 
-    USDAI_API
-    UsdAttribute GetDataAttr() const;
-
-    /// See GetDataAttr(), and also 
-    /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
-    /// If specified, author \p defaultValue as the attribute's default,
-    /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
-    /// the default for \p writeSparsely is \c false.
-    USDAI_API
-    UsdAttribute CreateDataAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateFilepathAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // ===================================================================== //
