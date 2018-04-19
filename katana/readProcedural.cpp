@@ -32,10 +32,10 @@ readAiProcedural(
 
     if (auto idAttr = procedural.GetIdAttr()) {
         if (idAttr.HasValue()) {
-            std::string id;
-            idAttr.Get<std::string>(&id);
-            attrs.set("rendererProcedural.node",
-                      FnKat::StringAttribute(id));
+            TfToken id;
+            idAttr.Get(&id);
+            attrs.set("rendererProcedural.procedural",
+                      FnKat::StringAttribute(id.GetString()));
         }
     }
 
@@ -43,6 +43,7 @@ readAiProcedural(
     // attributes in the "rendererProcedural.args" group attribute.
     // Note that these are only sampled once per frame.
     FnKat::GroupBuilder argsBuilder;
+    argsBuilder.set("__outputStyle", FnKat::StringAttribute("typedArguments"));
 
     UsdAiNodeAPI nodeAPI = UsdAiNodeAPI(procedural);
     std::vector<UsdAttribute> userAttrs = nodeAPI.GetUserAttributes();
