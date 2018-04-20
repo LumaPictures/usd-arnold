@@ -30,6 +30,7 @@ pxr_shared_library(usdAi
         aiMaterialAPI
         aiNodeAPI
         aiProcedural
+        aiProceduralNode
         aiShader
         aiShaderExport
         aiShapeAPI
@@ -51,6 +52,7 @@ pxr_shared_library(usdAi
         wrapAiMaterialAPI.cpp
         wrapAiNodeAPI.cpp
         wrapAiProcedural.cpp
+        wrapAiProceduralNode.cpp
         wrapAiShader.cpp
         wrapAiShaderExport.cpp
         wrapAiShapeAPI.cpp
