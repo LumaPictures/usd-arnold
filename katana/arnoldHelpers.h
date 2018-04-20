@@ -17,8 +17,15 @@ class SdfValueTypeName;
 // Given an SDF value type, return a (possibly empty) type hint string for KtoA.
 std::string getArnoldAttrTypeHint(const SdfValueTypeName& scalarType);
 
-// Given a prim, return a new GroupAttribute to apply as its `arnoldStatements`
+// Given a prim representing an Arnold procedural, build a GroupAttribute from
+// all attributes in the "user:" namespace for the `rendererProcedural.args`
 // attribute in Katana.
+FnKat::Attribute buildProceduralArgsGroup(
+        const UsdPrim& prim,
+        const double time);
+
+// Given a prim, return a new GroupAttribute to populate the `arnoldStatements`
+// attribute group in Katana.
 FnKat::Attribute getArnoldStatementsGroup(const UsdPrim& prim);
 
 // Based on PxrUsdKatanaAttrMap::toInterface

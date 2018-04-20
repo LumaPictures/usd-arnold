@@ -4,9 +4,10 @@
 #include <usdKatana/attrMap.h>
 #include <usdKatana/usdInPluginRegistry.h>
 
-#include <pxr/usd/usdAi/aiProcedural.h>
-#include <pxr/usd/usdAi/aiVolume.h>
 #include <pxr/usd/usdAi/aiAOV.h>
+#include <pxr/usd/usdAi/aiProcedural.h>
+#include <pxr/usd/usdAi/aiProceduralNode.h>
+#include <pxr/usd/usdAi/aiVolume.h>
 
 #include "readAOV.h"
 #include "readProcedural.h"
@@ -66,6 +67,7 @@ void registerPlugins()
 {
     USD_OP_REGISTER_PLUGIN(AiProceduralOp, "AiProceduralOp", 0, 1);
     PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiProcedural>("AiProceduralOp");
+    PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiProceduralNode>("AiProceduralOp");
     USD_OP_REGISTER_PLUGIN(AiVolumeOp, "AiVolumeOp", 0, 1);
     PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiVolume>("AiVolumeOp");
     USD_OP_REGISTER_PLUGIN(AiAOVOp, "AiAOVOp", 0, 1);

@@ -1,5 +1,8 @@
 #include "arnoldHelpers.h"
 
+#include <usdKatana/utils.h>
+
+#include <pxr/usd/usdAi/aiNodeAPI.h>
 #include <pxr/usd/usdAi/aiShapeAPI.h>
 
 #include <pxr/usd/usdGeom/basisCurves.h>
@@ -59,6 +62,55 @@ getArnoldAttrTypeHint(const SdfValueTypeName& scalarType)
         hint = "rgba";
     }
     return hint;
+}
+
+
+FnKat::Attribute
+buildProceduralArgsGroup(const UsdPrim& prim,
+                         const double time) {
+    FnKat::GroupBuilder argsBuilder;
+    UsdAiNodeAPI nodeAPI(prim);
+
+    std::vector<UsdAttribute> userAttrs = nodeAPI.GetUserAttributes();
+    if (userAttrs.empty()) {
+        return FnKat::Attribute();
+    }
+
+    argsBuilder.set("__outputStyle", FnKat::StringAttribute("typedArguments"));
+    for (const auto& userAttr : userAttrs) {
+        VtValue vtValue;
+        if (!userAttr.Get(&vtValue, time)) {
+            continue;
+        }
+
+        const std::string attrBaseName = userAttr.GetBaseName().GetString();
+        argsBuilder.set(
+            attrBaseName,
+            PxrUsdKatanaUtils::ConvertVtValueToKatAttr(vtValue, true));
+
+        // Create KtoA hint attribute if necessary.
+        std::vector<std::string> attrHints;
+        if (userAttr.GetTypeName().IsArray()) {
+            attrHints.push_back("array");
+            attrHints.push_back("true");
+        }
+
+        std::string typeHint = getArnoldAttrTypeHint(
+            userAttr.GetTypeName().GetScalarType());
+        if (!typeHint.empty()) {
+            attrHints.push_back("type");
+            attrHints.push_back(typeHint);
+        }
+        // TODO(?): `key_array` and `clone` hints
+
+        static const std::string hintPrefix("arnold_hint__");
+        if (!attrHints.empty()) {
+            argsBuilder.set(hintPrefix + attrBaseName,
+                            FnKat::StringAttribute(attrHints, 2));
+        }
+    }
+
+    return argsBuilder.build();
 }
 
 
