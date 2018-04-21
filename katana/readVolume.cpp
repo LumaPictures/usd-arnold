@@ -39,15 +39,14 @@ readVolume(
     // our KtoA version will handle this
     argsBuilder.set("grids", FnKat::StringAttribute(""));
     argsBuilder.set("__skipBuiltins", FnKat::IntAttribute(1));
+    argsBuilder.set("__outputStyle", FnKat::StringAttribute("typedArguments"));
+
     SdfAssetPath filename;
     volume.GetFilenameAttr().Get(&filename, currentTime);
     argsBuilder.set("filename", FnKat::StringAttribute(filename.GetResolvedPath()));
 
-    FnKat::GroupAttribute procArgs = buildProceduralArgsGroup(volume.GetPrim(),
-                                                              currentTime);
-    if (procArgs.isValid()) {
-        attrs.set("rendererProcedural.args", procArgs);
-    }
+    applyProceduralArgsAttrs(volume.GetPrim(), argsBuilder, currentTime);
+    attrs.set("rendererProcedural.args", argsBuilder.build());
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

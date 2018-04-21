@@ -64,20 +64,15 @@ getArnoldAttrTypeHint(const SdfValueTypeName& scalarType)
     return hint;
 }
 
-
-FnKat::Attribute
-buildProceduralArgsGroup(const UsdPrim& prim,
-                         const double time) {
-    FnKat::GroupBuilder argsBuilder;
+size_t
+applyProceduralArgsAttrs(
+        const UsdPrim& prim,
+        FnKat::GroupBuilder& argsBuilder,
+        const double time)
+{
     UsdAiNodeAPI nodeAPI(prim);
-
-    std::vector<UsdAttribute> userAttrs = nodeAPI.GetUserAttributes();
-    if (userAttrs.empty()) {
-        return FnKat::Attribute();
-    }
-
-    argsBuilder.set("__outputStyle", FnKat::StringAttribute("typedArguments"));
-    for (const auto& userAttr : userAttrs) {
+    size_t count = 0;
+    for (const auto& userAttr : nodeAPI.GetUserAttributes()) {
         VtValue vtValue;
         if (!userAttr.Get(&vtValue, time)) {
             continue;
@@ -87,6 +82,7 @@ buildProceduralArgsGroup(const UsdPrim& prim,
         argsBuilder.set(
             attrBaseName,
             PxrUsdKatanaUtils::ConvertVtValueToKatAttr(vtValue, true));
+        count++;
 
         // Create KtoA hint attribute if necessary.
         std::vector<std::string> attrHints;
@@ -109,8 +105,7 @@ buildProceduralArgsGroup(const UsdPrim& prim,
                             FnKat::StringAttribute(attrHints, 2));
         }
     }
-
-    return argsBuilder.build();
+    return count;
 }
 
 

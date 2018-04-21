@@ -49,11 +49,10 @@ readAiProcedural(
                   FnKat::StringAttribute("procedural"));
     }
 
-    FnKat::GroupAttribute procArgs = buildProceduralArgsGroup(
-                procedural.GetPrim(),
-                currentTime);
-    if (procArgs.isValid()) {
-        attrs.set("rendererProcedural.args", procArgs);
+    FnKat::GroupBuilder argsBuilder;
+    if (applyProceduralArgsAttrs(procedural.GetPrim(), argsBuilder, currentTime)) {
+        argsBuilder.set("__outputStyle", FnKat::StringAttribute("typedArguments"));
+        attrs.set("rendererProcedural.args", argsBuilder.build());
     }
 }
 
