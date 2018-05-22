@@ -44,6 +44,7 @@ if (BUILD_USD_PLUGIN)
         find_package(GTest REQUIRED)
     endif ()
     add_subdirectory(lib/pxr/usd/usdAi)
+    add_subdirectory(plugin/pxr/imaging/hdAi)
     add_subdirectory(utils)
 endif ()
 

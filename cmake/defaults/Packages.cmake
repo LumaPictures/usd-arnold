@@ -33,6 +33,12 @@ set(build_shared_libs "${BUILD_SHARED_LIBS}")
 find_package(USD REQUIRED)
 find_package(Arnold REQUIRED)
 
+# USD Arnold HD Renderer Requirement
+# ----------------------------------------------
+if (BUILD_USD_PLUGIN)
+    find_package(GLEW REQUIRED)
+endif ()
+
 # Core USD Package Requirements 
 # ----------------------------------------------
 
