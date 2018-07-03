@@ -71,9 +71,6 @@ else()
 endif()
 
 # --TBB
-# LUMA: Force off for now, because turning it on causes usdview to error out
-# (Worrisome! see: https://github.com/PixarAnimationStudios/USD/issues/147)
-set(TBB_USE_DEBUG_BUILD OFF)
 find_package(TBB REQUIRED COMPONENTS tbb)
 add_definitions(${TBB_DEFINITIONS})
 
