@@ -9,16 +9,16 @@ PXR_NAMESPACE_OPEN_SCOPE
 class HdAiRendererPlugin final : public HdxRendererPlugin {
 public:
     HdAiRendererPlugin() = default;
-    virtual ~HdAiRendererPlugin() = default;
+    ~HdAiRendererPlugin() override = default;
 
-    virtual HdRenderDelegate *CreateRenderDelegate() override;
-    virtual void DeleteRenderDelegate(
-        HdRenderDelegate *renderDelegate) override;
-    virtual bool IsSupported() const override;
-private:
     // This class does not support copying.
     HdAiRendererPlugin(const HdAiRendererPlugin&) = delete;
     HdAiRendererPlugin &operator =(const HdAiRendererPlugin&) = delete;
+
+    HdRenderDelegate *CreateRenderDelegate() override;
+    void DeleteRenderDelegate(
+        HdRenderDelegate *renderDelegate) override;
+    bool IsSupported() const override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -11,7 +11,7 @@ class HdAiRenderDelegate final : public HdRenderDelegate {
 public:
     HdAiRenderDelegate();
 
-    virtual ~HdAiRenderDelegate();
+    ~HdAiRenderDelegate() override;
 
     HdRenderParam* GetRenderParam() const override;
 
