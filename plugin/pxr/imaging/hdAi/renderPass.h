@@ -10,6 +10,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 class HdAiRenderPass : public HdRenderPass {
 public:
     HdAiRenderPass(HdRenderIndex* index, const HdRprimCollection& collection);
+    ~HdAiRenderPass() override = default;
 
 protected:
     void _Execute(

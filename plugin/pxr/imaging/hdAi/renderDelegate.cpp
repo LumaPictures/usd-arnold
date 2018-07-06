@@ -9,6 +9,7 @@
 #include <pxr/imaging/hd/rprim.h>
 
 #include "pxr/imaging/hdAi/mesh.h"
+#include "pxr/imaging/hdAi/renderBuffer.h"
 #include "pxr/imaging/hdAi/renderPass.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -22,6 +23,7 @@ const TfTokenVector HdAiRenderDelegate::SUPPORTED_SPRIM_TYPES = {
 };
 
 const TfTokenVector HdAiRenderDelegate::SUPPORTED_BPRIM_TYPES = {
+    HdPrimTypeTokens->renderBuffer,
 };
 
 std::mutex HdAiRenderDelegate::_mutexResourceRegistry;
@@ -98,10 +100,8 @@ HdAiRenderDelegate::CreateRprim(
     const SdfPath& instancerId) {
     if (typeId == HdPrimTypeTokens->mesh) {
         return nullptr;
-    } else {
-        TF_CODING_ERROR("Unknown Rprim Type %s", typeId.GetText());
     }
-
+    TF_CODING_ERROR("Unknown Rprim Type %s", typeId.GetText());
     return nullptr;
 }
 
@@ -116,10 +116,8 @@ HdAiRenderDelegate::CreateSprim(
     const SdfPath& sprimId) {
     if (typeId == HdPrimTypeTokens->camera) {
         return new HdCamera(sprimId);
-    } else {
-        TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
     }
-
+    TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
     return nullptr;
 }
 
@@ -127,10 +125,8 @@ HdSprim*
 HdAiRenderDelegate::CreateFallbackSprim(const TfToken& typeId) {
     if (typeId == HdPrimTypeTokens->camera) {
         return new HdCamera(SdfPath::EmptyPath());
-    } else {
-        TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
     }
-
+    TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
     return nullptr;
 }
 
@@ -143,12 +139,18 @@ HdBprim*
 HdAiRenderDelegate::CreateBprim(
     const TfToken& typeId,
     const SdfPath& bprimId) {
+    if (typeId == HdPrimTypeTokens->renderBuffer) {
+        return new HdAiRenderBuffer(bprimId);
+    }
     TF_CODING_ERROR("Unknown Bprim Type %s", typeId.GetText());
     return nullptr;
 }
 
 HdBprim*
 HdAiRenderDelegate::CreateFallbackBprim(const TfToken& typeId) {
+    if (typeId == HdPrimTypeTokens->renderBuffer) {
+        return new HdAiRenderBuffer(SdfPath());
+    }
     TF_CODING_ERROR("Unknown Bprim Type %s", typeId.GetText());
     return nullptr;
 }

@@ -28,6 +28,7 @@ pxr_plugin(hdAi
    #    meshSamplers
    #    renderer
        rendererPlugin
+       renderBuffer
        renderDelegate
        renderPass
    #    sampler

@@ -12,6 +12,8 @@ public:
     HdAiMesh(
         const SdfPath& id,
         const SdfPath& instancerId = SdfPath());
+
+    ~HdAiMesh() override = default;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
