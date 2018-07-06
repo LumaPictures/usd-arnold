@@ -4,6 +4,7 @@
 #include <pxr/pxr.h>
 #include <pxr/imaging/hd/renderDelegate.h>
 #include <pxr/imaging/hd/renderThread.h>
+#include <pxr/imaging/hd/resourceRegistry.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -58,6 +59,10 @@ private:
     static const TfTokenVector SUPPORTED_RPRIM_TYPES;
     static const TfTokenVector SUPPORTED_SPRIM_TYPES;
     static const TfTokenVector SUPPORTED_BPRIM_TYPES;
+
+    static std::mutex _mutexResourceRegistry;
+    static std::atomic_int _counterResourceRegistry;
+    static HdResourceRegistrySharedPtr _resourceRegistry;
 
     HdAiRenderDelegate(const HdAiRenderDelegate&) = delete;
 

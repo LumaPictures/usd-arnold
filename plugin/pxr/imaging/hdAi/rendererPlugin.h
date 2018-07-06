@@ -1,8 +1,8 @@
 #ifndef HDAI_RENDERER_PLUGIN_H
 #define HDAI_RENDERER_PLUGIN_H
 
-#include "pxr/pxr.h"
-#include "pxr/imaging/hdx/rendererPlugin.h"
+#include <pxr/pxr.h>
+#include <pxr/imaging/hdx/rendererPlugin.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 

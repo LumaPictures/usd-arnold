@@ -24,12 +24,12 @@ pxr_plugin(hdAi
     PUBLIC_CLASSES
    #    config
    #    instancer
-   #    mesh
+       mesh
    #    meshSamplers
    #    renderer
        rendererPlugin
        renderDelegate
-   #    renderPass
+       renderPass
    #    sampler
 
     #PUBLIC_HEADERS

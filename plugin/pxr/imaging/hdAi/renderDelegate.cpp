@@ -1,4 +1,4 @@
-#include "renderDelegate.h"
+#include "pxr/imaging/hdAi/renderDelegate.h"
 
 #include <pxr/imaging/glf/glew.h>
 #include <pxr/imaging/hd/resourceRegistry.h>
@@ -7,6 +7,9 @@
 #include <pxr/imaging/hd/tokens.h>
 #include <pxr/imaging/hd/instancer.h>
 #include <pxr/imaging/hd/rprim.h>
+
+#include "pxr/imaging/hdAi/mesh.h"
+#include "pxr/imaging/hdAi/renderPass.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -21,10 +24,22 @@ const TfTokenVector HdAiRenderDelegate::SUPPORTED_SPRIM_TYPES = {
 const TfTokenVector HdAiRenderDelegate::SUPPORTED_BPRIM_TYPES = {
 };
 
+std::mutex HdAiRenderDelegate::_mutexResourceRegistry;
+std::atomic_int HdAiRenderDelegate::_counterResourceRegistry;
+HdResourceRegistrySharedPtr HdAiRenderDelegate::_resourceRegistry;
+
 HdAiRenderDelegate::HdAiRenderDelegate() {
+    std::lock_guard<std::mutex> guard(_mutexResourceRegistry);
+    if (_counterResourceRegistry.fetch_add(1) == 0) {
+        _resourceRegistry.reset( new HdResourceRegistry() );
+    }
 }
 
 HdAiRenderDelegate::~HdAiRenderDelegate() {
+    std::lock_guard<std::mutex> guard(_mutexResourceRegistry);
+    if (_counterResourceRegistry.fetch_sub(1) == 1) {
+        _resourceRegistry.reset();
+    }
 }
 
 HdRenderParam*
@@ -36,48 +51,51 @@ void
 HdAiRenderDelegate::CommitResources(HdChangeTracker *tracker) {
 }
 
-TfTokenVector const&
+const TfTokenVector&
 HdAiRenderDelegate::GetSupportedRprimTypes() const {
     return SUPPORTED_RPRIM_TYPES;
 }
 
-TfTokenVector const&
+const TfTokenVector&
 HdAiRenderDelegate::GetSupportedSprimTypes() const {
     return SUPPORTED_SPRIM_TYPES;
 }
 
-TfTokenVector const&
+const TfTokenVector&
 HdAiRenderDelegate::GetSupportedBprimTypes() const {
     return SUPPORTED_BPRIM_TYPES;
 }
 
 HdResourceRegistrySharedPtr
 HdAiRenderDelegate::GetResourceRegistry() const {
-    return nullptr;
+    return _resourceRegistry;
 }
 
 HdRenderPassSharedPtr
-HdAiRenderDelegate::CreateRenderPass(HdRenderIndex *index,
-                                         HdRprimCollection const& collection) {
-    return nullptr;
+HdAiRenderDelegate::CreateRenderPass(
+    HdRenderIndex* index,
+    const HdRprimCollection& collection) {
+    return HdRenderPassSharedPtr(new HdAiRenderPass(index, collection));
 }
 
-HdInstancer *
-HdAiRenderDelegate::CreateInstancer(HdSceneDelegate *delegate,
-                                        SdfPath const& id,
-                                        SdfPath const& instancerId) {
+HdInstancer*
+HdAiRenderDelegate::CreateInstancer(
+    HdSceneDelegate* delegate,
+    const SdfPath& id,
+    const SdfPath& instancerId) {
     return nullptr;
 }
 
 void
-HdAiRenderDelegate::DestroyInstancer(HdInstancer *instancer) {
+HdAiRenderDelegate::DestroyInstancer(HdInstancer* instancer) {
     delete instancer;
 }
 
-HdRprim *
-HdAiRenderDelegate::CreateRprim(TfToken const& typeId,
-                                    SdfPath const& rprimId,
-                                    SdfPath const& instancerId) {
+HdRprim*
+HdAiRenderDelegate::CreateRprim(
+    const TfToken& typeId,
+    const SdfPath& rprimId,
+    const SdfPath& instancerId) {
     if (typeId == HdPrimTypeTokens->mesh) {
         return nullptr;
     } else {
@@ -88,15 +106,16 @@ HdAiRenderDelegate::CreateRprim(TfToken const& typeId,
 }
 
 void
-HdAiRenderDelegate::DestroyRprim(HdRprim *rPrim) {
+HdAiRenderDelegate::DestroyRprim(HdRprim* rPrim) {
     delete rPrim;
 }
 
-HdSprim *
-HdAiRenderDelegate::CreateSprim(TfToken const& typeId,
-                                SdfPath const& sprimId) {
+HdSprim*
+HdAiRenderDelegate::CreateSprim(
+    const TfToken& typeId,
+    const SdfPath& sprimId) {
     if (typeId == HdPrimTypeTokens->camera) {
-        return nullptr;
+        return new HdCamera(sprimId);
     } else {
         TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
     }
@@ -104,10 +123,10 @@ HdAiRenderDelegate::CreateSprim(TfToken const& typeId,
     return nullptr;
 }
 
-HdSprim *
-HdAiRenderDelegate::CreateFallbackSprim(TfToken const& typeId) {
+HdSprim*
+HdAiRenderDelegate::CreateFallbackSprim(const TfToken& typeId) {
     if (typeId == HdPrimTypeTokens->camera) {
-        return nullptr;
+        return new HdCamera(SdfPath::EmptyPath());
     } else {
         TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
     }
@@ -116,25 +135,26 @@ HdAiRenderDelegate::CreateFallbackSprim(TfToken const& typeId) {
 }
 
 void
-HdAiRenderDelegate::DestroySprim(HdSprim *sPrim) {
+HdAiRenderDelegate::DestroySprim(HdSprim* sPrim) {
     delete sPrim;
 }
 
-HdBprim *
-HdAiRenderDelegate::CreateBprim(TfToken const& typeId,
-                                    SdfPath const& bprimId) {
+HdBprim*
+HdAiRenderDelegate::CreateBprim(
+    const TfToken& typeId,
+    const SdfPath& bprimId) {
     TF_CODING_ERROR("Unknown Bprim Type %s", typeId.GetText());
     return nullptr;
 }
 
-HdBprim *
-HdAiRenderDelegate::CreateFallbackBprim(TfToken const& typeId) {
+HdBprim*
+HdAiRenderDelegate::CreateFallbackBprim(const TfToken& typeId) {
     TF_CODING_ERROR("Unknown Bprim Type %s", typeId.GetText());
     return nullptr;
 }
 
 void
-HdAiRenderDelegate::DestroyBprim(HdBprim *bPrim) {
+HdAiRenderDelegate::DestroyBprim(HdBprim* bPrim) {
     delete bPrim;
 }
 

@@ -1,8 +1,8 @@
-#include "rendererPlugin.h"
+#include "pxr/imaging/hdAi/rendererPlugin.h"
 
 #include <pxr/imaging/hdx/rendererPluginRegistry.h>
 
-#include "renderDelegate.h"
+#include "pxr/imaging/hdAi/renderDelegate.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -15,12 +15,11 @@ TF_REGISTRY_FUNCTION(TfType)
 HdRenderDelegate*
 HdAiRendererPlugin::CreateRenderDelegate()
 {
-    // return new HdAiRenderDelegate();
-    return nullptr;
+    return new HdAiRenderDelegate();
 }
 
 void
-HdAiRendererPlugin::DeleteRenderDelegate(HdRenderDelegate *renderDelegate)
+HdAiRendererPlugin::DeleteRenderDelegate(HdRenderDelegate* renderDelegate)
 {
     delete renderDelegate;
 }
