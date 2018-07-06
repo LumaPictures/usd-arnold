@@ -28,6 +28,7 @@ option(PXR_ENABLE_NAMESPACES "Enable C++ namespaces." ON)
 
 # --
 option(BUILD_USD_PLUGIN "Building the usd plugin." OFF)
+option(BUILD_USD_IMAGING_PLUGIN "Building the usd imaging plugin." OFF)
 option(BUILD_USD_MAYA_PLUGIN "Building the usd maya plugin." OFF)
 option(BUILD_USD_KATANA_PLUGIN "Building the usd katana plugin." OFF)
 option(BUILD_USD_HOUDINI_PLUGIN "Building the usd houdini plugin." OFF)
