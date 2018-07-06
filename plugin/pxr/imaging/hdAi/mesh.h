@@ -5,6 +5,8 @@
 
 #include <pxr/imaging/hd/mesh.h>
 
+#include <ai.h>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HdAiMesh : public HdMesh {
@@ -14,6 +16,9 @@ public:
         const SdfPath& instancerId = SdfPath());
 
     ~HdAiMesh() override = default;
+
+private:
+    AtNode* _mesh;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

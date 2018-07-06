@@ -5,6 +5,8 @@
 
 #include <pxr/imaging/hd/renderPass.h>
 
+#include <ai.h>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HdAiRenderPass : public HdRenderPass {
@@ -16,6 +18,11 @@ protected:
     void _Execute(
         const HdRenderPassStateSharedPtr& renderPassState,
         const TfTokenVector& renderTags);
+
+private:
+    AtNode* _camera;
+    AtNode* _filter;
+    AtNode* _driver;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

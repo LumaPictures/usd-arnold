@@ -8,6 +8,8 @@
 #include <pxr/imaging/hd/instancer.h>
 #include <pxr/imaging/hd/rprim.h>
 
+#include <ai.h>
+
 #include "pxr/imaging/hdAi/mesh.h"
 #include "pxr/imaging/hdAi/renderBuffer.h"
 #include "pxr/imaging/hdAi/renderPass.h"
@@ -31,10 +33,15 @@ std::atomic_int HdAiRenderDelegate::_counterResourceRegistry;
 HdResourceRegistrySharedPtr HdAiRenderDelegate::_resourceRegistry;
 
 HdAiRenderDelegate::HdAiRenderDelegate() {
+    if (AiUniverseIsActive()) {
+        TF_CODING_ERROR("There is already an active Arnold universe!");
+    }
+    AiBegin(AI_SESSION_INTERACTIVE);
     std::lock_guard<std::mutex> guard(_mutexResourceRegistry);
     if (_counterResourceRegistry.fetch_add(1) == 0) {
         _resourceRegistry.reset( new HdResourceRegistry() );
     }
+    AiMsgSetConsoleFlags(AI_LOG_WARNINGS | AI_LOG_ERRORS);
 }
 
 HdAiRenderDelegate::~HdAiRenderDelegate() {
@@ -42,6 +49,7 @@ HdAiRenderDelegate::~HdAiRenderDelegate() {
     if (_counterResourceRegistry.fetch_sub(1) == 1) {
         _resourceRegistry.reset();
     }
+    AiEnd();
 }
 
 HdRenderParam*
@@ -50,7 +58,7 @@ HdAiRenderDelegate::GetRenderParam() const {
 }
 
 void
-HdAiRenderDelegate::CommitResources(HdChangeTracker *tracker) {
+HdAiRenderDelegate::CommitResources(HdChangeTracker* tracker) {
 }
 
 const TfTokenVector&
