@@ -1,6 +1,5 @@
 # CLion related files
 .idea
-cmake-build-debug
-cmake-build-release
+cmake-build*
 # Visual Studio Code related files
 .vscode

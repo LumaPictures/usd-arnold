@@ -1,6 +1,16 @@
 set(PXR_PREFIX pxr/imaging)
 set(PXR_PACKAGE hdAi)
 
+# required for pxr_shared_library
+if (NOT TARGET shared_libs)
+    add_custom_target(shared_libs)
+endif ()
+if (NOT TARGET python)
+add_custom_target(python ALL)
+endif ()
+
+find_package(PythonLibs REQUIRED)
+
 pxr_plugin(hdAi
     LIBRARIES
         plug
@@ -11,7 +21,6 @@ pxr_plugin(hdAi
         hf
         hd
         hdx
-        usdAi
         ${TBB_LIBRARIES}
         ${ARNOLD_LIBRARY}
 
@@ -20,6 +29,7 @@ pxr_plugin(hdAi
         ${TBB_INCLUDE_DIRS}
         ${ARNOLD_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}/../../../lib
+        ${PYTHON_INCLUDE_DIRS}
 
     PUBLIC_CLASSES
    #    config

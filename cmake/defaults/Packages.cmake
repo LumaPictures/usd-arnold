@@ -35,7 +35,7 @@ find_package(Arnold REQUIRED)
 
 # USD Arnold HD Renderer Requirement
 # ----------------------------------------------
-if (BUILD_USD_PLUGIN)
+if (BUILD_USD_PLUGIN OR BUILD_USD_IMAGING_PLUGIN)
     find_package(GLEW REQUIRED)
 endif ()
 

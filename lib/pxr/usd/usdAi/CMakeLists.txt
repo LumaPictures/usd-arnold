@@ -3,8 +3,12 @@ set(PXR_PREFIX pxr/usd)
 set(PXR_PACKAGE usdAi)
 
 # required for pxr_shared_library
-add_custom_target(shared_libs)
-add_custom_target(python ALL)
+if (NOT TARGET shared_libs)
+    add_custom_target(shared_libs)
+endif ()
+if (NOT TARGET python)
+    add_custom_target(python ALL)
+endif ()
 
 pxr_shared_library(usdAi
     LIBRARIES
