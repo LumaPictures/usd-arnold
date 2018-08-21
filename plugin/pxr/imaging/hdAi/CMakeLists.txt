@@ -25,6 +25,7 @@ pxr_plugin(hdAi
         ${ARNOLD_LIBRARY}
 
     INCLUDE_DIRS
+        ${Boost_INCLUDE_DIRS}
         ${GLEW_INCLUDE_DIR}
         ${TBB_INCLUDE_DIRS}
         ${ARNOLD_INCLUDE_DIRS}
