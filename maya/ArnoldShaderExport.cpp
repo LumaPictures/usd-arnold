@@ -33,7 +33,7 @@ ArnoldShaderExport::ArnoldShaderExport(const UsdStageRefPtr& _stage,
                                        const UsdTimeCode& _time_code,
                                        bool strip_namespaces,
                                        const SdfPath& parent_scope,
-                                       const PxrUsdMayaUtil::MDagPathMap<SdfPath>::Type& dag_to_usd) :
+                                       const UsdMayaUtil::MDagPathMap<SdfPath>& dag_to_usd) :
             AiShaderExport(_stage, parent_scope, _time_code), m_dag_to_usd(dag_to_usd),
             m_strip_namespaces(strip_namespaces)
 {
@@ -88,7 +88,7 @@ ArnoldShaderExport::export_shading_engine(MObject obj) {
     MString name = node.name();
     if (m_strip_namespaces) {
         // drop namespaces instead of making them part of the path
-        // Could use PxrUsdMayaUtil::stripNamespaces, but it's designed for working
+        // Could use UsdMayaUtil::stripNamespaces, but it's designed for working
         // with dag paths, and so is more complicated than we need, and also adds a
         // leading "|"
         int last_colon = name.rindexW(':');

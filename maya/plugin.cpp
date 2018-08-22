@@ -9,7 +9,7 @@
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
-class ArnoldShadingModeExporter : public PxrUsdMayaShadingModeExporter {
+class ArnoldShadingModeExporter : public UsdMayaShadingModeExporter {
 public:
     ArnoldShadingModeExporter() {
 
@@ -19,17 +19,17 @@ public:
         delete ai;
     }
 
-    void PreExport(const PxrUsdMayaShadingModeExportContext& context) override
+    void PreExport(UsdMayaShadingModeExportContext* context) override
     {
         ai = new ArnoldShaderExport(
-                context.GetUsdStage(),
+                context->GetUsdStage(),
                 UsdTimeCode::Default(),
-                context.GetStripNamespaces(),
-                context.GetParentScope(),
-                context.GetDagPathToUsdMap());
+                context->GetStripNamespaces(),
+                context->GetParentScope(),
+                context->GetDagPathToUsdMap());
     }
 
-    void Export(const PxrUsdMayaShadingModeExportContext& context,
+    void Export(const UsdMayaShadingModeExportContext& context,
                 UsdShadeMaterial * const mat,
                 SdfPathSet * const boundPrimPaths) override
     {
@@ -39,7 +39,7 @@ public:
         }
     }
 
-    void PostExport(const PxrUsdMayaShadingModeExportContext& context) override
+    void PostExport(const UsdMayaShadingModeExportContext& context) override
     {
         if (ai != nullptr)
         {
@@ -53,15 +53,15 @@ private:
     ArnoldShaderExport* ai;
 };
 
-TF_REGISTRY_FUNCTION_WITH_TAG(PxrUsdMayaShadingModeExportContext, arnold) {
-    PxrUsdMayaShadingModeRegistry::GetInstance().RegisterExporter("arnold", []() -> PxrUsdMayaShadingModeExporterPtr {
-        return PxrUsdMayaShadingModeExporterPtr(
-            static_cast<PxrUsdMayaShadingModeExporter*>(new ArnoldShadingModeExporter()));
+TF_REGISTRY_FUNCTION_WITH_TAG(UsdMayaShadingModeExportContext, arnold) {
+    UsdMayaShadingModeRegistry::GetInstance().RegisterExporter("arnold", []() -> UsdMayaShadingModeExporterPtr {
+        return UsdMayaShadingModeExporterPtr(
+            static_cast<UsdMayaShadingModeExporter*>(new ArnoldShadingModeExporter()));
     });
 }
 
-TF_REGISTRY_FUNCTION_WITH_TAG(PxrUsdMayaUserAttributeWriterRegistry, usdAi) {
-    PxrUsdMayaUserAttributeWriterRegistry::RegisterWriter("usdAi", [](
+TF_REGISTRY_FUNCTION_WITH_TAG(UsdMayaUserAttributeWriterRegistry, usdAi) {
+    UsdMayaUserAttributeWriterRegistry::RegisterWriter("usdAi", [](
         const MPlug& attrPlug,
         const UsdPrim& usdPrim,
         const std::string& attrName,

@@ -16,7 +16,7 @@ class ArnoldShaderExport : public AiShaderExport {
 public:
     ArnoldShaderExport(const UsdStageRefPtr& _stage, const UsdTimeCode& _time_code,
                        bool strip_namespaces, const SdfPath& parent_scope,
-                       const PxrUsdMayaUtil::MDagPathMap<SdfPath>::Type& dag_to_usd);
+                       const UsdMayaUtil::MDagPathMap<SdfPath>& dag_to_usd);
     virtual ~ArnoldShaderExport();
 
 private:
@@ -26,7 +26,7 @@ private:
         TRANSFORM_ASSIGNMENT_FULL
     };
     TransformAssignment m_transform_assignment;
-    const PxrUsdMayaUtil::MDagPathMap<SdfPath>::Type& m_dag_to_usd;
+    const UsdMayaUtil::MDagPathMap<SdfPath>& m_dag_to_usd;
 
     void setup_shader(const MDagPath& dg, const SdfPath& path);
 public:
