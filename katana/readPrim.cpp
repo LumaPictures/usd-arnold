@@ -25,15 +25,27 @@ static void resolveAOVs(
         const UsdPrim& rootPrim)
 {
     // This could just be `static TfToken aovPrimType("AiAOV");`, but I wanted
-    // to use something that would insulate against class name changed better.
+    // to use something that would insulate against class name changes better.
     // The tradeoff is that this will crash if `UsdAiAOV` has no aliases... :D
     static TfToken aovPrimType(TfType::Find<UsdSchemaBase>().GetAliases(
             TfType::Find<UsdAiAOV>()).front());
 
     std::vector<UsdPrim> aovPrims;
-    const UsdPrimRange range(rootPrim);
-    std::copy_if(range.begin(), range.end(), std::back_inserter(aovPrims),
-                 [](const UsdPrim& prim) { return prim.GetTypeName() == aovPrimType; });
+    auto aovPredicate = [&](const UsdPrim& prim) {
+        return prim.GetTypeName() == aovPrimType;
+    };
+
+    const UsdPrimRange rootRange(rootPrim);
+    std::copy_if(rootRange.begin(), rootRange.end(),
+                 std::back_inserter(aovPrims), aovPredicate);
+
+    // Note: This only really makes sense if `rootPrim` is the stage root.
+    for (auto& masterPrim : rootPrim.GetStage()->GetMasters())
+    {
+        const UsdPrimRange range(masterPrim);
+        std::copy_if(range.begin(), range.end(), std::back_inserter(aovPrims),
+                     aovPredicate);
+    }
 
     if (aovPrims.empty()) {
         return;
