@@ -31,9 +31,9 @@ include(Public)
 set(CMAKE_CXX_STANDARD 11)
 
 
-include_directories(${USD_INCLUDE_DIR})
+include_directories(SYSTEM ${USD_INCLUDE_DIR})
 link_directories(${USD_LIBRARY_DIR})
-include_directories(${ARNOLD_INCLUDE_DIR})
+include_directories(SYSTEM ${ARNOLD_INCLUDE_DIR})
 
 include_directories(SYSTEM ${TBB_INCLUDE_DIRS})
 include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})

@@ -56,13 +56,6 @@ convert(LHT& l, const RHT& r) {
 };
 
 template <> inline void
-convert<std::string, const char*>(std::string& l, const char* const& r) {
-    if (r != nullptr) {
-        l = r;
-    }
-};
-
-template <> inline void
 convert<std::string, AtString>(std::string& l, const AtString& r) {
     const auto* c = r.c_str();
     if (c != nullptr) {

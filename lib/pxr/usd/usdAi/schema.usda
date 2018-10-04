@@ -40,7 +40,7 @@ class "AiNodeAPI" (
              interface for getting and setting user parameters."""
     customData = {
         string extraIncludes = """
-class AtMetaDataEntry;"""
+struct AtMetaDataEntry;"""
     }
 ) {
     uniform token info:node_entry_type (

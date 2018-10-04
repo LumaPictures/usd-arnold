@@ -22,7 +22,7 @@ protected:
 private:
     AtNode* _camera;
     AtNode* _filter;
-    AtNode* _driver;
+    // AtNode* _driver;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

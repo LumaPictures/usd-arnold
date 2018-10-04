@@ -33,7 +33,7 @@
 #include "pxr/usd/usd/stage.h"
 #include "pxr/usd/usdAi/tokens.h"
 
-class AtMetaDataEntry;
+struct AtMetaDataEntry;
 
 #include "pxr/base/vt/value.h"
 

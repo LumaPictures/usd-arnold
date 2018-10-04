@@ -14,7 +14,9 @@ pxr_shared_library(usdAi
     LIBRARIES
         ${ARNOLD_LIBRARY}
         ${Boost_LIBRARIES}
+        ${PYTHON_LIBRARY}
         tf
+        gf
         vt
         sdf
         usd

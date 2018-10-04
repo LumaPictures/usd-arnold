@@ -3,8 +3,8 @@
 
 #include "pxr/usd/usdAi/aiShader.h"
 
-class AtNode;
-class AtParamEntry;
+struct AtNode;
+struct AtParamEntry;
 class AtParamValue;
 class AtArray;
 
