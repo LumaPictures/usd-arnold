@@ -17,7 +17,7 @@ public:
 protected:
     void _Execute(
         const HdRenderPassStateSharedPtr& renderPassState,
-        const TfTokenVector& renderTags);
+        const TfTokenVector& renderTags) override;
 
 private:
     AtNode* _camera;

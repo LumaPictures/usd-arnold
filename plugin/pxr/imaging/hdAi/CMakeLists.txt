@@ -13,6 +13,9 @@ find_package(PythonLibs REQUIRED)
 
 pxr_plugin(hdAi
     LIBRARIES
+        ${ARNOLD_LIBRARY}
+        ${PYTHON_LIBRARY}
+        ${Boost_LIBRARIES}
         plug
         tf
         vt
@@ -21,8 +24,8 @@ pxr_plugin(hdAi
         hf
         hd
         hdx
+        sdf
         ${TBB_LIBRARIES}
-        ${ARNOLD_LIBRARY}
 
     INCLUDE_DIRS
         ${Boost_INCLUDE_DIRS}
