@@ -139,7 +139,10 @@ HdSprim* HdAiRenderDelegate::CreateFallbackSprim(const TfToken& typeId) {
     return nullptr;
 }
 
-void HdAiRenderDelegate::DestroySprim(HdSprim* sPrim) { delete sPrim; }
+void HdAiRenderDelegate::DestroySprim(HdSprim* sPrim) {
+    /*delete sPrim;*/ // This crashes in the destructor. I suspect an invalid
+    // prim being removed.
+}
 
 HdBprim* HdAiRenderDelegate::CreateBprim(
     const TfToken& typeId, const SdfPath& bprimId) {
