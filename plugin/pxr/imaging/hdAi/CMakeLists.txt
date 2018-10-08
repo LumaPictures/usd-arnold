@@ -49,6 +49,7 @@ pxr_plugin(hdAi
 
    CPPFILES
        nodes/camera.cpp
+       nodes/driver.cpp
        nodes/nodes.cpp
 
    PRIVATE_HEADERS

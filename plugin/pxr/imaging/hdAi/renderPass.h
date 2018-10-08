@@ -52,12 +52,15 @@ protected:
         const TfTokenVector& renderTags) override;
 
 private:
-    AtNode* _camera;
-    AtNode* _filter;
-    // AtNode* _driver;
-    AtNode* _options;
+    AtNode* _camera = nullptr;
+    AtNode* _filter = nullptr;
+    AtNode* _driver = nullptr;
+    AtNode* _options = nullptr;
 
     HdxCompositor _compositor;
+
+    unsigned int _width = 0;
+    unsigned int _height = 0;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

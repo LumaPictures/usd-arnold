@@ -33,10 +33,11 @@
 #include <tuple>
 
 extern AtNodeMethods* HdAiCameraMtd;
+extern AtNodeMethods* HdAiDriverMtd;
 
-AtString hdAiCameraName("HdAiCamera");
-// AiNodeEntryInstall(AI_NODE_CAMERA, AI_TYPE_UNDEFINED, "HdAiCamera",
-// "<built-in>", HdAiCameraMtd, AI_VERSION);
+AtString HdAiNodeNames::camera("HdAiCamera");
+AtString HdAiNodeNames::driver("HdAiDriver");
+
 namespace {
 struct NodeDefinition {
     int type;
@@ -45,9 +46,10 @@ struct NodeDefinition {
     const AtNodeMethods* methods;
 };
 
-const std::array<NodeDefinition, 1> builtInNodes = {
-    {{AI_NODE_CAMERA, AI_TYPE_UNDEFINED, hdAiCameraName, HdAiCameraMtd}},
-};
+const std::array<NodeDefinition, 2> builtInNodes = {{
+    {AI_NODE_CAMERA, AI_TYPE_UNDEFINED, HdAiNodeNames::camera, HdAiCameraMtd},
+    {AI_NODE_DRIVER, AI_TYPE_UNDEFINED, HdAiNodeNames::driver, HdAiDriverMtd},
+}};
 
 } // namespace
 

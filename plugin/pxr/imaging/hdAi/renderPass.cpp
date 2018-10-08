@@ -30,8 +30,9 @@
 /*
  * TODO:
  * - Restart rendering if proj / view mtx or the viewport changes.
+ * - Writing to the render buffers directly.
+ * - Handling the depth buffer.
  */
-
 #include "pxr/imaging/hdAi/renderPass.h"
 
 #include <pxr/imaging/hd/renderPassState.h>
@@ -44,11 +45,13 @@ HdAiRenderPass::HdAiRenderPass(
     AtUniverse* universe, HdRenderIndex* index,
     const HdRprimCollection& collection)
     : HdRenderPass(index, collection) {
-    _camera = AiNode(universe, hdAiCameraName);
+    _camera = AiNode(universe, HdAiNodeNames::camera);
     AiNodeSetPtr(AiUniverseGetOptions(universe), "camera", _camera);
     AiNodeSetStr(_camera, "name", "HdAiRenderPass_camera");
     _filter = AiNode(universe, "gaussian_filter");
     AiNodeSetStr(_filter, "name", "HdAiRenderPass_filter");
+    _driver = AiNode(universe, HdAiNodeNames::driver);
+    AiNodeSetStr(_driver, "name", "HdAiRenderPass_driver");
     _options = AiUniverseGetOptions(universe);
 }
 
@@ -66,11 +69,32 @@ void HdAiRenderPass::_Execute(
     };
 
     AiNodeSetMatrix(
-        _camera, "projMtx", convertMtx(renderPassState->GetProjectionMatrix()));
+        _camera, HdAiCamera::projMtx,
+        convertMtx(renderPassState->GetProjectionMatrix()));
     AiNodeSetMatrix(
         _camera, "matrix", convertMtx(renderPassState->GetWorldToViewMatrix()));
 
+    const auto vp = renderPassState->GetViewport();
+
+    _width = static_cast<unsigned int>(vp[2]);
+    _height = static_cast<unsigned int>(vp[3]);
+
     AiRender();
+
+#pragma pack(1)
+    struct Color {
+        uint8_t r, g, b, a;
+    };
+#pragma pack()
+
+    // Blitting to the OpenGL buffer.
+    std::vector<Color> color(_width * _height, {255, 0, 0, 255});
+    std::vector<float> depth(_width * _height, 1.0f - AI_EPSILON);
+    _compositor.UpdateColor(
+        _width, _height, reinterpret_cast<uint8_t*>(color.data()));
+    _compositor.UpdateDepth(
+        _width, _height, reinterpret_cast<uint8_t*>(depth.data()));
+    _compositor.Draw();
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

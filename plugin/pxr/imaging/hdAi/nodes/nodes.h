@@ -32,7 +32,14 @@
 
 #include <ai.h>
 
-extern AtString hdAiCameraName;
+namespace HdAiNodeNames {
+extern AtString camera;
+extern AtString driver;
+} // namespace HdAiNodeNames
+
+namespace HdAiCamera {
+extern AtString projMtx;
+}
 
 void HdAiInstallNodes();
 void HdAiUninstallNodes();

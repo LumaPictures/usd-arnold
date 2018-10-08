@@ -29,62 +29,32 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ai.h>
 
-#include "pxr/imaging/hdAi/nodes/nodes.h"
-
-/*
- * TODO:
- * - Make sure derivatives are calculated properly.
- * - Investigate AiCameraUpdate's second parameter.
- */
-
-AI_CAMERA_NODE_EXPORT_METHODS(HdAiCameraMtd)
-
-AtString HdAiCamera::projMtx("projMtx");
+AI_DRIVER_NODE_EXPORT_METHODS(HdAiDriverMtd);
 
 namespace {
-
-struct ShaderData {
-    AtMatrix projMtx;
-    AtMatrix projMtxInv;
-};
-
-} // namespace
-
-node_parameters { AiParameterMtx(HdAiCamera::projMtx, AtMatrix()); }
-
-node_initialize {
-    AiCameraInitialize(node);
-    AiNodeSetLocalData(node, new ShaderData());
+const char* supportedExtensions[] = {nullptr};
 }
 
-node_update {
-    AiCameraUpdate(node, false);
-    auto* data = reinterpret_cast<ShaderData*>(AiNodeGetLocalData(node));
-    data->projMtx = AiNodeGetMatrix(node, HdAiCamera::projMtx);
-    data->projMtxInv = AiM4Invert(data->projMtx);
-}
+node_parameters {}
 
-node_finish { delete reinterpret_cast<ShaderData*>(AiNodeGetLocalData(node)); }
+node_initialize { AiDriverInitialize(node, false); }
 
-camera_create_ray {
-    const auto* data = reinterpret_cast<ShaderData*>(AiNodeGetLocalData(node));
-    output.weight = AI_RGB_WHITE;
+node_update {}
 
-    AtVector ndc(input.sx, input.sy, -1.0f);
-    auto npt = AiM4VectorByMatrixMult(data->projMtxInv, ndc);
-    if (fabsf(npt.z) < AI_EPSILON) {
-        output.origin = npt;
-        output.dir = AI_V3_NEGZ;
-    } else {
-        output.origin = AI_V3_ZERO;
-        output.dir = AiV3Normalize(npt);
-    }
-}
+node_finish {}
 
-camera_reverse_ray {
-    const auto* data = reinterpret_cast<ShaderData*>(AiNodeGetLocalData(node));
-    const auto ppo = AiM4VectorByMatrixMult(data->projMtx, Po);
-    Ps.x = ppo.x / ppo.z;
-    Ps.y = ppo.y / ppo.z;
-    return true;
-}
+driver_supports_pixel_type { return pixel_type == AI_TYPE_RGBA; }
+
+driver_extension { return supportedExtensions; }
+
+driver_open {}
+
+driver_needs_bucket { return true; }
+
+driver_prepare_bucket {}
+
+driver_process_bucket {}
+
+driver_write_bucket {}
+
+driver_close {}
