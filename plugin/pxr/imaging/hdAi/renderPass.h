@@ -59,8 +59,8 @@ private:
 
     HdxCompositor _compositor;
 
-    unsigned int _width = 0;
-    unsigned int _height = 0;
+    int _width = 0;
+    int _height = 0;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

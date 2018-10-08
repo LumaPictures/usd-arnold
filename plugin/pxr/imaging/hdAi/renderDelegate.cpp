@@ -70,7 +70,7 @@ HdAiRenderDelegate::HdAiRenderDelegate() {
         _resourceRegistry.reset(new HdResourceRegistry());
     }
     AiMsgSetConsoleFlags(AI_LOG_WARNINGS | AI_LOG_ERRORS);
-    HdAiInstallNodes();
+    hdAiInstallNodes();
 
     _universe = nullptr;
 }
@@ -80,7 +80,7 @@ HdAiRenderDelegate::~HdAiRenderDelegate() {
     if (_counterResourceRegistry.fetch_sub(1) == 1) {
         _resourceRegistry.reset();
     }
-    HdAiUninstallNodes();
+    hdAiUninstallNodes();
     AiUniverseDestroy(_universe);
     AiEnd();
 }

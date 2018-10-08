@@ -53,7 +53,7 @@ const std::array<NodeDefinition, 2> builtInNodes = {{
 
 } // namespace
 
-void HdAiInstallNodes() {
+void hdAiInstallNodes() {
     for (const auto& it : builtInNodes) {
         AiNodeEntryInstall(
             it.type, it.outputType, it.name, "<built-in>", it.methods,
@@ -61,6 +61,6 @@ void HdAiInstallNodes() {
     }
 }
 
-void HdAiUninstallNodes() {
+void hdAiUninstallNodes() {
     for (const auto& it : builtInNodes) { AiNodeEntryUninstall(it.name); }
 }

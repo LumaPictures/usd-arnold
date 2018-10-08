@@ -29,10 +29,29 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ai.h>
 
+#include <tbb/concurrent_queue.h>
+
+#include <memory>
+
+#include "pxr/imaging/hdAi/nodes/nodes.h"
+
 AI_DRIVER_NODE_EXPORT_METHODS(HdAiDriverMtd);
 
 namespace {
 const char* supportedExtensions[] = {nullptr};
+}
+
+tbb::concurrent_queue<HdAiBucketData*> bucketQueue;
+
+void hdAiEmptyBucketQueue(const std::function<void(const HdAiBucketData*)>& f) {
+    HdAiBucketData* data = nullptr;
+    while (bucketQueue.try_pop(data)) {
+        if (data) {
+            f(data);
+            delete data;
+            data = nullptr;
+        }
+    }
 }
 
 node_parameters {}
@@ -53,7 +72,27 @@ driver_needs_bucket { return true; }
 
 driver_prepare_bucket {}
 
-driver_process_bucket {}
+driver_process_bucket {
+    const char* outputName = nullptr;
+    int pixelType = AI_TYPE_RGBA;
+    const void* bucketData = nullptr;
+    while (AiOutputIteratorGetNext(
+        iterator, &outputName, &pixelType, &bucketData)) {
+        if (pixelType != AI_TYPE_RGBA) { continue; }
+        auto* data = new HdAiBucketData();
+        data->dataType = AI_TYPE_RGBA;
+        data->xo = bucket_xo;
+        data->yo = bucket_yo;
+        data->sizeX = bucket_size_x;
+        data->sizeY = bucket_size_y;
+        const size_t memSize =
+            bucket_size_x * bucket_size_y * sizeof(float) * 4;
+        data->data.resize(memSize, 0);
+        memcpy(data->data.data(), bucketData, memSize);
+        bucketQueue.push(data);
+        break; // Only one buffer for now.
+    }
+}
 
 driver_write_bucket {}
 

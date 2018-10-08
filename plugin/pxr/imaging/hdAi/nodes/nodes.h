@@ -32,6 +32,9 @@
 
 #include <ai.h>
 
+#include <functional>
+#include <vector>
+
 namespace HdAiNodeNames {
 extern AtString camera;
 extern AtString driver;
@@ -39,9 +42,25 @@ extern AtString driver;
 
 namespace HdAiCamera {
 extern AtString projMtx;
-}
+} // namespace HdAiCamera
 
-void HdAiInstallNodes();
-void HdAiUninstallNodes();
+void hdAiInstallNodes();
+void hdAiUninstallNodes();
+
+struct HdAiBucketData {
+    HdAiBucketData() = default;
+    ~HdAiBucketData() = default;
+    HdAiBucketData(const HdAiBucketData&) = delete;
+    HdAiBucketData(HdAiBucketData&&) = delete;
+    HdAiBucketData& operator= (const HdAiBucketData&) = delete;
+    std::vector<uint8_t> data;
+    int dataType = AI_TYPE_RGBA;
+    int xo = 0;
+    int yo = 0;
+    int sizeX = 0;
+    int sizeY = 0;
+};
+
+void hdAiEmptyBucketQueue(const std::function<void(const HdAiBucketData*)>& f);
 
 #endif

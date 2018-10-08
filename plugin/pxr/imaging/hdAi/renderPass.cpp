@@ -53,6 +53,9 @@ HdAiRenderPass::HdAiRenderPass(
     _driver = AiNode(universe, HdAiNodeNames::driver);
     AiNodeSetStr(_driver, "name", "HdAiRenderPass_driver");
     _options = AiUniverseGetOptions(universe);
+    AiNodeSetStr(
+        _options, "outputs",
+        "RGBA RGBA HdAiRenderPass_filter HdAiRenderPass_driver");
 }
 
 void HdAiRenderPass::_Execute(
@@ -76,22 +79,49 @@ void HdAiRenderPass::_Execute(
 
     const auto vp = renderPassState->GetViewport();
 
-    _width = static_cast<unsigned int>(vp[2]);
-    _height = static_cast<unsigned int>(vp[3]);
+    _width = static_cast<int>(vp[2]);
+    _height = static_cast<int>(vp[3]);
+
+    AiNodeSetInt(_options, "xres", _width);
+    AiNodeSetInt(_options, "yres", _height);
+
+    AiNodeSetInt(_options, "bucket_size", 24);
 
     AiRender();
 
-#pragma pack(1)
-    struct Color {
-        uint8_t r, g, b, a;
-    };
-#pragma pack()
-
     // Blitting to the OpenGL buffer.
-    std::vector<Color> color(_width * _height, {255, 0, 0, 255});
+    std::vector<uint8_t> color(_width * _height * 4, 0);
     std::vector<float> depth(_width * _height, 1.0f - AI_EPSILON);
+    hdAiEmptyBucketQueue([this, &color](const HdAiBucketData* data) {
+        const auto xo = AiClamp(data->xo, 0, _width - 1);
+        const auto xe = AiClamp(data->xo + data->sizeX, 0, _width - 1);
+        const auto sizeX = xe - xo + 1;
+        if (sizeX <= 0) { return; }
+        const auto yo = AiClamp(data->yo, 0, _height - 1);
+        const auto ye = AiClamp(data->yo + data->sizeY, 0, _height - 1);
+        const auto sizeY = ye - yo + 1;
+        if (sizeY <= 0) { return; }
+        const auto xoff = xo - data->xo;
+        const auto yoff = yo - data->yo;
+        constexpr auto numChannels = 4;
+        const auto pixelSizeIn = sizeof(float) * numChannels;
+        const auto pixelSizeOut = sizeof(uint8_t) * numChannels;
+        for (auto y = 0; y < sizeY; ++y) {
+            const auto* strideIn = reinterpret_cast<const float*>(
+                data->data.data() + pixelSizeIn * data->sizeX * (y + yoff));
+            auto* strideOut = color.data() + pixelSizeOut * _width * (y + yo);
+            for (auto x = 0; x < sizeX; ++x) {
+                const auto* in = strideIn + numChannels * (x + xoff);
+                auto* out = strideOut + numChannels * (x + xo);
+                for (auto i = 0; i < numChannels; ++i) {
+                    out[i] = AiQuantize8bit(x + xo, y + yo, i, in[i], true);
+                }
+            }
+        }
+    });
+
     _compositor.UpdateColor(
-        _width, _height, reinterpret_cast<uint8_t*>(color.data()));
+        _width, _height, color.data());
     _compositor.UpdateDepth(
         _width, _height, reinterpret_cast<uint8_t*>(depth.data()));
     _compositor.Draw();
