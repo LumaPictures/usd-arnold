@@ -33,6 +33,7 @@
 #include <pxr/pxr.h>
 
 #include <pxr/imaging/hd/renderPass.h>
+#include <pxr/imaging/hdx/compositor.h>
 
 #include <ai.h>
 
@@ -40,7 +41,9 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class HdAiRenderPass : public HdRenderPass {
 public:
-    HdAiRenderPass(HdRenderIndex* index, const HdRprimCollection& collection);
+    HdAiRenderPass(
+        AtUniverse* universe, HdRenderIndex* index,
+        const HdRprimCollection& collection);
     ~HdAiRenderPass() override = default;
 
 protected:
@@ -52,6 +55,9 @@ private:
     AtNode* _camera;
     AtNode* _filter;
     // AtNode* _driver;
+    AtNode* _options;
+
+    HdxCompositor _compositor;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

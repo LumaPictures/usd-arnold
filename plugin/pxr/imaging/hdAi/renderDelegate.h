@@ -35,6 +35,8 @@
 #include <pxr/imaging/hd/resourceRegistry.h>
 #include <pxr/pxr.h>
 
+#include <ai.h>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HdAiRenderDelegate final : public HdRenderDelegate {
@@ -96,6 +98,8 @@ private:
     HdAiRenderDelegate(const HdAiRenderDelegate&) = delete;
 
     HdAiRenderDelegate& operator=(const HdAiRenderDelegate&) = delete;
+
+    AtUniverse* _universe;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

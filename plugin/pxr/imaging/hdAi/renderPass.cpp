@@ -27,6 +27,11 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/*
+ * TODO:
+ * - Restart rendering if proj / view mtx or the viewport changes.
+ */
+
 #include "pxr/imaging/hdAi/renderPass.h"
 
 #include <pxr/imaging/hd/renderPassState.h>
@@ -36,13 +41,15 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 HdAiRenderPass::HdAiRenderPass(
-    HdRenderIndex* index, const HdRprimCollection& collection)
+    AtUniverse* universe, HdRenderIndex* index,
+    const HdRprimCollection& collection)
     : HdRenderPass(index, collection) {
-    _camera = AiNode(hdAiCameraName);
-    AiNodeSetPtr(AiUniverseGetOptions(), "camera", _camera);
+    _camera = AiNode(universe, hdAiCameraName);
+    AiNodeSetPtr(AiUniverseGetOptions(universe), "camera", _camera);
     AiNodeSetStr(_camera, "name", "HdAiRenderPass_camera");
-    _filter = AiNode("gaussian_filter");
+    _filter = AiNode(universe, "gaussian_filter");
     AiNodeSetStr(_filter, "name", "HdAiRenderPass_filter");
+    _options = AiUniverseGetOptions(universe);
 }
 
 void HdAiRenderPass::_Execute(

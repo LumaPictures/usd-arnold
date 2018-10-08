@@ -37,8 +37,6 @@
 #include <pxr/imaging/hd/rprim.h>
 #include <pxr/imaging/hd/tokens.h>
 
-#include <ai.h>
-
 #include "pxr/imaging/hdAi/mesh.h"
 #include "pxr/imaging/hdAi/nodes/nodes.h"
 #include "pxr/imaging/hdAi/renderBuffer.h"
@@ -73,6 +71,8 @@ HdAiRenderDelegate::HdAiRenderDelegate() {
     }
     AiMsgSetConsoleFlags(AI_LOG_WARNINGS | AI_LOG_ERRORS);
     HdAiInstallNodes();
+
+    _universe = nullptr;
 }
 
 HdAiRenderDelegate::~HdAiRenderDelegate() {
@@ -81,6 +81,7 @@ HdAiRenderDelegate::~HdAiRenderDelegate() {
         _resourceRegistry.reset();
     }
     HdAiUninstallNodes();
+    AiUniverseDestroy(_universe);
     AiEnd();
 }
 
@@ -106,7 +107,8 @@ HdResourceRegistrySharedPtr HdAiRenderDelegate::GetResourceRegistry() const {
 
 HdRenderPassSharedPtr HdAiRenderDelegate::CreateRenderPass(
     HdRenderIndex* index, const HdRprimCollection& collection) {
-    return HdRenderPassSharedPtr(new HdAiRenderPass(index, collection));
+    return HdRenderPassSharedPtr(
+        new HdAiRenderPass(_universe, index, collection));
 }
 
 HdInstancer* HdAiRenderDelegate::CreateInstancer(
@@ -120,7 +122,9 @@ void HdAiRenderDelegate::DestroyInstancer(HdInstancer* instancer) {
 
 HdRprim* HdAiRenderDelegate::CreateRprim(
     const TfToken& typeId, const SdfPath& rprimId, const SdfPath& instancerId) {
-    if (typeId == HdPrimTypeTokens->mesh) { return nullptr; }
+    if (typeId == HdPrimTypeTokens->mesh) {
+        return new HdAiMesh(_universe, rprimId, instancerId);
+    }
     TF_CODING_ERROR("Unknown Rprim Type %s", typeId.GetText());
     return nullptr;
 }

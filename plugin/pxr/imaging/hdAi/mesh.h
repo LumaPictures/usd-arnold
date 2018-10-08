@@ -40,11 +40,29 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class HdAiMesh : public HdMesh {
 public:
-    HdAiMesh(const SdfPath& id, const SdfPath& instancerId = SdfPath());
+    HdAiMesh(
+        AtUniverse* universe, const SdfPath& id,
+        const SdfPath& instancerId = SdfPath());
 
     ~HdAiMesh() override = default;
 
+    void Sync(
+        HdSceneDelegate* delegate, HdRenderParam* renderParam,
+        HdDirtyBits* dirtyBits, const HdReprSelector& reprSelector,
+        bool forcedRepr) override;
+
+    HdDirtyBits GetInitialDirtyBitsMask() const override;
+
 private:
+    void _UpdateRepr(
+        HdSceneDelegate* sceneDelegate, const HdReprSelector& reprSelector,
+        HdDirtyBits* dirtyBits) override;
+
+    HdDirtyBits _PropagateDirtyBits(HdDirtyBits bits) const override;
+
+    void _InitRepr(
+        const HdReprSelector& reprSelector, HdDirtyBits* dirtyBits) override;
+
     AtNode* _mesh;
 };
 

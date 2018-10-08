@@ -31,10 +31,35 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdAiMesh::HdAiMesh(const SdfPath& id, const SdfPath& instancerId)
+HdAiMesh::HdAiMesh(
+    AtUniverse* universe, const SdfPath& id, const SdfPath& instancerId)
     : HdMesh(id, instancerId) {
-    _mesh = AiNode("polymesh");
+    _mesh = AiNode(universe, "polymesh");
     AiNodeSetStr(_mesh, "name", id.GetText());
+}
+
+void HdAiMesh::Sync(
+    HdSceneDelegate* delegate, HdRenderParam* renderParam,
+    HdDirtyBits* dirtyBits, const HdReprSelector& reprSelector,
+    bool forcedRepr) {}
+
+HdDirtyBits HdAiMesh::GetInitialDirtyBitsMask() const {
+    return HdChangeTracker::AllDirty;
+}
+
+void HdAiMesh::_UpdateRepr(
+    HdSceneDelegate* sceneDelegate, const HdReprSelector& reprSelector,
+    HdDirtyBits* dirtyBits) {
+    *dirtyBits = HdChangeTracker::Clean;
+}
+
+HdDirtyBits HdAiMesh::_PropagateDirtyBits(HdDirtyBits bits) const {
+    return bits & HdChangeTracker::AllDirty;
+}
+
+void HdAiMesh::_InitRepr(
+    const HdReprSelector& reprSelector, HdDirtyBits* dirtyBits) {
+    *dirtyBits = HdChangeTracker::Clean;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
