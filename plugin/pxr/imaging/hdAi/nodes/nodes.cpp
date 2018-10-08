@@ -27,43 +27,38 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include "pxr/imaging/hdAi/renderPass.h"
-
-#include <pxr/imaging/hd/renderPassState.h>
-
 #include "pxr/imaging/hdAi/nodes/nodes.h"
 
-PXR_NAMESPACE_OPEN_SCOPE
+#include <array>
+#include <tuple>
 
-HdAiRenderPass::HdAiRenderPass(
-    HdRenderIndex* index, const HdRprimCollection& collection)
-    : HdRenderPass(index, collection) {
-    _camera = AiNode(hdAiCameraName);
-    AiNodeSetPtr(AiUniverseGetOptions(), "camera", _camera);
-    AiNodeSetStr(_camera, "name", "HdAiRenderPass_camera");
-    _filter = AiNode("gaussian_filter");
-    AiNodeSetStr(_filter, "name", "HdAiRenderPass_filter");
+extern AtNodeMethods* HdAiCameraMtd;
+
+AtString hdAiCameraName("HdAiCamera");
+// AiNodeEntryInstall(AI_NODE_CAMERA, AI_TYPE_UNDEFINED, "HdAiCamera",
+// "<built-in>", HdAiCameraMtd, AI_VERSION);
+namespace {
+struct NodeDefinition {
+    int type;
+    uint8_t outputType;
+    AtString& name;
+    const AtNodeMethods* methods;
+};
+
+const std::array<NodeDefinition, 1> builtInNodes = {
+    {{AI_NODE_CAMERA, AI_TYPE_UNDEFINED, hdAiCameraName, HdAiCameraMtd}},
+};
+
+} // namespace
+
+void HdAiInstallNodes() {
+    for (const auto& it : builtInNodes) {
+        AiNodeEntryInstall(
+            it.type, it.outputType, it.name, "<built-in>", it.methods,
+            AI_VERSION);
+    }
 }
 
-void HdAiRenderPass::_Execute(
-    const HdRenderPassStateSharedPtr& renderPassState,
-    const TfTokenVector& renderTags) {
-    if (AiRendering()) { AiRenderAbort(AI_BLOCKING); }
-
-    auto convertMtx = [](const GfMatrix4d& in) -> AtMatrix {
-        AtMatrix out = AI_M4_IDENTITY;
-        for (auto i = 0; i < 16; ++i) {
-            *(&out.data[0][0] + i) = static_cast<float>(*(in.data() + i));
-        }
-        return out;
-    };
-
-    AiNodeSetMatrix(
-        _camera, "projMtx", convertMtx(renderPassState->GetProjectionMatrix()));
-    AiNodeSetMatrix(
-        _camera, "matrix", convertMtx(renderPassState->GetWorldToViewMatrix()));
-
-    AiRender();
+void HdAiUninstallNodes() {
+    for (const auto& it : builtInNodes) { AiNodeEntryUninstall(it.name); }
 }
-
-PXR_NAMESPACE_CLOSE_SCOPE

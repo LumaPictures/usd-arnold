@@ -40,6 +40,7 @@
 #include <ai.h>
 
 #include "pxr/imaging/hdAi/mesh.h"
+#include "pxr/imaging/hdAi/nodes/nodes.h"
 #include "pxr/imaging/hdAi/renderBuffer.h"
 #include "pxr/imaging/hdAi/renderPass.h"
 
@@ -71,6 +72,7 @@ HdAiRenderDelegate::HdAiRenderDelegate() {
         _resourceRegistry.reset(new HdResourceRegistry());
     }
     AiMsgSetConsoleFlags(AI_LOG_WARNINGS | AI_LOG_ERRORS);
+    HdAiInstallNodes();
 }
 
 HdAiRenderDelegate::~HdAiRenderDelegate() {
@@ -78,6 +80,7 @@ HdAiRenderDelegate::~HdAiRenderDelegate() {
     if (_counterResourceRegistry.fetch_sub(1) == 1) {
         _resourceRegistry.reset();
     }
+    HdAiUninstallNodes();
     AiEnd();
 }
 

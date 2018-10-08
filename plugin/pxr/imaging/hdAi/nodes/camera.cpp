@@ -27,43 +27,64 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include "pxr/imaging/hdAi/renderPass.h"
+#include <ai.h>
 
-#include <pxr/imaging/hd/renderPassState.h>
+/*
+ * TODO:
+ * - Make sure derivatives are calculated properly.
+ * - Investigate AiCameraUpdate's second parameter.
+ */
 
-#include "pxr/imaging/hdAi/nodes/nodes.h"
+AI_CAMERA_NODE_EXPORT_METHODS(HdAiCameraMtd)
 
-PXR_NAMESPACE_OPEN_SCOPE
+namespace {
 
-HdAiRenderPass::HdAiRenderPass(
-    HdRenderIndex* index, const HdRprimCollection& collection)
-    : HdRenderPass(index, collection) {
-    _camera = AiNode(hdAiCameraName);
-    AiNodeSetPtr(AiUniverseGetOptions(), "camera", _camera);
-    AiNodeSetStr(_camera, "name", "HdAiRenderPass_camera");
-    _filter = AiNode("gaussian_filter");
-    AiNodeSetStr(_filter, "name", "HdAiRenderPass_filter");
+// Arnold's camera operates in view space, so we only need to
+// deal with the projection matrix.
+AtString _projMtxName("projMtx");
+
+struct ShaderData {
+    AtMatrix projMtx;
+    AtMatrix projMtxInv;
+};
+
+} // namespace
+
+node_parameters { AiParameterMtx(_projMtxName, AtMatrix()); }
+
+node_initialize {
+    AiCameraInitialize(node);
+    AiNodeSetLocalData(node, new ShaderData());
 }
 
-void HdAiRenderPass::_Execute(
-    const HdRenderPassStateSharedPtr& renderPassState,
-    const TfTokenVector& renderTags) {
-    if (AiRendering()) { AiRenderAbort(AI_BLOCKING); }
-
-    auto convertMtx = [](const GfMatrix4d& in) -> AtMatrix {
-        AtMatrix out = AI_M4_IDENTITY;
-        for (auto i = 0; i < 16; ++i) {
-            *(&out.data[0][0] + i) = static_cast<float>(*(in.data() + i));
-        }
-        return out;
-    };
-
-    AiNodeSetMatrix(
-        _camera, "projMtx", convertMtx(renderPassState->GetProjectionMatrix()));
-    AiNodeSetMatrix(
-        _camera, "matrix", convertMtx(renderPassState->GetWorldToViewMatrix()));
-
-    AiRender();
+node_update {
+    AiCameraUpdate(node, false);
+    auto* data = reinterpret_cast<ShaderData*>(AiNodeGetLocalData(node));
+    data->projMtx = AiNodeGetMatrix(node, _projMtxName);
+    data->projMtxInv = AiM4Invert(data->projMtx);
 }
 
-PXR_NAMESPACE_CLOSE_SCOPE
+node_finish { delete reinterpret_cast<ShaderData*>(AiNodeGetLocalData(node)); }
+
+camera_create_ray {
+    const auto* data = reinterpret_cast<ShaderData*>(AiNodeGetLocalData(node));
+    output.weight = AI_RGB_WHITE;
+
+    AtVector ndc(input.sx, input.sy, -1.0f);
+    auto npt = AiM4VectorByMatrixMult(data->projMtxInv, ndc);
+    if (fabsf(npt.z) < AI_EPSILON) {
+        output.origin = npt;
+        output.dir = AI_V3_NEGZ;
+    } else {
+        output.origin = AI_V3_ZERO;
+        output.dir = AiV3Normalize(npt);
+    }
+}
+
+camera_reverse_ray {
+    const auto* data = reinterpret_cast<ShaderData*>(AiNodeGetLocalData(node));
+    const auto ppo = AiM4VectorByMatrixMult(data->projMtx, Po);
+    Ps.x = ppo.x / ppo.z;
+    Ps.y = ppo.y / ppo.z;
+    return true;
+}

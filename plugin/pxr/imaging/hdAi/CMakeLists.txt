@@ -47,6 +47,13 @@ pxr_plugin(hdAi
        renderPass
    #    sampler
 
+   CPPFILES
+       nodes/camera.cpp
+       nodes/nodes.cpp
+
+   PRIVATE_HEADERS
+       nodes/nodes.h
+
     #PUBLIC_HEADERS
    #    context.h
    #    renderParam.h
