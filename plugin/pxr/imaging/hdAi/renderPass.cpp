@@ -65,9 +65,22 @@ void HdAiRenderPass::_Execute(
 
     auto convertMtx = [](const GfMatrix4d& in) -> AtMatrix {
         AtMatrix out = AI_M4_IDENTITY;
-        for (auto i = 0; i < 16; ++i) {
-            *(&out.data[0][0] + i) = static_cast<float>(*(in.data() + i));
-        }
+        out.data[0][0] = static_cast<float>(in[0][0]);
+        out.data[0][1] = static_cast<float>(in[0][1]);
+        out.data[0][2] = static_cast<float>(in[0][2]);
+        out.data[0][3] = static_cast<float>(in[0][3]);
+        out.data[1][0] = static_cast<float>(in[1][0]);
+        out.data[1][1] = static_cast<float>(in[1][1]);
+        out.data[1][2] = static_cast<float>(in[1][2]);
+        out.data[1][3] = static_cast<float>(in[1][3]);
+        out.data[2][0] = static_cast<float>(in[2][0]);
+        out.data[2][1] = static_cast<float>(in[2][1]);
+        out.data[2][2] = static_cast<float>(in[2][2]);
+        out.data[2][3] = static_cast<float>(in[2][3]);
+        out.data[3][0] = static_cast<float>(in[3][0]);
+        out.data[3][1] = static_cast<float>(in[3][1]);
+        out.data[3][2] = static_cast<float>(in[3][2]);
+        out.data[3][3] = static_cast<float>(in[3][3]);
         return out;
     };
 
@@ -95,24 +108,20 @@ void HdAiRenderPass::_Execute(
     hdAiEmptyBucketQueue([this, &color](const HdAiBucketData* data) {
         const auto xo = AiClamp(data->xo, 0, _width - 1);
         const auto xe = AiClamp(data->xo + data->sizeX, 0, _width - 1);
-        const auto sizeX = xe - xo + 1;
-        if (sizeX <= 0) { return; }
+        if (xe == xo) { return; }
         const auto yo = AiClamp(data->yo, 0, _height - 1);
         const auto ye = AiClamp(data->yo + data->sizeY, 0, _height - 1);
-        const auto sizeY = ye - yo + 1;
-        if (sizeY <= 0) { return; }
-        const auto xoff = xo - data->xo;
-        const auto yoff = yo - data->yo;
+        if (ye == yo) { return; }
         constexpr auto numChannels = 4;
         const auto pixelSizeIn = sizeof(float) * numChannels;
         const auto pixelSizeOut = sizeof(uint8_t) * numChannels;
-        for (auto y = 0; y < sizeY; ++y) {
+        for (auto y = yo; y < ye; ++y) {
             const auto* strideIn = reinterpret_cast<const float*>(
-                data->data.data() + pixelSizeIn * data->sizeX * (y + yoff));
-            auto* strideOut = color.data() + pixelSizeOut * _width * (y + yo);
-            for (auto x = 0; x < sizeX; ++x) {
-                const auto* in = strideIn + numChannels * (x + xoff);
-                auto* out = strideOut + numChannels * (x + xo);
+                data->data.data() + pixelSizeIn * data->sizeX * (y - data->yo));
+            auto* strideOut = color.data() + pixelSizeOut * _width * y;
+            for (auto x = xo; x < xe; ++x) {
+                const auto* in = strideIn + numChannels * (x - data->xo);
+                auto* out = strideOut + numChannels * x;
                 for (auto i = 0; i < numChannels; ++i) {
                     out[i] = AiQuantize8bit(x + xo, y + yo, i, in[i], true);
                 }
@@ -120,8 +129,7 @@ void HdAiRenderPass::_Execute(
         }
     });
 
-    _compositor.UpdateColor(
-        _width, _height, color.data());
+    _compositor.UpdateColor(_width, _height, color.data());
     _compositor.UpdateDepth(
         _width, _height, reinterpret_cast<uint8_t*>(depth.data()));
     _compositor.Draw();
