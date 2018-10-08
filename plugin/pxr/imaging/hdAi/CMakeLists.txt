@@ -36,16 +36,11 @@ pxr_plugin(hdAi
         ${PYTHON_INCLUDE_DIRS}
 
     PUBLIC_CLASSES
-   #    config
-   #    instancer
        mesh
-   #    meshSamplers
-   #    renderer
        rendererPlugin
        renderBuffer
        renderDelegate
        renderPass
-   #    sampler
 
    CPPFILES
        nodes/camera.cpp
@@ -54,10 +49,6 @@ pxr_plugin(hdAi
 
    PRIVATE_HEADERS
        nodes/nodes.h
-
-    #PUBLIC_HEADERS
-   #    context.h
-   #    renderParam.h
 
     RESOURCE_FILES
         plugInfo.json

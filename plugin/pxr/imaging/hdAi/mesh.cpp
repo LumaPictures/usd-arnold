@@ -41,17 +41,50 @@ HdAiMesh::HdAiMesh(
 void HdAiMesh::Sync(
     HdSceneDelegate* delegate, HdRenderParam* renderParam,
     HdDirtyBits* dirtyBits, const HdReprSelector& reprSelector,
-    bool forcedRepr) {}
+    bool forcedRepr) {
+    const auto& id = GetId();
+
+    if (HdChangeTracker::IsPrimvarDirty(*dirtyBits, id, HdTokens->points)) {
+        auto value = delegate->Get(id, HdTokens->points);
+        const auto& vecArray = value.Get<VtVec3fArray>();
+        AiNodeSetArray(
+            _mesh, "vlist",
+            AiArrayConvert(
+                vecArray.size(), 1, AI_TYPE_VECTOR, vecArray.data()));
+    }
+
+    if (HdChangeTracker::IsTopologyDirty(*dirtyBits, id)) {
+        const auto topology = GetMeshTopology(delegate);
+        const auto& vertexCounts = topology.GetFaceVertexCounts();
+        const auto& vertexIndices = topology.GetFaceVertexIndices();
+        const auto numFaces = topology.GetNumFaces();
+        const auto numVertexIndices = vertexIndices.size();
+        auto* nsides = AiArrayAllocate(numFaces, 1, AI_TYPE_UINT);
+        auto* vidxs = AiArrayAllocate(vertexIndices.size(), 1, AI_TYPE_UINT);
+        for (auto i = decltype(numFaces){0}; i < numFaces; ++i) {
+            AiArraySetUInt(
+                nsides, i, static_cast<unsigned int>(vertexCounts[i]));
+        }
+        for (auto i = decltype(numVertexIndices){0}; i < numVertexIndices;
+             ++i) {
+            AiArraySetUInt(
+                vidxs, i, static_cast<unsigned int>(vertexIndices[i]));
+        }
+        AiNodeSetArray(_mesh, "nsides", nsides);
+        AiNodeSetArray(_mesh, "vidxs", vidxs);
+    }
+
+    *dirtyBits = ~HdChangeTracker::AllSceneDirtyBits;
+}
 
 HdDirtyBits HdAiMesh::GetInitialDirtyBitsMask() const {
-    return HdChangeTracker::AllDirty;
+    return HdChangeTracker::Clean | HdChangeTracker::InitRepr |
+           HdChangeTracker::DirtyPoints | HdChangeTracker::DirtyTopology;
 }
 
 void HdAiMesh::_UpdateRepr(
     HdSceneDelegate* sceneDelegate, const HdReprSelector& reprSelector,
-    HdDirtyBits* dirtyBits) {
-    *dirtyBits = HdChangeTracker::Clean;
-}
+    HdDirtyBits* dirtyBits) {}
 
 HdDirtyBits HdAiMesh::_PropagateDirtyBits(HdDirtyBits bits) const {
     return bits & HdChangeTracker::AllDirty;
@@ -59,7 +92,6 @@ HdDirtyBits HdAiMesh::_PropagateDirtyBits(HdDirtyBits bits) const {
 
 void HdAiMesh::_InitRepr(
     const HdReprSelector& reprSelector, HdDirtyBits* dirtyBits) {
-    *dirtyBits = HdChangeTracker::Clean;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
