@@ -38,6 +38,7 @@
 #include <pxr/imaging/hd/renderPassState.h>
 
 #include "pxr/imaging/hdAi/nodes/nodes.h"
+#include "pxr/imaging/hdAi/utils.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -64,35 +65,15 @@ void HdAiRenderPass::_Execute(
     const TfTokenVector& renderTags) {
     if (AiRendering()) { AiRenderAbort(AI_BLOCKING); }
 
-    auto convertMtx = [](const GfMatrix4d& in) -> AtMatrix {
-        AtMatrix out = AI_M4_IDENTITY;
-        out.data[0][0] = static_cast<float>(in[0][0]);
-        out.data[0][1] = static_cast<float>(in[0][1]);
-        out.data[0][2] = static_cast<float>(in[0][2]);
-        out.data[0][3] = static_cast<float>(in[0][3]);
-        out.data[1][0] = static_cast<float>(in[1][0]);
-        out.data[1][1] = static_cast<float>(in[1][1]);
-        out.data[1][2] = static_cast<float>(in[1][2]);
-        out.data[1][3] = static_cast<float>(in[1][3]);
-        out.data[2][0] = static_cast<float>(in[2][0]);
-        out.data[2][1] = static_cast<float>(in[2][1]);
-        out.data[2][2] = static_cast<float>(in[2][2]);
-        out.data[2][3] = static_cast<float>(in[2][3]);
-        out.data[3][0] = static_cast<float>(in[3][0]);
-        out.data[3][1] = static_cast<float>(in[3][1]);
-        out.data[3][2] = static_cast<float>(in[3][2]);
-        out.data[3][3] = static_cast<float>(in[3][3]);
-        return out;
-    };
-
     const auto vp = renderPassState->GetViewport();
 
     AiNodeSetMatrix(
         _camera, HdAiCamera::projMtx,
-        convertMtx(renderPassState->GetProjectionMatrix()));
+        HdAiConvertMatrix(renderPassState->GetProjectionMatrix()));
     AiNodeSetMatrix(
         _camera, "matrix",
-        convertMtx(renderPassState->GetWorldToViewMatrix().GetInverse()));
+        HdAiConvertMatrix(
+            renderPassState->GetWorldToViewMatrix().GetInverse()));
     AiNodeSetFlt(_camera, HdAiCamera::frameAspect, vp[2] / vp[3]);
 
     _width = static_cast<int>(vp[2]);

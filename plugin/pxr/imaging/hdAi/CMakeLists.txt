@@ -41,6 +41,7 @@ pxr_plugin(hdAi
        renderBuffer
        renderDelegate
        renderPass
+       utils
 
    CPPFILES
        nodes/camera.cpp
