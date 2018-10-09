@@ -36,6 +36,7 @@ pxr_plugin(hdAi
         ${PYTHON_INCLUDE_DIRS}
 
     PUBLIC_CLASSES
+       material
        mesh
        rendererPlugin
        renderBuffer

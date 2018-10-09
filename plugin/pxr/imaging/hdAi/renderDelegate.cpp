@@ -37,6 +37,7 @@
 #include <pxr/imaging/hd/rprim.h>
 #include <pxr/imaging/hd/tokens.h>
 
+#include "pxr/imaging/hdAi/material.h"
 #include "pxr/imaging/hdAi/mesh.h"
 #include "pxr/imaging/hdAi/nodes/nodes.h"
 #include "pxr/imaging/hdAi/renderBuffer.h"
@@ -50,6 +51,7 @@ const TfTokenVector HdAiRenderDelegate::SUPPORTED_RPRIM_TYPES = {
 
 const TfTokenVector HdAiRenderDelegate::SUPPORTED_SPRIM_TYPES = {
     HdPrimTypeTokens->camera,
+    HdPrimTypeTokens->material,
 };
 
 const TfTokenVector HdAiRenderDelegate::SUPPORTED_BPRIM_TYPES = {
@@ -113,6 +115,9 @@ HdRenderPassSharedPtr HdAiRenderDelegate::CreateRenderPass(
 
 HdInstancer* HdAiRenderDelegate::CreateInstancer(
     HdSceneDelegate* delegate, const SdfPath& id, const SdfPath& instancerId) {
+    TF_UNUSED(delegate);
+    TF_UNUSED(id);
+    TF_UNUSED(instancerId);
     return nullptr;
 }
 
@@ -134,6 +139,9 @@ void HdAiRenderDelegate::DestroyRprim(HdRprim* rPrim) { delete rPrim; }
 HdSprim* HdAiRenderDelegate::CreateSprim(
     const TfToken& typeId, const SdfPath& sprimId) {
     if (typeId == HdPrimTypeTokens->camera) { return new HdCamera(sprimId); }
+    if (typeId == HdPrimTypeTokens->material) {
+        return new HdAiMaterial(_universe, sprimId);
+    }
     TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
     return nullptr;
 }
@@ -142,11 +150,15 @@ HdSprim* HdAiRenderDelegate::CreateFallbackSprim(const TfToken& typeId) {
     if (typeId == HdPrimTypeTokens->camera) {
         return new HdCamera(SdfPath::EmptyPath());
     }
+    if (typeId == HdPrimTypeTokens->material) {
+        return new HdAiMaterial(_universe, SdfPath::EmptyPath());
+    }
     TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
     return nullptr;
 }
 
 void HdAiRenderDelegate::DestroySprim(HdSprim* sPrim) {
+    // TODO: Figure out what to do with this.
     /*delete sPrim;*/ // This crashes in the destructor. I suspect an invalid
     // prim being removed.
 }
