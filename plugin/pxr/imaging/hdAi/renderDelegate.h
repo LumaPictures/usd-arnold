@@ -30,10 +30,12 @@
 #ifndef HDAI_RENDER_DELEGATE_H
 #define HDAI_RENDER_DELEGATE_H
 
+#include <pxr/pxr.h>
+#include "pxr/imaging/hdAi/api.h"
+
 #include <pxr/imaging/hd/renderDelegate.h>
 #include <pxr/imaging/hd/renderThread.h>
 #include <pxr/imaging/hd/resourceRegistry.h>
-#include <pxr/pxr.h>
 
 #include <ai.h>
 
@@ -41,49 +43,50 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class HdAiRenderDelegate final : public HdRenderDelegate {
 public:
+    HDAI_API
     HdAiRenderDelegate();
-
+    HDAI_API
     ~HdAiRenderDelegate() override;
-
+    HDAI_API
     HdRenderParam* GetRenderParam() const override;
-
+    HDAI_API
     const TfTokenVector& GetSupportedRprimTypes() const override;
-
+    HDAI_API
     const TfTokenVector& GetSupportedSprimTypes() const override;
-
+    HDAI_API
     const TfTokenVector& GetSupportedBprimTypes() const override;
-
+    HDAI_API
     HdResourceRegistrySharedPtr GetResourceRegistry() const override;
-
+    HDAI_API
     HdRenderPassSharedPtr CreateRenderPass(
         HdRenderIndex* index, HdRprimCollection const& collection) override;
-
+    HDAI_API
     HdInstancer* CreateInstancer(
         HdSceneDelegate* delegate, SdfPath const& id,
         SdfPath const& instancerId) override;
-
+    HDAI_API
     void DestroyInstancer(HdInstancer* instancer) override;
-
+    HDAI_API
     HdRprim* CreateRprim(
         TfToken const& typeId, SdfPath const& rprimId,
         SdfPath const& instancerId) override;
-
+    HDAI_API
     void DestroyRprim(HdRprim* rPrim) override;
-
+    HDAI_API
     HdSprim* CreateSprim(
         TfToken const& typeId, SdfPath const& sprimId) override;
-
+    HDAI_API
     HdSprim* CreateFallbackSprim(TfToken const& typeId) override;
-
+    HDAI_API
     void DestroySprim(HdSprim* sPrim) override;
-
+    HDAI_API
     HdBprim* CreateBprim(
         TfToken const& typeId, SdfPath const& bprimId) override;
-
+    HDAI_API
     HdBprim* CreateFallbackBprim(TfToken const& typeId) override;
-
+    HDAI_API
     void DestroyBprim(HdBprim* bPrim) override;
-
+    HDAI_API
     void CommitResources(HdChangeTracker* tracker) override;
 
 private:
@@ -94,9 +97,7 @@ private:
     static std::mutex _mutexResourceRegistry;
     static std::atomic_int _counterResourceRegistry;
     static HdResourceRegistrySharedPtr _resourceRegistry;
-
     HdAiRenderDelegate(const HdAiRenderDelegate&) = delete;
-
     HdAiRenderDelegate& operator=(const HdAiRenderDelegate&) = delete;
 
     AtUniverse* _universe;

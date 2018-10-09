@@ -31,6 +31,7 @@
 #define HDAI_MESH_H
 
 #include <pxr/pxr.h>
+#include "pxr/imaging/hdAi/api.h"
 
 #include <pxr/imaging/hd/mesh.h>
 
@@ -40,10 +41,12 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class HdAiMesh : public HdMesh {
 public:
+    HDAI_API
     HdAiMesh(
         AtUniverse* universe, const SdfPath& id,
         const SdfPath& instancerId = SdfPath());
 
+    HDAI_API
     ~HdAiMesh() override = default;
 
     void Sync(
@@ -51,15 +54,19 @@ public:
         HdDirtyBits* dirtyBits, const HdReprSelector& reprSelector,
         bool forcedRepr) override;
 
+    HDAI_API
     HdDirtyBits GetInitialDirtyBitsMask() const override;
 
-private:
+protected:
+    HDAI_API
     void _UpdateRepr(
         HdSceneDelegate* sceneDelegate, const HdReprSelector& reprSelector,
         HdDirtyBits* dirtyBits) override;
 
+    HDAI_API
     HdDirtyBits _PropagateDirtyBits(HdDirtyBits bits) const override;
 
+    HDAI_API
     void _InitRepr(
         const HdReprSelector& reprSelector, HdDirtyBits* dirtyBits) override;
 

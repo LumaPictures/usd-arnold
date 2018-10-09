@@ -31,6 +31,7 @@
 #define HDAI_UTILS_H
 
 #include <pxr/pxr.h>
+#include "pxr/imaging/hdAi/api.h"
 
 #include <pxr/base/gf/matrix4d.h>
 #include <pxr/base/gf/matrix4f.h>
@@ -39,7 +40,9 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+HDAI_API
 AtMatrix HdAiConvertMatrix(const GfMatrix4d& in);
+HDAI_API
 AtMatrix HdAiConvertMatrix(const GfMatrix4f& in);
 
 PXR_NAMESPACE_CLOSE_SCOPE

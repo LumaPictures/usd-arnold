@@ -30,22 +30,29 @@
 #ifndef HDAI_RENDERER_PLUGIN_H
 #define HDAI_RENDERER_PLUGIN_H
 
-#include <pxr/imaging/hdx/rendererPlugin.h>
 #include <pxr/pxr.h>
+#include "pxr/imaging/hdAi/api.h"
+
+#include <pxr/imaging/hdx/rendererPlugin.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HdAiRendererPlugin final : public HdxRendererPlugin {
 public:
+    HDAI_API
     HdAiRendererPlugin() = default;
+    HDAI_API
     ~HdAiRendererPlugin() override = default;
 
     // This class does not support copying.
     HdAiRendererPlugin(const HdAiRendererPlugin &) = delete;
     HdAiRendererPlugin &operator=(const HdAiRendererPlugin &) = delete;
 
+    HDAI_API
     HdRenderDelegate *CreateRenderDelegate() override;
+    HDAI_API
     void DeleteRenderDelegate(HdRenderDelegate *renderDelegate) override;
+    HDAI_API
     bool IsSupported() const override;
 };
 

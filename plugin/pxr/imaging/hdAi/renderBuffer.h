@@ -31,6 +31,7 @@
 #define HDAI_RENDER_BUFFER_H
 
 #include <pxr/pxr.h>
+#include "pxr/imaging/hdAi/api.h"
 
 #include <pxr/imaging/hd/renderBuffer.h>
 
@@ -38,25 +39,38 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class HdAiRenderBuffer : public HdRenderBuffer {
 public:
+    HDAI_API
     HdAiRenderBuffer(const SdfPath& id);
+    HDAI_API
     ~HdAiRenderBuffer() override = default;
 
+    HDAI_API
     bool Allocate(
         const GfVec3i& dimensions, HdFormat format, bool multiSampled) override;
 
+    HDAI_API
     unsigned int GetWidth() const override;
+    HDAI_API
     unsigned int GetHeight() const override;
+    HDAI_API
     unsigned int GetDepth() const override;
+    HDAI_API
     HdFormat GetFormat() const override;
+    HDAI_API
     bool IsMultiSampled() const override;
+    HDAI_API
     uint8_t* Map() override;
+    HDAI_API
     void Unmap() override;
+    HDAI_API
     bool IsMapped() const override;
+    HDAI_API
     void Resolve() override;
-
+    HDAI_API
     bool IsConverged() const override;
 
-private:
+protected:
+    HDAI_API
     void _Deallocate() override;
 };
 

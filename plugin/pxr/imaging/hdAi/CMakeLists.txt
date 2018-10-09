@@ -51,6 +51,9 @@ pxr_plugin(hdAi
    PRIVATE_HEADERS
        nodes/nodes.h
 
+   PUBLIC_HEADERS
+       api.h
+
     RESOURCE_FILES
         plugInfo.json
 )

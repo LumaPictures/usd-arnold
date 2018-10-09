@@ -27,46 +27,27 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#ifndef HDAI_RENDER_PASS_H
-#define HDAI_RENDER_PASS_H
+#ifndef HDAI_API_H
+#define HDAI_API_H
 
-#include <pxr/pxr.h>
-#include "pxr/imaging/hdAi/api.h"
+#include "pxr/base/arch/export.h"
 
-#include <pxr/imaging/hd/renderPass.h>
-#include <pxr/imaging/hdx/compositor.h>
+#if defined(PXR_STATIC)
+#define HDAI_API
+#define HDAI_API_TEMPLATE_CLASS(...)
+#define HDAI_API_TEMPLATE_STRUCT(...)
+#define HDAI_LOCAL
+#else
+#if defined(HDAI_EXPORTS)
+#define HDAI_API ARCH_EXPORT
+#define HDAI_API_TEMPLATE_CLASS(...) ARCH_EXPORT_TEMPLATE(class, __VA_ARGS__)
+#define HDAI_API_TEMPLATE_STRUCT(...) ARCH_EXPORT_TEMPLATE(struct, __VA_ARGS__)
+#else
+#define HDAI_API ARCH_IMPORT
+#define HDAI_API_TEMPLATE_CLASS(...) ARCH_IMPORT_TEMPLATE(class, __VA_ARGS__)
+#define HDAI_API_TEMPLATE_STRUCT(...) ARCH_IMPORT_TEMPLATE(struct, __VA_ARGS__)
+#endif
+#define HDAI_LOCAL ARCH_HIDDEN
+#endif
 
-#include <ai.h>
-
-PXR_NAMESPACE_OPEN_SCOPE
-
-class HdAiRenderPass : public HdRenderPass {
-public:
-    HDAI_API
-    HdAiRenderPass(
-        AtUniverse* universe, HdRenderIndex* index,
-        const HdRprimCollection& collection);
-    HDAI_API
-    ~HdAiRenderPass() override = default;
-
-protected:
-    HDAI_API
-    void _Execute(
-        const HdRenderPassStateSharedPtr& renderPassState,
-        const TfTokenVector& renderTags) override;
-
-private:
-    AtNode* _camera = nullptr;
-    AtNode* _filter = nullptr;
-    AtNode* _driver = nullptr;
-    AtNode* _options = nullptr;
-
-    HdxCompositor _compositor;
-
-    int _width = 0;
-    int _height = 0;
-};
-
-PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif // HDAI_RENDER_PASS_H
+#endif
