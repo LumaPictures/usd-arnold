@@ -47,7 +47,6 @@ HdAiRenderPass::HdAiRenderPass(
     const HdRprimCollection& collection)
     : HdRenderPass(index, collection) {
     _camera = AiNode(universe, HdAiNodeNames::camera);
-    // _camera = AiNode(universe, "persp_camera");
     AiNodeSetPtr(AiUniverseGetOptions(universe), "camera", _camera);
     AiNodeSetStr(_camera, "name", "HdAiRenderPass_camera");
     _filter = AiNode(universe, "gaussian_filter");
@@ -58,6 +57,9 @@ HdAiRenderPass::HdAiRenderPass(
     AiNodeSetStr(
         _options, "outputs",
         "RGBA RGBA HdAiRenderPass_filter HdAiRenderPass_driver");
+    auto* ambientOcclusion = AiNode(universe, "ambient_occlusion");
+    AiNodeSetInt(ambientOcclusion, "samples", 1);
+    AiNodeSetPtr(_options, "shader_override", ambientOcclusion);
 }
 
 void HdAiRenderPass::_Execute(
