@@ -29,6 +29,8 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pxr/imaging/hdAi/mesh.h"
 
+#include "pxr/imaging/hdAi/utils.h"
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 HdAiMesh::HdAiMesh(
@@ -74,12 +76,18 @@ void HdAiMesh::Sync(
         AiNodeSetArray(_mesh, "vidxs", vidxs);
     }
 
+    if (HdChangeTracker::IsTransformDirty(*dirtyBits, id)) {
+        const auto transform = delegate->GetTransform(id);
+        AiNodeSetMatrix(_mesh, "matrix", HdAiConvertMatrix(transform));
+    }
+
     *dirtyBits = ~HdChangeTracker::AllSceneDirtyBits;
 }
 
 HdDirtyBits HdAiMesh::GetInitialDirtyBitsMask() const {
     return HdChangeTracker::Clean | HdChangeTracker::InitRepr |
-           HdChangeTracker::DirtyPoints | HdChangeTracker::DirtyTopology;
+           HdChangeTracker::DirtyPoints | HdChangeTracker::DirtyTopology |
+           HdChangeTracker::DirtyTransform;
 }
 
 void HdAiMesh::_UpdateRepr(

@@ -102,7 +102,8 @@ void HdAiRenderPass::_Execute(
         for (auto y = yo; y < ye; ++y) {
             const auto* strideIn = reinterpret_cast<const float*>(
                 data->data.data() + pixelSizeIn * data->sizeX * (y - data->yo));
-            auto* strideOut = color.data() + pixelSizeOut * _width * y;
+            auto* strideOut =
+                color.data() + pixelSizeOut * _width * (_height - y - 1);
             for (auto x = xo; x < xe; ++x) {
                 const auto* in = strideIn + numChannels * (x - data->xo);
                 auto* out = strideOut + numChannels * x;
