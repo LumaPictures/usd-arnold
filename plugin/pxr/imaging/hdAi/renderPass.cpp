@@ -46,6 +46,7 @@ HdAiRenderPass::HdAiRenderPass(
     const HdRprimCollection& collection)
     : HdRenderPass(index, collection) {
     _camera = AiNode(universe, HdAiNodeNames::camera);
+    // _camera = AiNode(universe, "persp_camera");
     AiNodeSetPtr(AiUniverseGetOptions(universe), "camera", _camera);
     AiNodeSetStr(_camera, "name", "HdAiRenderPass_camera");
     _filter = AiNode(universe, "gaussian_filter");
@@ -84,13 +85,15 @@ void HdAiRenderPass::_Execute(
         return out;
     };
 
+    const auto vp = renderPassState->GetViewport();
+
     AiNodeSetMatrix(
         _camera, HdAiCamera::projMtx,
         convertMtx(renderPassState->GetProjectionMatrix()));
     AiNodeSetMatrix(
-        _camera, "matrix", convertMtx(renderPassState->GetWorldToViewMatrix()));
-
-    const auto vp = renderPassState->GetViewport();
+        _camera, "matrix",
+        convertMtx(renderPassState->GetWorldToViewMatrix().GetInverse()));
+    AiNodeSetFlt(_camera, HdAiCamera::frameAspect, vp[2] / vp[3]);
 
     _width = static_cast<int>(vp[2]);
     _height = static_cast<int>(vp[3]);

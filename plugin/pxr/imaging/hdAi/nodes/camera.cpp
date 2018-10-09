@@ -31,6 +31,8 @@
 
 #include "pxr/imaging/hdAi/nodes/nodes.h"
 
+#include <iostream>
+
 /*
  * TODO:
  * - Make sure derivatives are calculated properly.
@@ -40,17 +42,22 @@
 AI_CAMERA_NODE_EXPORT_METHODS(HdAiCameraMtd)
 
 AtString HdAiCamera::projMtx("projMtx");
+AtString HdAiCamera::frameAspect("frameAspect");
 
 namespace {
 
 struct ShaderData {
     AtMatrix projMtx;
     AtMatrix projMtxInv;
+    float frameAspect;
 };
 
 } // namespace
 
-node_parameters { AiParameterMtx(HdAiCamera::projMtx, AtMatrix()); }
+node_parameters {
+    AiParameterMtx(HdAiCamera::projMtx, AtMatrix());
+    AiParameterFlt(HdAiCamera::frameAspect, 1.0f);
+}
 
 node_initialize {
     AiCameraInitialize(node);
@@ -62,6 +69,7 @@ node_update {
     auto* data = reinterpret_cast<ShaderData*>(AiNodeGetLocalData(node));
     data->projMtx = AiNodeGetMatrix(node, HdAiCamera::projMtx);
     data->projMtxInv = AiM4Invert(data->projMtx);
+    data->frameAspect = AiNodeGetFlt(node, HdAiCamera::frameAspect);
 }
 
 node_finish { delete reinterpret_cast<ShaderData*>(AiNodeGetLocalData(node)); }
@@ -70,9 +78,9 @@ camera_create_ray {
     const auto* data = reinterpret_cast<ShaderData*>(AiNodeGetLocalData(node));
     output.weight = AI_RGB_WHITE;
 
-    AtVector ndc(input.sx, input.sy, -1.0f);
-    auto npt = AiM4VectorByMatrixMult(data->projMtxInv, ndc);
-    if (fabsf(npt.z) < AI_EPSILON) {
+    AtVector ndc(input.sx, input.sy * data->frameAspect, -1.0f);
+    const auto npt = AiM4PointByMatrixMult(data->projMtxInv, ndc);
+    if (fabsf(npt[2]) < AI_EPSILON) {
         output.origin = npt;
         output.dir = AI_V3_NEGZ;
     } else {
@@ -83,7 +91,7 @@ camera_create_ray {
 
 camera_reverse_ray {
     const auto* data = reinterpret_cast<ShaderData*>(AiNodeGetLocalData(node));
-    const auto ppo = AiM4VectorByMatrixMult(data->projMtx, Po);
+    const auto ppo = AiM4PointByMatrixMult(data->projMtx, Po);
     Ps.x = ppo.x / ppo.z;
     Ps.y = ppo.y / ppo.z;
     return true;

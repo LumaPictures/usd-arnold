@@ -91,7 +91,6 @@ HdDirtyBits HdAiMesh::_PropagateDirtyBits(HdDirtyBits bits) const {
 }
 
 void HdAiMesh::_InitRepr(
-    const HdReprSelector& reprSelector, HdDirtyBits* dirtyBits) {
-}
+    const HdReprSelector& reprSelector, HdDirtyBits* dirtyBits) {}
 
 PXR_NAMESPACE_CLOSE_SCOPE

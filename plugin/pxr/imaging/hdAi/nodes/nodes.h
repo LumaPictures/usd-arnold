@@ -42,6 +42,7 @@ extern AtString driver;
 
 namespace HdAiCamera {
 extern AtString projMtx;
+extern AtString frameAspect;
 } // namespace HdAiCamera
 
 void hdAiInstallNodes();
@@ -52,7 +53,7 @@ struct HdAiBucketData {
     ~HdAiBucketData() = default;
     HdAiBucketData(const HdAiBucketData&) = delete;
     HdAiBucketData(HdAiBucketData&&) = delete;
-    HdAiBucketData& operator= (const HdAiBucketData&) = delete;
+    HdAiBucketData& operator=(const HdAiBucketData&) = delete;
     std::vector<uint8_t> data;
     int dataType = AI_TYPE_RGBA;
     int xo = 0;
