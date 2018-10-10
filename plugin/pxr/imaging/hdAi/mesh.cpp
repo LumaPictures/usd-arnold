@@ -29,14 +29,15 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pxr/imaging/hdAi/mesh.h"
 
+#include "pxr/imaging/hdAi/material.h"
 #include "pxr/imaging/hdAi/utils.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 HdAiMesh::HdAiMesh(
-    AtUniverse* universe, const SdfPath& id, const SdfPath& instancerId)
-    : HdMesh(id, instancerId) {
-    _mesh = AiNode(universe, "polymesh");
+    HdAiRenderDelegate* delegate, const SdfPath& id, const SdfPath& instancerId)
+    : HdMesh(id, instancerId), _delegate(delegate) {
+    _mesh = AiNode(delegate->GetUniverse(), "polymesh");
     AiNodeSetStr(_mesh, "name", id.GetText());
 }
 
@@ -44,6 +45,7 @@ void HdAiMesh::Sync(
     HdSceneDelegate* delegate, HdRenderParam* renderParam,
     HdDirtyBits* dirtyBits, const HdReprSelector& reprSelector,
     bool forcedRepr) {
+    TF_UNUSED(forcedRepr);
     const auto& id = GetId();
 
     if (HdChangeTracker::IsPrimvarDirty(*dirtyBits, id, HdTokens->points)) {
@@ -81,24 +83,44 @@ void HdAiMesh::Sync(
         AiNodeSetMatrix(_mesh, "matrix", HdAiConvertMatrix(transform));
     }
 
+    if (*dirtyBits & HdChangeTracker::DirtyMaterialId) {
+        const auto* material = reinterpret_cast<const HdAiMaterial*>(
+            delegate->GetRenderIndex().GetSprim(
+                HdPrimTypeTokens->material, delegate->GetMaterialId(id)));
+        if (material != nullptr) {
+            AiNodeSetPtr(_mesh, "shader", material->GetSurfaceShader());
+            AiNodeSetPtr(_mesh, "disp_map", material->GetDisplacementShader());
+        } else {
+            AiNodeSetPtr(_mesh, "shader", _delegate->GetFallbackShader());
+            AiNodeSetPtr(_mesh, "disp_map", nullptr);
+        }
+    }
+
     *dirtyBits = ~HdChangeTracker::AllSceneDirtyBits;
 }
 
 HdDirtyBits HdAiMesh::GetInitialDirtyBitsMask() const {
     return HdChangeTracker::Clean | HdChangeTracker::InitRepr |
            HdChangeTracker::DirtyPoints | HdChangeTracker::DirtyTopology |
-           HdChangeTracker::DirtyTransform;
+           HdChangeTracker::DirtyTransform | HdChangeTracker::DirtyMaterialId;
 }
 
 void HdAiMesh::_UpdateRepr(
     HdSceneDelegate* sceneDelegate, const HdReprSelector& reprSelector,
-    HdDirtyBits* dirtyBits) {}
+    HdDirtyBits* dirtyBits) {
+    TF_UNUSED(sceneDelegate);
+    TF_UNUSED(reprSelector);
+    TF_UNUSED(dirtyBits);
+}
 
 HdDirtyBits HdAiMesh::_PropagateDirtyBits(HdDirtyBits bits) const {
     return bits & HdChangeTracker::AllDirty;
 }
 
 void HdAiMesh::_InitRepr(
-    const HdReprSelector& reprSelector, HdDirtyBits* dirtyBits) {}
+    const HdReprSelector& reprSelector, HdDirtyBits* dirtyBits) {
+    TF_UNUSED(reprSelector);
+    TF_UNUSED(dirtyBits);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -75,6 +75,9 @@ HdAiRenderDelegate::HdAiRenderDelegate() {
     hdAiInstallNodes();
 
     _universe = nullptr;
+
+    _fallbackShader = AiNode(_universe, "ambient_occlusion");
+    AiNodeSetInt(_fallbackShader, "samples", 1);
 }
 
 HdAiRenderDelegate::~HdAiRenderDelegate() {
@@ -89,7 +92,9 @@ HdAiRenderDelegate::~HdAiRenderDelegate() {
 
 HdRenderParam* HdAiRenderDelegate::GetRenderParam() const { return nullptr; }
 
-void HdAiRenderDelegate::CommitResources(HdChangeTracker* tracker) {}
+void HdAiRenderDelegate::CommitResources(HdChangeTracker* tracker) {
+    TF_UNUSED(tracker);
+}
 
 const TfTokenVector& HdAiRenderDelegate::GetSupportedRprimTypes() const {
     return SUPPORTED_RPRIM_TYPES;
@@ -128,7 +133,7 @@ void HdAiRenderDelegate::DestroyInstancer(HdInstancer* instancer) {
 HdRprim* HdAiRenderDelegate::CreateRprim(
     const TfToken& typeId, const SdfPath& rprimId, const SdfPath& instancerId) {
     if (typeId == HdPrimTypeTokens->mesh) {
-        return new HdAiMesh(_universe, rprimId, instancerId);
+        return new HdAiMesh(this, rprimId, instancerId);
     }
     TF_CODING_ERROR("Unknown Rprim Type %s", typeId.GetText());
     return nullptr;
@@ -140,7 +145,7 @@ HdSprim* HdAiRenderDelegate::CreateSprim(
     const TfToken& typeId, const SdfPath& sprimId) {
     if (typeId == HdPrimTypeTokens->camera) { return new HdCamera(sprimId); }
     if (typeId == HdPrimTypeTokens->material) {
-        return new HdAiMaterial(_universe, sprimId);
+        return new HdAiMaterial(this, sprimId);
     }
     TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
     return nullptr;
@@ -151,7 +156,7 @@ HdSprim* HdAiRenderDelegate::CreateFallbackSprim(const TfToken& typeId) {
         return new HdCamera(SdfPath::EmptyPath());
     }
     if (typeId == HdPrimTypeTokens->material) {
-        return new HdAiMaterial(_universe, SdfPath::EmptyPath());
+        return new HdAiMaterial(this, SdfPath::EmptyPath());
     }
     TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
     return nullptr;
@@ -181,5 +186,12 @@ HdBprim* HdAiRenderDelegate::CreateFallbackBprim(const TfToken& typeId) {
 }
 
 void HdAiRenderDelegate::DestroyBprim(HdBprim* bPrim) { delete bPrim; }
+
+AtUniverse* HdAiRenderDelegate::GetUniverse() const { return _universe; }
+
+HDAI_API
+AtNode* HdAiRenderDelegate::GetFallbackShader() const {
+    return _fallbackShader;
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

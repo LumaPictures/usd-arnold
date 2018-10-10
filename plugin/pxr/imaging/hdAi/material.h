@@ -35,6 +35,8 @@
 
 #include <pxr/imaging/hd/material.h>
 
+#include "pxr/imaging/hdAi/renderDelegate.h"
+
 #include <ai.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -42,7 +44,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 class HdAiMaterial : public HdMaterial {
 public:
     HDAI_API
-    HdAiMaterial(AtUniverse* universe, const SdfPath& id);
+    HdAiMaterial(HdAiRenderDelegate* delegate, const SdfPath& id);
 
     ~HdAiMaterial() override = default;
 
@@ -55,9 +57,13 @@ public:
     HdDirtyBits GetInitialDirtyBitsMask() const override;
     HDAI_API
     void Reload() override;
+    HDAI_API
+    AtNode* GetSurfaceShader() const;
+    HDAI_API
+    AtNode* GetDisplacementShader() const;
 
 protected:
-    AtUniverse* _universe;
+    HdAiRenderDelegate* _delegate;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

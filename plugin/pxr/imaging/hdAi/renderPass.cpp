@@ -57,9 +57,6 @@ HdAiRenderPass::HdAiRenderPass(
     AiNodeSetStr(
         _options, "outputs",
         "RGBA RGBA HdAiRenderPass_filter HdAiRenderPass_driver");
-    auto* ambientOcclusion = AiNode(universe, "ambient_occlusion");
-    AiNodeSetInt(ambientOcclusion, "samples", 1);
-    AiNodeSetPtr(_options, "shader_override", ambientOcclusion);
 }
 
 void HdAiRenderPass::_Execute(

@@ -89,6 +89,12 @@ public:
     HDAI_API
     void CommitResources(HdChangeTracker* tracker) override;
 
+    HDAI_API
+    AtUniverse* GetUniverse() const;
+
+    HDAI_API
+    AtNode* GetFallbackShader() const;
+
 private:
     static const TfTokenVector SUPPORTED_RPRIM_TYPES;
     static const TfTokenVector SUPPORTED_SPRIM_TYPES;
@@ -101,6 +107,7 @@ private:
     HdAiRenderDelegate& operator=(const HdAiRenderDelegate&) = delete;
 
     AtUniverse* _universe;
+    AtNode* _fallbackShader;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

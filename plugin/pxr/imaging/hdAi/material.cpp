@@ -32,8 +32,8 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdAiMaterial::HdAiMaterial(AtUniverse* universe, const SdfPath& id)
-    : HdMaterial(id), _universe(universe) {}
+HdAiMaterial::HdAiMaterial(HdAiRenderDelegate* delegate, const SdfPath& id)
+    : HdMaterial(id), _delegate(delegate) {}
 
 void HdAiMaterial::Sync(
     HdSceneDelegate* sceneDelegate, HdRenderParam* renderParam,
@@ -48,5 +48,11 @@ HdDirtyBits HdAiMaterial::GetInitialDirtyBitsMask() const {
 }
 
 void HdAiMaterial::Reload() {}
+
+AtNode* HdAiMaterial::GetSurfaceShader() const {
+    return _delegate->GetFallbackShader();
+}
+
+AtNode* HdAiMaterial::GetDisplacementShader() const { return nullptr; }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -35,6 +35,8 @@
 
 #include <pxr/imaging/hd/mesh.h>
 
+#include "pxr/imaging/hdAi/renderDelegate.h"
+
 #include <ai.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -43,7 +45,7 @@ class HdAiMesh : public HdMesh {
 public:
     HDAI_API
     HdAiMesh(
-        AtUniverse* universe, const SdfPath& id,
+        HdAiRenderDelegate* delegate, const SdfPath& id,
         const SdfPath& instancerId = SdfPath());
 
     HDAI_API
@@ -70,6 +72,7 @@ protected:
     void _InitRepr(
         const HdReprSelector& reprSelector, HdDirtyBits* dirtyBits) override;
 
+    HdAiRenderDelegate* _delegate;
     AtNode* _mesh;
 };
 
