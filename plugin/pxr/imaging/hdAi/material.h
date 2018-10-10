@@ -63,6 +63,8 @@ public:
     AtNode* GetDisplacementShader() const;
 
 protected:
+    HDAI_API
+    void ReadMaterialNetworkMap(const HdMaterialNetworkMap& map);
     HdAiRenderDelegate* _delegate;
 };
 

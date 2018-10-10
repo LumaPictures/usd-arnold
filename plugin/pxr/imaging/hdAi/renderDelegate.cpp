@@ -29,6 +29,8 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pxr/imaging/hdAi/renderDelegate.h"
 
+#include <pxr/base/tf/getenv.h>
+
 #include <pxr/imaging/glf/glew.h>
 #include <pxr/imaging/hd/bprim.h>
 #include <pxr/imaging/hd/camera.h>
@@ -73,6 +75,8 @@ HdAiRenderDelegate::HdAiRenderDelegate() {
     }
     AiMsgSetConsoleFlags(AI_LOG_WARNINGS | AI_LOG_ERRORS);
     hdAiInstallNodes();
+    const auto arnoldPluginPath = TfGetenv("ARNOLD_PLUGIN_PATH");
+    if (!arnoldPluginPath.empty()) { AiLoadPlugins(arnoldPluginPath.c_str()); }
 
     _universe = nullptr;
 
@@ -186,6 +190,10 @@ HdBprim* HdAiRenderDelegate::CreateFallbackBprim(const TfToken& typeId) {
 }
 
 void HdAiRenderDelegate::DestroyBprim(HdBprim* bPrim) { delete bPrim; }
+
+TfToken HdAiRenderDelegate::GetMaterialBindingPurpose() const {
+    return HdTokens->full;
+}
 
 AtUniverse* HdAiRenderDelegate::GetUniverse() const { return _universe; }
 

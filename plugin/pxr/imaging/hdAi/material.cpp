@@ -38,13 +38,19 @@ HdAiMaterial::HdAiMaterial(HdAiRenderDelegate* delegate, const SdfPath& id)
 void HdAiMaterial::Sync(
     HdSceneDelegate* sceneDelegate, HdRenderParam* renderParam,
     HdDirtyBits* dirtyBits) {
-    TF_UNUSED(sceneDelegate);
     TF_UNUSED(renderParam);
-    TF_UNUSED(dirtyBits);
+    const auto id = GetId();
+    if ((*dirtyBits & HdMaterial::DirtyResource) && !id.IsEmpty()) {
+        auto value = sceneDelegate->GetMaterialResource(GetId());
+        if (value.IsHolding<HdMaterialNetworkMap>()) {
+            ReadMaterialNetworkMap(value.UncheckedGet<HdMaterialNetworkMap>());
+        }
+    }
+    *dirtyBits = HdMaterial::Clean;
 }
 
 HdDirtyBits HdAiMaterial::GetInitialDirtyBitsMask() const {
-    return HdMaterial::AllDirty;
+    return HdMaterial::DirtyResource;
 }
 
 void HdAiMaterial::Reload() {}
@@ -54,5 +60,9 @@ AtNode* HdAiMaterial::GetSurfaceShader() const {
 }
 
 AtNode* HdAiMaterial::GetDisplacementShader() const { return nullptr; }
+
+void HdAiMaterial::ReadMaterialNetworkMap(const HdMaterialNetworkMap& map) {
+    TF_UNUSED(map);
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

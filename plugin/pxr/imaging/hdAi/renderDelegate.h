@@ -88,6 +88,8 @@ public:
     void DestroyBprim(HdBprim* bPrim) override;
     HDAI_API
     void CommitResources(HdChangeTracker* tracker) override;
+    HDAI_API
+    TfToken GetMaterialBindingPurpose() const override;
 
     HDAI_API
     AtUniverse* GetUniverse() const;
