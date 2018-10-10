@@ -36,6 +36,8 @@
 #include <pxr/imaging/hd/renderPass.h>
 #include <pxr/imaging/hdx/compositor.h>
 
+#include "pxr/imaging/hdAi/renderDelegate.h"
+
 #include <ai.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -44,7 +46,7 @@ class HdAiRenderPass : public HdRenderPass {
 public:
     HDAI_API
     HdAiRenderPass(
-        AtUniverse* universe, HdRenderIndex* index,
+        HdAiRenderDelegate* delegate, HdRenderIndex* index,
         const HdRprimCollection& collection);
     HDAI_API
     ~HdAiRenderPass() override = default;
@@ -56,10 +58,10 @@ protected:
         const TfTokenVector& renderTags) override;
 
 private:
+    HdAiRenderDelegate* _delegate;
     AtNode* _camera = nullptr;
     AtNode* _filter = nullptr;
     AtNode* _driver = nullptr;
-    AtNode* _options = nullptr;
 
     HdxCompositor _compositor;
 

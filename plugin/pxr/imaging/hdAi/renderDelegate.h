@@ -95,6 +95,9 @@ public:
     AtUniverse* GetUniverse() const;
 
     HDAI_API
+    AtNode* GetOptions() const;
+
+    HDAI_API
     AtNode* GetFallbackShader() const;
 
 private:
@@ -109,6 +112,7 @@ private:
     HdAiRenderDelegate& operator=(const HdAiRenderDelegate&) = delete;
 
     AtUniverse* _universe;
+    AtNode* _options;
     AtNode* _fallbackShader;
 };
 

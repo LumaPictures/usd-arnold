@@ -80,6 +80,8 @@ HdAiRenderDelegate::HdAiRenderDelegate() {
 
     _universe = nullptr;
 
+    _options = AiUniverseGetOptions(_universe);
+
     _fallbackShader = AiNode(_universe, "ambient_occlusion");
     AiNodeSetInt(_fallbackShader, "samples", 1);
 }
@@ -118,8 +120,7 @@ HdResourceRegistrySharedPtr HdAiRenderDelegate::GetResourceRegistry() const {
 
 HdRenderPassSharedPtr HdAiRenderDelegate::CreateRenderPass(
     HdRenderIndex* index, const HdRprimCollection& collection) {
-    return HdRenderPassSharedPtr(
-        new HdAiRenderPass(_universe, index, collection));
+    return HdRenderPassSharedPtr(new HdAiRenderPass(this, index, collection));
 }
 
 HdInstancer* HdAiRenderDelegate::CreateInstancer(
@@ -197,7 +198,8 @@ TfToken HdAiRenderDelegate::GetMaterialBindingPurpose() const {
 
 AtUniverse* HdAiRenderDelegate::GetUniverse() const { return _universe; }
 
-HDAI_API
+AtNode* HdAiRenderDelegate::GetOptions() const { return _options; }
+
 AtNode* HdAiRenderDelegate::GetFallbackShader() const {
     return _fallbackShader;
 }

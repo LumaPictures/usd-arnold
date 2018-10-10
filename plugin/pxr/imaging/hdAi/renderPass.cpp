@@ -43,9 +43,10 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 HdAiRenderPass::HdAiRenderPass(
-    AtUniverse* universe, HdRenderIndex* index,
+    HdAiRenderDelegate* delegate, HdRenderIndex* index,
     const HdRprimCollection& collection)
-    : HdRenderPass(index, collection) {
+    : HdRenderPass(index, collection), _delegate(delegate) {
+    auto* universe = delegate->GetUniverse();
     _camera = AiNode(universe, HdAiNodeNames::camera);
     AiNodeSetPtr(AiUniverseGetOptions(universe), "camera", _camera);
     AiNodeSetStr(_camera, "name", "HdAiRenderPass_camera");
@@ -53,9 +54,9 @@ HdAiRenderPass::HdAiRenderPass(
     AiNodeSetStr(_filter, "name", "HdAiRenderPass_filter");
     _driver = AiNode(universe, HdAiNodeNames::driver);
     AiNodeSetStr(_driver, "name", "HdAiRenderPass_driver");
-    _options = AiUniverseGetOptions(universe);
+    auto* options = delegate->GetOptions();
     AiNodeSetStr(
-        _options, "outputs",
+        options, "outputs",
         "RGBA RGBA HdAiRenderPass_filter HdAiRenderPass_driver");
 }
 
@@ -78,10 +79,11 @@ void HdAiRenderPass::_Execute(
     _width = static_cast<int>(vp[2]);
     _height = static_cast<int>(vp[3]);
 
-    AiNodeSetInt(_options, "xres", _width);
-    AiNodeSetInt(_options, "yres", _height);
+    auto* options = _delegate->GetOptions();
+    AiNodeSetInt(options, "xres", _width);
+    AiNodeSetInt(options, "yres", _height);
 
-    AiNodeSetInt(_options, "bucket_size", 24);
+    AiNodeSetInt(options, "bucket_size", 24);
 
     AiRender();
 
