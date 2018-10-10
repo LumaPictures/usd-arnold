@@ -40,21 +40,27 @@
 #include "pxr/imaging/hdAi/nodes/nodes.h"
 #include "pxr/imaging/hdAi/utils.h"
 
+namespace {
+const AtString cameraName("HdAiRenderPass@camera");
+const AtString filterName("HdAiRenderPass@filter");
+const AtString driverName("HdAiRenderPass@driver");
+} // namespace
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 HdAiRenderPass::HdAiRenderPass(
     HdAiRenderDelegate* delegate, HdRenderIndex* index,
     const HdRprimCollection& collection)
     : HdRenderPass(index, collection), _delegate(delegate) {
-    auto* universe = delegate->GetUniverse();
+    auto* universe = _delegate->GetUniverse();
     _camera = AiNode(universe, HdAiNodeNames::camera);
     AiNodeSetPtr(AiUniverseGetOptions(universe), "camera", _camera);
-    AiNodeSetStr(_camera, "name", "HdAiRenderPass_camera");
+    AiNodeSetStr(_camera, "name", _delegate->GetLocalNodeName(cameraName));
     _filter = AiNode(universe, "gaussian_filter");
-    AiNodeSetStr(_filter, "name", "HdAiRenderPass_filter");
+    AiNodeSetStr(_filter, "name", _delegate->GetLocalNodeName(filterName));
     _driver = AiNode(universe, HdAiNodeNames::driver);
-    AiNodeSetStr(_driver, "name", "HdAiRenderPass_driver");
-    auto* options = delegate->GetOptions();
+    AiNodeSetStr(_driver, "name", _delegate->GetLocalNodeName(driverName));
+    auto* options = _delegate->GetOptions();
     AiNodeSetStr(
         options, "outputs",
         "RGBA RGBA HdAiRenderPass_filter HdAiRenderPass_driver");

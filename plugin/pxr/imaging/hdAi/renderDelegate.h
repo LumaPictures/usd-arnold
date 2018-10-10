@@ -92,6 +92,9 @@ public:
     TfToken GetMaterialBindingPurpose() const override;
 
     HDAI_API
+    AtString GetLocalNodeName(const AtString& name) const;
+
+    HDAI_API
     AtUniverse* GetUniverse() const;
 
     HDAI_API
@@ -111,6 +114,7 @@ private:
     HdAiRenderDelegate(const HdAiRenderDelegate&) = delete;
     HdAiRenderDelegate& operator=(const HdAiRenderDelegate&) = delete;
 
+    SdfPath _id;
     AtUniverse* _universe;
     AtNode* _options;
     AtNode* _fallbackShader;

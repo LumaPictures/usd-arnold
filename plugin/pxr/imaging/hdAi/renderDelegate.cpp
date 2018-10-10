@@ -65,6 +65,7 @@ std::atomic_int HdAiRenderDelegate::_counterResourceRegistry;
 HdResourceRegistrySharedPtr HdAiRenderDelegate::_resourceRegistry;
 
 HdAiRenderDelegate::HdAiRenderDelegate() {
+    _id = SdfPath(TfToken(TfStringPrintf("/HdAiRenderDelegate_%p", this)));
     if (AiUniverseIsActive()) {
         TF_CODING_ERROR("There is already an active Arnold universe!");
     }
@@ -194,6 +195,10 @@ void HdAiRenderDelegate::DestroyBprim(HdBprim* bPrim) { delete bPrim; }
 
 TfToken HdAiRenderDelegate::GetMaterialBindingPurpose() const {
     return HdTokens->full;
+}
+
+AtString HdAiRenderDelegate::GetLocalNodeName(const AtString& name) const {
+    return AtString(_id.AppendChild(TfToken(name.c_str())).GetText());
 }
 
 AtUniverse* HdAiRenderDelegate::GetUniverse() const { return _universe; }
