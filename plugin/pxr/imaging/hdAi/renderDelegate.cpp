@@ -53,10 +53,9 @@ const TfTokenVector HdAiRenderDelegate::SUPPORTED_RPRIM_TYPES = {
 };
 
 const TfTokenVector HdAiRenderDelegate::SUPPORTED_SPRIM_TYPES = {
-    HdPrimTypeTokens->camera,
-    HdPrimTypeTokens->material,
-    HdPrimTypeTokens->distantLight,
-    HdPrimTypeTokens->sphereLight,
+    HdPrimTypeTokens->camera,       HdPrimTypeTokens->material,
+    HdPrimTypeTokens->distantLight, HdPrimTypeTokens->sphereLight,
+    HdPrimTypeTokens->diskLight,
 };
 
 const TfTokenVector HdAiRenderDelegate::SUPPORTED_BPRIM_TYPES = {
@@ -164,6 +163,9 @@ HdSprim* HdAiRenderDelegate::CreateSprim(
     if (typeId == HdPrimTypeTokens->distantLight) {
         return HdAiLight::CreateDistantLight(this, sprimId);
     }
+    if (typeId == HdPrimTypeTokens->diskLight) {
+        return HdAiLight::CreateDiskLight(this, sprimId);
+    }
     TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
     return nullptr;
 }
@@ -181,13 +183,18 @@ HdSprim* HdAiRenderDelegate::CreateFallbackSprim(const TfToken& typeId) {
     if (typeId == HdPrimTypeTokens->distantLight) {
         return HdAiLight::CreateDistantLight(this, SdfPath::EmptyPath());
     }
+    if (typeId == HdPrimTypeTokens->diskLight) {
+        return HdAiLight::CreateDiskLight(this, SdfPath::EmptyPath());
+    }
     TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
     return nullptr;
 }
 
 void HdAiRenderDelegate::DestroySprim(HdSprim* sPrim) {
+    TF_UNUSED(sPrim);
     // TODO: Figure out what to do with this.
-    /*delete sPrim;*/ // This crashes in the destructor. I suspect an invalid
+    /*delete sPrim;*/ // This crashes in HdCamera::~HdCamera. I suspect an
+                      // invalid
     // prim being removed.
 }
 

@@ -39,6 +39,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 namespace {
 const AtString pointLightType("point_light");
 const AtString distantLightType("distant_light");
+const AtString diskLightType("disk_light");
 
 struct ParamDesc {
     ParamDesc(const char* aname, const TfToken& hname)
@@ -62,6 +63,8 @@ std::vector<ParamDesc> pointParams = {{"radius", HdLightTokens->radius}};
 
 std::vector<ParamDesc> distantParams = {{"angle", HdLightTokens->angle}};
 
+std::vector<ParamDesc> diskParams = {{"radius", HdLightTokens->radius}};
+
 void iterateParams(
     AtNode* light, const AtNodeEntry* nentry, const SdfPath& id,
     HdSceneDelegate* delegate, const std::vector<ParamDesc>& params) {
@@ -80,8 +83,13 @@ auto pointLightSync = [](AtNode* light, const AtNodeEntry* nentry,
 };
 
 auto distantLightSync = [](AtNode* light, const AtNodeEntry* nentry,
-                         const SdfPath& id, HdSceneDelegate* delegate) {
+                           const SdfPath& id, HdSceneDelegate* delegate) {
     iterateParams(light, nentry, id, delegate, distantParams);
+};
+
+auto diskLightSync = [](AtNode* light, const AtNodeEntry* nentry,
+                        const SdfPath& id, HdSceneDelegate* delegate) {
+    iterateParams(light, nentry, id, delegate, diskParams);
 };
 
 } // namespace
@@ -94,6 +102,11 @@ HdAiLight* HdAiLight::CreatePointLight(
 HdAiLight* HdAiLight::CreateDistantLight(
     HdAiRenderDelegate* delegate, const SdfPath& id) {
     return new HdAiLight(delegate, id, distantLightType, distantLightSync);
+}
+
+HdAiLight* HdAiLight::CreateDiskLight(
+    HdAiRenderDelegate* delegate, const SdfPath& id) {
+    return new HdAiLight(delegate, id, diskLightType, diskLightSync);
 }
 
 void HdAiLight::Sync(
