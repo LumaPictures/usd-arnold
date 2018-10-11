@@ -37,24 +37,25 @@ pxr_plugin(hdAi
         ${PYTHON_INCLUDE_DIRS}
 
     PUBLIC_CLASSES
-       material
-       mesh
-       rendererPlugin
-       renderBuffer
-       renderDelegate
-       renderPass
-       utils
+        light
+        material
+        mesh
+        rendererPlugin
+        renderBuffer
+        renderDelegate
+        renderPass
+        utils
 
-   CPPFILES
-       nodes/camera.cpp
-       nodes/driver.cpp
-       nodes/nodes.cpp
+    CPPFILES
+        nodes/camera.cpp
+        nodes/driver.cpp
+        nodes/nodes.cpp
 
-   PRIVATE_HEADERS
-       nodes/nodes.h
+    PRIVATE_HEADERS
+        nodes/nodes.h
 
-   PUBLIC_HEADERS
-       api.h
+    PUBLIC_HEADERS
+        api.h
 
     RESOURCE_FILES
         plugInfo.json

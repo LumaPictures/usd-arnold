@@ -39,6 +39,7 @@
 #include <pxr/imaging/hd/rprim.h>
 #include <pxr/imaging/hd/tokens.h>
 
+#include "pxr/imaging/hdAi/light.h"
 #include "pxr/imaging/hdAi/material.h"
 #include "pxr/imaging/hdAi/mesh.h"
 #include "pxr/imaging/hdAi/nodes/nodes.h"
@@ -54,6 +55,7 @@ const TfTokenVector HdAiRenderDelegate::SUPPORTED_RPRIM_TYPES = {
 const TfTokenVector HdAiRenderDelegate::SUPPORTED_SPRIM_TYPES = {
     HdPrimTypeTokens->camera,
     HdPrimTypeTokens->material,
+    HdPrimTypeTokens->sphereLight,
 };
 
 const TfTokenVector HdAiRenderDelegate::SUPPORTED_BPRIM_TYPES = {
@@ -153,6 +155,9 @@ HdSprim* HdAiRenderDelegate::CreateSprim(
     if (typeId == HdPrimTypeTokens->material) {
         return new HdAiMaterial(this, sprimId);
     }
+    if (typeId == HdPrimTypeTokens->sphereLight) {
+        return HdAiLight::CreatePointLight(this, sprimId);
+    }
     TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
     return nullptr;
 }
@@ -163,6 +168,9 @@ HdSprim* HdAiRenderDelegate::CreateFallbackSprim(const TfToken& typeId) {
     }
     if (typeId == HdPrimTypeTokens->material) {
         return new HdAiMaterial(this, SdfPath::EmptyPath());
+    }
+    if (typeId == HdPrimTypeTokens->sphereLight) {
+        return HdAiLight::CreatePointLight(this, SdfPath::EmptyPath());
     }
     TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
     return nullptr;
