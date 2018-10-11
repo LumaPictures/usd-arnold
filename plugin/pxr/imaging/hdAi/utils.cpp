@@ -73,4 +73,16 @@ AtMatrix HdAiConvertMatrix(const GfMatrix4f& in) {
     return out;
 }
 
+void HdAiSetTransform(
+    AtNode* node, HdSceneDelegate* delegate, const SdfPath& id) {
+    constexpr size_t maxSamples = 3;
+    HdTimeSampleArray<GfMatrix4d, maxSamples> xf;
+    delegate->SampleTransform(id, &xf);
+    AtArray* matrices = AiArrayAllocate(1, xf.count, AI_TYPE_MATRIX);
+    for (auto i = decltype(xf.count){0}; i < xf.count; ++i) {
+        AiArraySetMtx(matrices, i, HdAiConvertMatrix(xf.values[i]));
+    }
+    AiNodeSetArray(node, "matrix", matrices);
+}
+
 PXR_NAMESPACE_CLOSE_SCOPE

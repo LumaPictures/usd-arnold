@@ -52,7 +52,7 @@ public:
     ~HdAiMesh() override = default;
 
     void Sync(
-        HdSceneDelegate* delegate, HdRenderParam* renderParam,
+        HdSceneDelegate* sceneDelegate, HdRenderParam* renderParam,
         HdDirtyBits* dirtyBits, const HdReprSelector& reprSelector,
         bool forcedRepr) override;
 

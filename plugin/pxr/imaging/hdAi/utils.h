@@ -36,6 +36,8 @@
 #include <pxr/base/gf/matrix4d.h>
 #include <pxr/base/gf/matrix4f.h>
 
+#include <pxr/imaging/hd/sceneDelegate.h>
+
 #include <ai.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -44,6 +46,9 @@ HDAI_API
 AtMatrix HdAiConvertMatrix(const GfMatrix4d& in);
 HDAI_API
 AtMatrix HdAiConvertMatrix(const GfMatrix4f& in);
+HDAI_API
+void HdAiSetTransform(
+    AtNode* node, HdSceneDelegate* delegate, const SdfPath& id);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

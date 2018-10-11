@@ -42,14 +42,14 @@ HdAiMesh::HdAiMesh(
 }
 
 void HdAiMesh::Sync(
-    HdSceneDelegate* delegate, HdRenderParam* renderParam,
+    HdSceneDelegate* sceneDelegate, HdRenderParam* renderParam,
     HdDirtyBits* dirtyBits, const HdReprSelector& reprSelector,
     bool forcedRepr) {
     TF_UNUSED(forcedRepr);
     const auto& id = GetId();
 
     if (HdChangeTracker::IsPrimvarDirty(*dirtyBits, id, HdTokens->points)) {
-        auto value = delegate->Get(id, HdTokens->points);
+        auto value = sceneDelegate->Get(id, HdTokens->points);
         const auto& vecArray = value.Get<VtVec3fArray>();
         AiNodeSetArray(
             _mesh, "vlist",
@@ -58,7 +58,7 @@ void HdAiMesh::Sync(
     }
 
     if (HdChangeTracker::IsTopologyDirty(*dirtyBits, id)) {
-        const auto topology = GetMeshTopology(delegate);
+        const auto topology = GetMeshTopology(sceneDelegate);
         const auto& vertexCounts = topology.GetFaceVertexCounts();
         const auto& vertexIndices = topology.GetFaceVertexIndices();
         const auto numFaces = topology.GetNumFaces();
@@ -79,19 +79,13 @@ void HdAiMesh::Sync(
     }
 
     if (HdChangeTracker::IsTransformDirty(*dirtyBits, id)) {
-        HdTimeSampleArray<GfMatrix4d, 3> xf;
-        delegate->SampleTransform(GetId(), &xf);
-        AtArray* matrices = AiArrayAllocate(1, xf.count, AI_TYPE_MATRIX);
-        for (auto i = decltype(xf.count){0}; i < xf.count; ++i) {
-            AiArraySetMtx(matrices, i, HdAiConvertMatrix(xf.values[i]));
-        }
-        AiNodeSetArray(_mesh, "matrix", matrices);
+        HdAiSetTransform(_mesh, sceneDelegate, GetId());
     }
 
     if (*dirtyBits & HdChangeTracker::DirtyMaterialId) {
         const auto* material = reinterpret_cast<const HdAiMaterial*>(
-            delegate->GetRenderIndex().GetSprim(
-                HdPrimTypeTokens->material, delegate->GetMaterialId(id)));
+            sceneDelegate->GetRenderIndex().GetSprim(
+                HdPrimTypeTokens->material, sceneDelegate->GetMaterialId(id)));
         if (material != nullptr) {
             AiNodeSetPtr(_mesh, "shader", material->GetSurfaceShader());
             AiNodeSetPtr(_mesh, "disp_map", material->GetDisplacementShader());

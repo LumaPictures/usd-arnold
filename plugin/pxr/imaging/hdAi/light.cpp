@@ -179,13 +179,7 @@ void HdAiLight::Sync(
     }
 
     if (*dirtyBits & HdLight::DirtyTransform) {
-        HdTimeSampleArray<GfMatrix4d, 3> xf;
-        sceneDelegate->SampleTransform(GetId(), &xf);
-        AtArray* matrices = AiArrayAllocate(1, xf.count, AI_TYPE_MATRIX);
-        for (auto i = decltype(xf.count){0}; i < xf.count; ++i) {
-            AiArraySetMtx(matrices, i, HdAiConvertMatrix(xf.values[i]));
-        }
-        AiNodeSetArray(_light, "matrix", matrices);
+        HdAiSetTransform(_light, sceneDelegate, GetId());
     }
     *dirtyBits = HdLight::Clean;
 }
