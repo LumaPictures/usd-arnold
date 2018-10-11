@@ -46,6 +46,9 @@ public:
     static HdAiLight* CreatePointLight(
         HdAiRenderDelegate* delegate, const SdfPath& id);
 
+    static HdAiLight* CreateDistantLight(
+        HdAiRenderDelegate* delegate, const SdfPath& id);
+
     void Sync(
         HdSceneDelegate* sceneDelegate, HdRenderParam* renderParam,
         HdDirtyBits* dirtyBits) override;

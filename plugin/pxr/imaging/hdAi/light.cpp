@@ -38,6 +38,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
 const AtString pointLightType("point_light");
+const AtString distantLightType("distant_light");
 
 struct ParamDesc {
     ParamDesc(const char* aname, const TfToken& hname)
@@ -59,6 +60,8 @@ std::vector<ParamDesc> genericParams = {
 
 std::vector<ParamDesc> pointParams = {{"radius", HdLightTokens->radius}};
 
+std::vector<ParamDesc> distantParams = {{"angle", HdLightTokens->angle}};
+
 void iterateParams(
     AtNode* light, const AtNodeEntry* nentry, const SdfPath& id,
     HdSceneDelegate* delegate, const std::vector<ParamDesc>& params) {
@@ -76,11 +79,21 @@ auto pointLightSync = [](AtNode* light, const AtNodeEntry* nentry,
     iterateParams(light, nentry, id, delegate, pointParams);
 };
 
+auto distantLightSync = [](AtNode* light, const AtNodeEntry* nentry,
+                         const SdfPath& id, HdSceneDelegate* delegate) {
+    iterateParams(light, nentry, id, delegate, distantParams);
+};
+
 } // namespace
 
 HdAiLight* HdAiLight::CreatePointLight(
     HdAiRenderDelegate* delegate, const SdfPath& id) {
     return new HdAiLight(delegate, id, pointLightType, pointLightSync);
+}
+
+HdAiLight* HdAiLight::CreateDistantLight(
+    HdAiRenderDelegate* delegate, const SdfPath& id) {
+    return new HdAiLight(delegate, id, distantLightType, distantLightSync);
 }
 
 void HdAiLight::Sync(
