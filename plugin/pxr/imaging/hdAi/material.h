@@ -64,10 +64,6 @@ public:
     HDAI_API
     AtNode* GetDisplacementShader() const;
 
-    HDAI_API
-    static void SetParameter(
-        AtNode* node, const AtParamEntry* pentry, const VtValue& value);
-
 protected:
     HDAI_API
     AtNode* ReadMaterialNetwork(const HdMaterialNetwork& network);

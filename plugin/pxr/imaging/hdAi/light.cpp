@@ -32,18 +32,25 @@
 #include "pxr/imaging/hdAi/material.h"
 #include "pxr/imaging/hdAi/utils.h"
 
+#include <pxr/usd/usdLux/tokens.h>
+
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
-TF_DEFINE_PRIVATE_TOKENS(_tokens, (length));
 
 const AtString pointLightType("point_light");
 const AtString distantLightType("distant_light");
 const AtString diskLightType("disk_light");
-const AtString quadLightType("quad_light");
+const AtString rectLightType("quad_light");
 const AtString cylinderLightType("cylinder_light");
+const AtString domeLightType("skydome_light");
+
+const AtString formatStr("format");
+const AtString angularStr("angular");
+const AtString latlongStr("latlong");
+const AtString mirroredBallStr("mirrored_ball");
 
 struct ParamDesc {
     ParamDesc(const char* aname, const TfToken& hname)
@@ -78,7 +85,7 @@ void iterateParams(
         const auto* pentry =
             AiNodeEntryLookUpParameter(nentry, param.arnoldName);
         if (pentry == nullptr) { continue; }
-        HdAiMaterial::SetParameter(
+        HdAiSetParameter(
             light, pentry, delegate->GetLightParamValue(id, param.hdName));
     }
 }
@@ -129,13 +136,29 @@ auto cylinderLightSync = [](AtNode* light, const AtNodeEntry* nentry,
                             const SdfPath& id, HdSceneDelegate* delegate) {
     iterateParams(light, nentry, id, delegate, cylinderParams);
     float length = 1.0f;
-    const auto& lengthValue = delegate->GetLightParamValue(id, _tokens->length);
+    const auto& lengthValue =
+        delegate->GetLightParamValue(id, UsdLuxTokens->length);
     if (lengthValue.IsHolding<float>()) {
         length = lengthValue.UncheckedGet<float>();
     }
     length /= 2.0f;
     AiNodeSetVec(light, "bottom", 0.0f, -length, 0.0f);
     AiNodeSetVec(light, "top", 0.0f, length, 0.0f);
+};
+
+auto domeLightSync = [](AtNode* light, const AtNodeEntry* nentry,
+                        const SdfPath& id, HdSceneDelegate* delegate) {
+    const auto& formatValue =
+        delegate->GetLightParamValue(id, UsdLuxTokens->textureFormat);
+    if (formatValue.IsHolding<TfToken>()) {
+        const auto& textureFormat = formatValue.UncheckedGet<TfToken>();
+        AiNodeSetStr(light, formatStr, angularStr); // default value
+        if (textureFormat == UsdLuxTokens->latlong) {
+            AiNodeSetStr(light, formatStr, latlongStr);
+        } else if (textureFormat == UsdLuxTokens->mirroredBall) {
+            AiNodeSetStr(light, formatStr, mirroredBallStr);
+        }
+    }
 };
 
 } // namespace
@@ -157,12 +180,17 @@ HdAiLight* HdAiLight::CreateDiskLight(
 
 HdAiLight* HdAiLight::CreateRectLight(
     HdAiRenderDelegate* delegate, const SdfPath& id) {
-    return new HdAiLight(delegate, id, quadLightType, quadLightSync);
+    return new HdAiLight(delegate, id, rectLightType, quadLightSync);
 }
 
 HdAiLight* HdAiLight::CreateCylinderLight(
     HdAiRenderDelegate* delegate, const SdfPath& id) {
     return new HdAiLight(delegate, id, cylinderLightType, cylinderLightSync);
+}
+
+HdAiLight* HdAiLight::CreateDomeLight(
+    HdAiRenderDelegate* delegate, const SdfPath& id) {
+    return new HdAiLight(delegate, id, domeLightType, domeLightSync);
 }
 
 void HdAiLight::Sync(

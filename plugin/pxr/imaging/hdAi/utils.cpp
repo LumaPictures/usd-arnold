@@ -29,6 +29,8 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pxr/imaging/hdAi/utils.h"
 
+#include <pxr/base/gf/vec2f.h>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 AtMatrix HdAiConvertMatrix(const GfMatrix4d& in) {
@@ -83,6 +85,86 @@ void HdAiSetTransform(
         AiArraySetMtx(matrices, i, HdAiConvertMatrix(xf.values[i]));
     }
     AiNodeSetArray(node, "matrix", matrices);
+}
+
+void HdAiSetParameter(
+    AtNode* node, const AtParamEntry* pentry, const VtValue& value) {
+    const auto paramName = AiParamGetName(pentry);
+    switch (AiParamGetType(pentry)) {
+        case AI_TYPE_BYTE:
+            if (value.IsHolding<int>()) {
+                AiNodeSetByte(
+                    node, paramName,
+                    static_cast<uint8_t>(value.UncheckedGet<int>()));
+            }
+            break;
+        case AI_TYPE_INT:
+            if (value.IsHolding<int>()) {
+                AiNodeSetInt(node, paramName, value.UncheckedGet<int>());
+            }
+            break;
+        case AI_TYPE_UINT:
+        case AI_TYPE_USHORT:
+            if (value.IsHolding<unsigned int>()) {
+                AiNodeSetUInt(
+                    node, paramName, value.UncheckedGet<unsigned int>());
+            }
+            break;
+        case AI_TYPE_BOOLEAN:
+            if (value.IsHolding<bool>()) {
+                AiNodeSetBool(node, paramName, value.UncheckedGet<bool>());
+            }
+            break;
+        case AI_TYPE_FLOAT:
+        case AI_TYPE_HALF:
+            if (value.IsHolding<float>()) {
+                AiNodeSetFlt(node, paramName, value.UncheckedGet<float>());
+            }
+            break;
+        case AI_TYPE_RGB:
+            if (value.IsHolding<GfVec3f>()) {
+                const auto& v = value.UncheckedGet<GfVec3f>();
+                AiNodeSetRGB(node, paramName, v[0], v[1], v[2]);
+            }
+            break;
+        case AI_TYPE_RGBA:
+            if (value.IsHolding<GfVec3f>()) {
+                const auto& v = value.UncheckedGet<GfVec4f>();
+                AiNodeSetRGBA(node, paramName, v[0], v[1], v[2], v[3]);
+            }
+            break;
+        case AI_TYPE_VECTOR:
+            if (value.IsHolding<GfVec3f>()) {
+                const auto& v = value.UncheckedGet<GfVec3f>();
+                AiNodeSetVec(node, paramName, v[0], v[1], v[2]);
+            }
+            break;
+        case AI_TYPE_VECTOR2:
+            if (value.IsHolding<GfVec2f>()) {
+                const auto& v = value.UncheckedGet<GfVec2f>();
+                AiNodeSetVec2(node, paramName, v[0], v[1]);
+            }
+            break;
+        case AI_TYPE_STRING:
+            if (value.IsHolding<TfToken>()) {
+                AiNodeSetStr(
+                    node, paramName, value.UncheckedGet<TfToken>().GetText());
+            }
+            break;
+        case AI_TYPE_POINTER:
+        case AI_TYPE_NODE:
+            break; // Should be in the relationships list.
+        case AI_TYPE_MATRIX:
+            break; // TODO
+        case AI_TYPE_ENUM:
+            break; // TODO
+        case AI_TYPE_CLOSURE:
+            break; // Should be in the relationships list.
+        default:
+            AiMsgError(
+                "Unsupported parameter %s.%s", AiNodeGetName(node),
+                AiParamGetName(pentry).c_str());
+    }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
