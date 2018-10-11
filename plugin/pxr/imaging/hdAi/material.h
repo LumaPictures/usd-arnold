@@ -39,6 +39,8 @@
 
 #include <ai.h>
 
+#include <unordered_map>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HdAiMaterial : public HdMaterial {
@@ -62,10 +64,24 @@ public:
     HDAI_API
     AtNode* GetDisplacementShader() const;
 
+    HDAI_API
+    static void SetParameter(
+        AtNode* node, const AtParamEntry* pentry, const VtValue& value);
+
 protected:
     HDAI_API
-    void ReadMaterialNetworkMap(const HdMaterialNetworkMap& map);
+    AtNode* ReadMaterialNetwork(const HdMaterialNetwork& network);
+
+    HDAI_API
+    AtNode* ReadMaterial(const HdMaterialNode& node);
+
+    HDAI_API
+    AtString GetLocalNodeName(const SdfPath& path) const;
+
+    std::unordered_map<AtString, AtNode*, AtStringHash> _nodes;
     HdAiRenderDelegate* _delegate;
+    AtNode* _surface = nullptr;
+    AtNode* _displacement = nullptr;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -41,9 +41,9 @@
 #include "pxr/imaging/hdAi/utils.h"
 
 namespace {
-const AtString cameraName("HdAiRenderPass@camera");
-const AtString filterName("HdAiRenderPass@filter");
-const AtString driverName("HdAiRenderPass@driver");
+const AtString cameraName("HdAiRenderPass_camera");
+const AtString filterName("HdAiRenderPass_filter");
+const AtString driverName("HdAiRenderPass_driver");
 } // namespace
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -61,9 +61,9 @@ HdAiRenderPass::HdAiRenderPass(
     _driver = AiNode(universe, HdAiNodeNames::driver);
     AiNodeSetStr(_driver, "name", _delegate->GetLocalNodeName(driverName));
     auto* options = _delegate->GetOptions();
-    AiNodeSetStr(
-        options, "outputs",
-        "RGBA RGBA HdAiRenderPass_filter HdAiRenderPass_driver");
+    const auto outputsString = TfStringPrintf(
+        "RGBA RGBA %s %s", AiNodeGetName(_filter), AiNodeGetName(_driver));
+    AiNodeSetStr(options, "outputs", outputsString.c_str());
 }
 
 void HdAiRenderPass::_Execute(
