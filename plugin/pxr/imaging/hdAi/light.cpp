@@ -40,6 +40,7 @@ namespace {
 const AtString pointLightType("point_light");
 const AtString distantLightType("distant_light");
 const AtString diskLightType("disk_light");
+const AtString quadLightType("quad_light");
 
 struct ParamDesc {
     ParamDesc(const char* aname, const TfToken& hname)
@@ -92,6 +93,33 @@ auto diskLightSync = [](AtNode* light, const AtNodeEntry* nentry,
     iterateParams(light, nentry, id, delegate, diskParams);
 };
 
+// TODO: support the texture:file slot.
+auto quadLightSync = [](AtNode* light, const AtNodeEntry* nentry,
+                        const SdfPath& id, HdSceneDelegate* delegate) {
+    float width = 1.0f;
+    float height = 1.0f;
+    const auto& widthValue =
+        delegate->GetLightParamValue(id, HdLightTokens->width);
+    if (widthValue.IsHolding<float>()) {
+        width = widthValue.UncheckedGet<float>();
+    }
+    const auto& heightValue =
+        delegate->GetLightParamValue(id, HdLightTokens->height);
+    if (heightValue.IsHolding<float>()) {
+        height = heightValue.UncheckedGet<float>();
+    }
+
+    width /= 2.0f;
+    height /= 2.0f;
+
+    AiNodeSetArray(
+        light, "vertices",
+        AiArray(
+            4, 1, AI_TYPE_VECTOR, AtVector(-width, height, 0.0f),
+            AtVector(width, height, 0.0f), AtVector(width, -height, 0.0f),
+            AtVector(-width, -height, 0.0f)));
+};
+
 } // namespace
 
 HdAiLight* HdAiLight::CreatePointLight(
@@ -107,6 +135,11 @@ HdAiLight* HdAiLight::CreateDistantLight(
 HdAiLight* HdAiLight::CreateDiskLight(
     HdAiRenderDelegate* delegate, const SdfPath& id) {
     return new HdAiLight(delegate, id, diskLightType, diskLightSync);
+}
+
+HdAiLight* HdAiLight::CreateRectLight(
+    HdAiRenderDelegate* delegate, const SdfPath& id) {
+    return new HdAiLight(delegate, id, quadLightType, quadLightSync);
 }
 
 void HdAiLight::Sync(
