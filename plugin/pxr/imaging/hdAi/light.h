@@ -55,6 +55,9 @@ public:
     static HdAiLight* CreateRectLight(
         HdAiRenderDelegate* delegate, const SdfPath& id);
 
+    static HdAiLight* CreateCylinderLight(
+        HdAiRenderDelegate* delegate, const SdfPath& id);
+
     void Sync(
         HdSceneDelegate* sceneDelegate, HdRenderParam* renderParam,
         HdDirtyBits* dirtyBits) override;

@@ -55,7 +55,8 @@ const TfTokenVector HdAiRenderDelegate::SUPPORTED_RPRIM_TYPES = {
 const TfTokenVector HdAiRenderDelegate::SUPPORTED_SPRIM_TYPES = {
     HdPrimTypeTokens->camera,       HdPrimTypeTokens->material,
     HdPrimTypeTokens->distantLight, HdPrimTypeTokens->sphereLight,
-    HdPrimTypeTokens->diskLight,    HdPrimTypeTokens->rectLight};
+    HdPrimTypeTokens->diskLight,    HdPrimTypeTokens->rectLight,
+    HdPrimTypeTokens->cylinderLight};
 
 const TfTokenVector HdAiRenderDelegate::SUPPORTED_BPRIM_TYPES = {
     HdPrimTypeTokens->renderBuffer,
@@ -168,6 +169,9 @@ HdSprim* HdAiRenderDelegate::CreateSprim(
     if (typeId == HdPrimTypeTokens->rectLight) {
         return HdAiLight::CreateRectLight(this, sprimId);
     }
+    if (typeId == HdPrimTypeTokens->cylinderLight) {
+        return HdAiLight::CreateCylinderLight(this, sprimId);
+    }
     TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
     return nullptr;
 }
@@ -190,6 +194,9 @@ HdSprim* HdAiRenderDelegate::CreateFallbackSprim(const TfToken& typeId) {
     }
     if (typeId == HdPrimTypeTokens->rectLight) {
         return HdAiLight::CreateRectLight(this, SdfPath::EmptyPath());
+    }
+    if (typeId == HdPrimTypeTokens->cylinderLight) {
+        return HdAiLight::CreateCylinderLight(this, SdfPath::EmptyPath());
     }
     TF_CODING_ERROR("Unknown Sprim Type %s", typeId.GetText());
     return nullptr;

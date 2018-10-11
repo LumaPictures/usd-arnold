@@ -37,10 +37,13 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
+TF_DEFINE_PRIVATE_TOKENS(_tokens, (length));
+
 const AtString pointLightType("point_light");
 const AtString distantLightType("distant_light");
 const AtString diskLightType("disk_light");
 const AtString quadLightType("quad_light");
+const AtString cylinderLightType("cylinder_light");
 
 struct ParamDesc {
     ParamDesc(const char* aname, const TfToken& hname)
@@ -65,6 +68,8 @@ std::vector<ParamDesc> pointParams = {{"radius", HdLightTokens->radius}};
 std::vector<ParamDesc> distantParams = {{"angle", HdLightTokens->angle}};
 
 std::vector<ParamDesc> diskParams = {{"radius", HdLightTokens->radius}};
+
+std::vector<ParamDesc> cylinderParams = {{"radius", HdLightTokens->radius}};
 
 void iterateParams(
     AtNode* light, const AtNodeEntry* nentry, const SdfPath& id,
@@ -120,6 +125,19 @@ auto quadLightSync = [](AtNode* light, const AtNodeEntry* nentry,
             AtVector(-width, -height, 0.0f)));
 };
 
+auto cylinderLightSync = [](AtNode* light, const AtNodeEntry* nentry,
+                            const SdfPath& id, HdSceneDelegate* delegate) {
+    iterateParams(light, nentry, id, delegate, cylinderParams);
+    float length = 1.0f;
+    const auto& lengthValue = delegate->GetLightParamValue(id, _tokens->length);
+    if (lengthValue.IsHolding<float>()) {
+        length = lengthValue.UncheckedGet<float>();
+    }
+    length /= 2.0f;
+    AiNodeSetVec(light, "bottom", 0.0f, -length, 0.0f);
+    AiNodeSetVec(light, "top", 0.0f, length, 0.0f);
+};
+
 } // namespace
 
 HdAiLight* HdAiLight::CreatePointLight(
@@ -140,6 +158,11 @@ HdAiLight* HdAiLight::CreateDiskLight(
 HdAiLight* HdAiLight::CreateRectLight(
     HdAiRenderDelegate* delegate, const SdfPath& id) {
     return new HdAiLight(delegate, id, quadLightType, quadLightSync);
+}
+
+HdAiLight* HdAiLight::CreateCylinderLight(
+    HdAiRenderDelegate* delegate, const SdfPath& id) {
+    return new HdAiLight(delegate, id, cylinderLightType, cylinderLightSync);
 }
 
 void HdAiLight::Sync(
