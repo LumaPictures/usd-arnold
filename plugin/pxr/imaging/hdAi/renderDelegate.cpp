@@ -84,6 +84,8 @@ HdAiRenderDelegate::HdAiRenderDelegate() {
     _universe = nullptr;
 
     _options = AiUniverseGetOptions(_universe);
+    AiNodeSetInt(_options, "GI_diffuse_depth", 1);
+    AiNodeSetInt(_options, "GI_specular_depth", 1);
 
     _fallbackShader = AiNode(_universe, "ambient_occlusion");
     AiNodeSetInt(_fallbackShader, "samples", 1);

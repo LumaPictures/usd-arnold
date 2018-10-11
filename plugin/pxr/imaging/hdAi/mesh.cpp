@@ -79,8 +79,13 @@ void HdAiMesh::Sync(
     }
 
     if (HdChangeTracker::IsTransformDirty(*dirtyBits, id)) {
-        const auto transform = delegate->GetTransform(id);
-        AiNodeSetMatrix(_mesh, "matrix", HdAiConvertMatrix(transform));
+        HdTimeSampleArray<GfMatrix4d, 3> xf;
+        delegate->SampleTransform(GetId(), &xf);
+        AtArray* matrices = AiArrayAllocate(1, xf.count, AI_TYPE_MATRIX);
+        for (auto i = decltype(xf.count){0}; i < xf.count; ++i) {
+            AiArraySetMtx(matrices, i, HdAiConvertMatrix(xf.values[i]));
+        }
+        AiNodeSetArray(_mesh, "matrix", matrices);
     }
 
     if (*dirtyBits & HdChangeTracker::DirtyMaterialId) {

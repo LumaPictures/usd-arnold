@@ -97,8 +97,13 @@ void HdAiLight::Sync(
     }
 
     if (*dirtyBits & HdLight::DirtyTransform) {
-        const auto transform = sceneDelegate->GetTransform(GetId());
-        AiNodeSetMatrix(_light, "matrix", HdAiConvertMatrix(transform));
+        HdTimeSampleArray<GfMatrix4d, 3> xf;
+        sceneDelegate->SampleTransform(GetId(), &xf);
+        AtArray* matrices = AiArrayAllocate(1, xf.count, AI_TYPE_MATRIX);
+        for (auto i = decltype(xf.count){0}; i < xf.count; ++i) {
+            AiArraySetMtx(matrices, i, HdAiConvertMatrix(xf.values[i]));
+        }
+        AiNodeSetArray(_light, "matrix", matrices);
     }
     *dirtyBits = HdLight::Clean;
 }
@@ -112,6 +117,11 @@ HdAiLight::HdAiLight(
     const HdAiLight::SyncParams& sync)
     : HdLight(id), _syncParams(sync), _delegate(delegate) {
     _light = AiNode(_delegate->GetUniverse(), arnoldType);
+    if (id.IsEmpty()) {
+        AiNodeSetFlt(_light, "intensity", 0.0f);
+    } else {
+        AiNodeSetStr(_light, "name", id.GetText());
+    }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -64,6 +64,9 @@ HdAiRenderPass::HdAiRenderPass(
     const auto outputsString = TfStringPrintf(
         "RGBA RGBA %s %s", AiNodeGetName(_filter), AiNodeGetName(_driver));
     AiNodeSetStr(options, "outputs", outputsString.c_str());
+
+    AiNodeSetFlt(_camera, "shutter_start", -0.25f);
+    AiNodeSetFlt(_camera, "shutter_end", 0.25f);
 }
 
 void HdAiRenderPass::_Execute(
