@@ -49,6 +49,7 @@ endif ()
 
 if (BUILD_USD_IMAGING_PLUGIN)
     add_subdirectory(plugin/pxr/imaging/hdAi)
+    add_subdirectory(plugin/pxr/usd/ndrAi)
     add_subdirectory(shader)
 endif ()
 
