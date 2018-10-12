@@ -27,3 +27,34 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#include "pxr/usd/ndrAi/aiParser.h"
+
+#include <pxr/base/tf/staticTokens.h>
+
+#include <pxr/usd/ndr/node.h>
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+NDR_REGISTER_PARSER_PLUGIN(NdrAiParserPlugin);
+
+TF_DEFINE_PRIVATE_TOKENS(_tokens, (arnold)(binary));
+
+NdrAiParserPlugin::NdrAiParserPlugin() {}
+
+NdrAiParserPlugin::~NdrAiParserPlugin() {}
+
+NdrNodeUniquePtr NdrAiParserPlugin::Parse(
+    const NdrNodeDiscoveryResult& discoveryResult) {
+    return nullptr;
+}
+
+const NdrTokenVec& NdrAiParserPlugin::GetDiscoveryTypes() const {
+    static const NdrTokenVec ret = {_tokens->arnold};
+    return ret;
+}
+
+const TfToken& NdrAiParserPlugin::GetSourceType() const {
+    return _tokens->binary;
+}
+
+PXR_NAMESPACE_CLOSE_SCOPE

@@ -27,3 +27,34 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#ifndef NDRAI_PARSER_H
+#define NDRAI_PARSER_H
+#include <pxr/pxr.h>
+#include "pxr/usd/ndrAi/api.h"
+
+#include <pxr/usd/ndr/parserPlugin.h>
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+class NdrAiParserPlugin : public NdrParserPlugin {
+public:
+    NDRAI_API
+    NdrAiParserPlugin();
+
+    NDRAI_API
+    ~NdrAiParserPlugin() override;
+
+    NDRAI_API
+    NdrNodeUniquePtr Parse(
+        const NdrNodeDiscoveryResult& discoveryResult) override;
+
+    NDRAI_API
+    const NdrTokenVec& GetDiscoveryTypes() const override;
+
+    NDRAI_API
+    const TfToken& GetSourceType() const override;
+};
+
+PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // NDRAI_PARSER_H
