@@ -15,6 +15,8 @@ USD Schemas and tools for exchanging Arnold shader information between multiple 
     * AiVolume - Schema for Arnold's volume node.
 * Shader exporter for usdMaya. A custom shading mode exporter for Maya that exports all Arnold shader definitions via MtoA. We support MtoA-1.2 and MtoA-1.4.
 * Tools for usdKatana. Ops for describing and reading in procedurals to Katana.
+* Arnold render delegate.
+* Arnold shader discovery and parsing.
 
 ### Planned
 * Supporting MtoA-2.x.
@@ -49,12 +51,12 @@ We use and test with the following library versions.
 | TBB     | 4.4.6            |
 | OpenEXR | 2.2.0 - latest   |
 | MtoA    | 1.2.x and 1.4.2  |
-| Katana  | 2.5v6            |
-| Maya    | 2016.5 and 2017  |
+| Katana  | 2.5v6  - 3.0     |
+| Maya    | 2016.5 - 2018    |
 
 You can use configuration variables to enable/disable individual components during the build process. These are the following.
 * BUILD\_USD\_PLUGIN - Generating the schemas.
-* BUILD\_USD\_IMAGING\_PLUGIN - Building the render delegate.
+* BUILD\_USD\_IMAGING\_PLUGIN - Building the render delegate and ndr plugins.
 * BUILD\_USD\_MAYA\_PLUGIN - Building the usdMaya plugin.
 * BUILD\_USD\_KATANA\_PLUGIN - Building the usdKatana plugin.
 
