@@ -34,6 +34,8 @@
 
 #include <pxr/usd/usdLux/tokens.h>
 
+#include <pxr/usd/sdf/assetPath.h>
+
 #include <vector>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -51,6 +53,11 @@ const AtString formatStr("format");
 const AtString angularStr("angular");
 const AtString latlongStr("latlong");
 const AtString mirroredBallStr("mirrored_ball");
+
+const AtString shaderStr("shader");
+
+const AtString imageStr("image");
+const AtString filenameStr("filename");
 
 struct ParamDesc {
     ParamDesc(const char* aname, const TfToken& hname)
@@ -190,7 +197,7 @@ HdAiLight* HdAiLight::CreateCylinderLight(
 
 HdAiLight* HdAiLight::CreateDomeLight(
     HdAiRenderDelegate* delegate, const SdfPath& id) {
-    return new HdAiLight(delegate, id, domeLightType, domeLightSync);
+    return new HdAiLight(delegate, id, domeLightType, domeLightSync, true);
 }
 
 void HdAiLight::Sync(
@@ -204,6 +211,10 @@ void HdAiLight::Sync(
         const auto* nentry = AiNodeGetNodeEntry(_light);
         iterateParams(_light, nentry, id, sceneDelegate, genericParams);
         _syncParams(_light, nentry, id, sceneDelegate);
+        if (_supportsTexture) {
+            SetupTexture(sceneDelegate->GetLightParamValue(
+                id, HdLightTokens->textureFile));
+        }
     }
 
     if (*dirtyBits & HdLight::DirtyTransform) {
@@ -212,14 +223,36 @@ void HdAiLight::Sync(
     *dirtyBits = HdLight::Clean;
 }
 
+void HdAiLight::SetupTexture(const VtValue& value) {
+    AiNodeSetPtr(_light, shaderStr, nullptr);
+    if (_texture != nullptr) {
+        AiNodeDestroy(_texture);
+        _texture = nullptr;
+    }
+    if (!value.IsHolding<SdfAssetPath>()) { return; }
+    const auto& assetPath = value.UncheckedGet<SdfAssetPath>();
+    auto path = assetPath.GetResolvedPath();
+    if (path.empty()) {
+        path = assetPath.GetAssetPath();
+    }
+
+    if (path.empty()) { return; }
+    _texture = AiNode(_delegate->GetUniverse(), imageStr);
+    AiNodeSetStr(_texture, filenameStr, path.c_str());
+    AiNodeSetPtr(_light, shaderStr, _texture);
+}
+
 HdDirtyBits HdAiLight::GetInitialDirtyBitsMask() const {
     return HdLight::DirtyParams | HdLight::DirtyTransform;
 }
 
 HdAiLight::HdAiLight(
     HdAiRenderDelegate* delegate, const SdfPath& id, const AtString& arnoldType,
-    const HdAiLight::SyncParams& sync)
-    : HdLight(id), _syncParams(sync), _delegate(delegate) {
+    const HdAiLight::SyncParams& sync, bool supportsTexture)
+    : HdLight(id),
+      _syncParams(sync),
+      _delegate(delegate),
+      _supportsTexture(supportsTexture) {
     _light = AiNode(_delegate->GetUniverse(), arnoldType);
     if (id.IsEmpty()) {
         AiNodeSetFlt(_light, "intensity", 0.0f);

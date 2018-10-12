@@ -43,24 +43,31 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 class HdAiLight : public HdLight {
 public:
+    HDAI_API
     static HdAiLight* CreatePointLight(
         HdAiRenderDelegate* delegate, const SdfPath& id);
 
+    HDAI_API
     static HdAiLight* CreateDistantLight(
         HdAiRenderDelegate* delegate, const SdfPath& id);
 
+    HDAI_API
     static HdAiLight* CreateDiskLight(
         HdAiRenderDelegate* delegate, const SdfPath& id);
 
+    HDAI_API
     static HdAiLight* CreateRectLight(
         HdAiRenderDelegate* delegate, const SdfPath& id);
 
+    HDAI_API
     static HdAiLight* CreateCylinderLight(
         HdAiRenderDelegate* delegate, const SdfPath& id);
 
+    HDAI_API
     static HdAiLight* CreateDomeLight(
         HdAiRenderDelegate* delegate, const SdfPath& id);
 
+    HDAI_API
     void Sync(
         HdSceneDelegate* sceneDelegate, HdRenderParam* renderParam,
         HdDirtyBits* dirtyBits) override;
@@ -70,13 +77,21 @@ public:
 protected:
     using SyncParams = std::function<void(
         AtNode*, const AtNodeEntry*, const SdfPath&, HdSceneDelegate*)>;
+
+    HDAI_API
     HdAiLight(
         HdAiRenderDelegate* delegate, const SdfPath& id,
-        const AtString& arnoldType, const SyncParams& sync);
+        const AtString& arnoldType, const SyncParams& sync,
+        bool supportsTexture = false);
+
+    HDAI_API
+    void SetupTexture(const VtValue& value);
 
     SyncParams _syncParams;
     HdAiRenderDelegate* _delegate;
     AtNode* _light;
+    AtNode* _texture = nullptr;
+    bool _supportsTexture = false;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
