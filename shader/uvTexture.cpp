@@ -29,6 +29,8 @@ node_parameters {
     AiParameterRGBA("fallback", 0.0f, 0.0f, 0.0f, 1.0f);
     AiParameterRGBA("scale", 1.0f, 1.0f, 1.0f, 1.0f);
     AiParameterRGBA("bias", 0.0f, 0.0f, 0.0f, 0.0f);
+
+    AiMetaDataSetBool(nentry, "", "ndrai_dont_discover", true);
 }
 
 node_initialize {}

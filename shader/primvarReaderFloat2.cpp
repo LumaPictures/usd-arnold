@@ -9,6 +9,8 @@ enum { p_varname, p_fallback };
 node_parameters {
     AiParameterStr("varname", "");
     AiParameterVec2("fallback", 0.0f, 0.0f);
+
+    AiMetaDataSetBool(nentry, "", "ndrai_dont_discover", true);
 }
 
 node_initialize {}

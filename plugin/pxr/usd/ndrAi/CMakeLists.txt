@@ -14,17 +14,22 @@ pxr_plugin(ndrAi
         ${ARNOLD_LIBRARY}
         ${PYTHON_LIBRARY}
         ${Boost_LIBRARIES}
-        hdAi
+        tf
         ndr
+        sdr
 
     INCLUDE_DIRS
         ${Boost_INCLUDE_DIRS}
         ${ARNOLD_INCLUDE_DIRS}
         ${PYTHON_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../../lib
 
     PUBLIC_CLASSES
         aiDiscovery
         aiParser
+
+    PUBLIC_HEADERS
+        api.h
 
     PYTHON_CPPFILES
         moduleDeps.cpp

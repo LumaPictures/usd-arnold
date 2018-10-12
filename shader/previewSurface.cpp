@@ -36,6 +36,8 @@ node_parameters {
     AiParameterVec("normal", 0.0f, 0.0f, 1.0f);
     AiParameterFlt("displacement", 1.0f);
     AiParameterFlt("occlusion", 1.0f);
+
+    AiMetaDataSetBool(nentry, "", "ndrai_dont_discover", true);
 }
 
 node_initialize {}

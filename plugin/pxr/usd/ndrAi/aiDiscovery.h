@@ -27,3 +27,32 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#ifndef NDRAI_DISCOVERY_H
+#define NDRAI_DISCOVERY_H
+
+#include <pxr/pxr.h>
+#include "pxr/usd/ndrAi/api.h"
+
+#include <pxr/usd/ndr/discoveryPlugin.h>
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+class NdrAiDiscoveryPlugin : public NdrDiscoveryPlugin {
+public:
+    using Context = NdrDiscoveryPluginContext;
+
+    NDRAI_API
+    NdrAiDiscoveryPlugin();
+
+    NDRAI_API
+    ~NdrAiDiscoveryPlugin() override;
+
+    NDRAI_API
+    NdrNodeDiscoveryResultVec DiscoverNodes(const Context& context) override;
+
+    const NdrStringVec& GetSearchURIs() const override;
+};
+
+PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // NDRAI_DISCOVERY_H
