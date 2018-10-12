@@ -55,9 +55,9 @@ const AtString latlongStr("latlong");
 const AtString mirroredBallStr("mirrored_ball");
 
 const AtString shaderStr("shader");
-
 const AtString imageStr("image");
 const AtString filenameStr("filename");
+const AtString colorStr("color");
 
 struct ParamDesc {
     ParamDesc(const char* aname, const TfToken& hname)
@@ -112,8 +112,7 @@ auto diskLightSync = [](AtNode* light, const AtNodeEntry* nentry,
     iterateParams(light, nentry, id, delegate, diskParams);
 };
 
-// TODO: support the texture:file slot.
-auto quadLightSync = [](AtNode* light, const AtNodeEntry* nentry,
+auto rectLightSync = [](AtNode* light, const AtNodeEntry* nentry,
                         const SdfPath& id, HdSceneDelegate* delegate) {
     float width = 1.0f;
     float height = 1.0f;
@@ -187,7 +186,7 @@ HdAiLight* HdAiLight::CreateDiskLight(
 
 HdAiLight* HdAiLight::CreateRectLight(
     HdAiRenderDelegate* delegate, const SdfPath& id) {
-    return new HdAiLight(delegate, id, rectLightType, quadLightSync);
+    return new HdAiLight(delegate, id, rectLightType, rectLightSync, true);
 }
 
 HdAiLight* HdAiLight::CreateCylinderLight(
@@ -239,7 +238,13 @@ void HdAiLight::SetupTexture(const VtValue& value) {
     if (path.empty()) { return; }
     _texture = AiNode(_delegate->GetUniverse(), imageStr);
     AiNodeSetStr(_texture, filenameStr, path.c_str());
-    AiNodeSetPtr(_light, shaderStr, _texture);
+    const auto* nentry = AiNodeGetNodeEntry(_light);
+    if (AiNodeEntryLookUpParameter(nentry, shaderStr) != nullptr) {
+        AiNodeSetPtr(_light, shaderStr, _texture);
+    } else { // Connect to color if filename doesn't exists.
+        AiNodeLink(_texture, colorStr, _light);
+    }
+
 }
 
 HdDirtyBits HdAiLight::GetInitialDirtyBitsMask() const {
