@@ -33,7 +33,7 @@
 #include <pxr/base/tf/staticTokens.h>
 #include <pxr/base/tf/stringUtils.h>
 
-#include <ai.h>
+// #include <ai.h>
 
 #include <iostream>
 
@@ -50,40 +50,6 @@ NdrAiDiscoveryPlugin::~NdrAiDiscoveryPlugin() {}
 NdrNodeDiscoveryResultVec NdrAiDiscoveryPlugin::DiscoverNodes(
     const Context& context) {
     NdrNodeDiscoveryResultVec ret;
-    AiBegin();
-    AiMsgSetConsoleFlags(AI_LOG_NONE);
-    const auto arnoldPluginPath = TfGetenv("ARNOLD_PLUGIN_PATH");
-    if (!arnoldPluginPath.empty()) { AiLoadPlugins(arnoldPluginPath.c_str()); }
-
-    auto* nentryIter = AiUniverseGetNodeEntryIterator(AI_NODE_SHADER);
-
-    while (!AiNodeEntryIteratorFinished(nentryIter)) {
-        const auto* nentry = AiNodeEntryIteratorGetNext(nentryIter);
-        AiNodeEntryGetMetaDataIterator(nentry, "");
-        auto dontDiscover = false;
-        if (AiMetaDataGetBool(
-                nentry, "", "ndrai_dont_discover", &dontDiscover) &&
-            dontDiscover) {
-            continue;
-        }
-
-        ret.emplace_back(
-            TfToken(TfStringPrintf(
-                "arnold_%s_%i_%i", AiNodeEntryGetName(nentry),
-                AI_VERSION_ARCH_NUM, AI_VERSION_MAJOR_NUM)),       // identifier
-            NdrVersion(AI_VERSION_ARCH_NUM, AI_VERSION_MAJOR_NUM), // version
-            AiNodeEntryGetName(nentry),                            // name
-            _tokens->shader,                                       // family
-            _tokens->arnold, // discoveryType
-            _tokens->binary, // sourceType
-            "", // uri // Setting up URI or ResolverURI breaks HdStream??
-            ""  // resolvedUri
-        );
-    }
-
-    AiNodeEntryIteratorDestroy(nentryIter);
-
-    AiEnd();
     return ret;
 }
 

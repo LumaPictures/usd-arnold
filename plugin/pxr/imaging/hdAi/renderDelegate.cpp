@@ -209,11 +209,7 @@ HdSprim* HdAiRenderDelegate::CreateFallbackSprim(const TfToken& typeId) {
 }
 
 void HdAiRenderDelegate::DestroySprim(HdSprim* sPrim) {
-    TF_UNUSED(sPrim);
-    // TODO: Figure out what to do with this.
-    /*delete sPrim;*/ // This crashes in HdCamera::~HdCamera. I suspect an
-                      // invalid
-    // prim being removed.
+    delete sPrim;
 }
 
 HdBprim* HdAiRenderDelegate::CreateBprim(

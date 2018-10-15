@@ -45,6 +45,7 @@ NdrAiParserPlugin::~NdrAiParserPlugin() {}
 
 NdrNodeUniquePtr NdrAiParserPlugin::Parse(
     const NdrNodeDiscoveryResult& discoveryResult) {
+    std::cerr << "Parsing" << std::endl;
     return nullptr;
 }
 
@@ -54,7 +55,7 @@ const NdrTokenVec& NdrAiParserPlugin::GetDiscoveryTypes() const {
 }
 
 const TfToken& NdrAiParserPlugin::GetSourceType() const {
-    return _tokens->binary;
+    return _tokens->arnold;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
