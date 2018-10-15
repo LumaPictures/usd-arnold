@@ -379,7 +379,7 @@ findFirstChildrenOfType(OP_Node* op, const char* type) {
 UsdStagePtr getArnoldShaderDesc() {
     static UsdStageRefPtr shaderDescCache = nullptr;
     if (shaderDescCache == nullptr) {
-        std::stringstream command; command << "usdAiShaderInfo --count";
+        std::stringstream command; command << "usdAiShaderInfo --cout";
         auto* HTOA_PATH = getenv("HTOA_PATH");
         if (HTOA_PATH != nullptr) {
              command << " --meta " << HTOA_PATH << "/arnold/metadata";
@@ -397,7 +397,6 @@ UsdStagePtr getArnoldShaderDesc() {
             pclose(pipe);
             shaderDescCache = UsdStage::CreateInMemory(".usda");
             shaderDescCache->GetRootLayer()->ImportFromString(result.str());
-
         }
     }
     return shaderDescCache;
