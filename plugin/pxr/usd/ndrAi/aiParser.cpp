@@ -45,7 +45,6 @@ NdrAiParserPlugin::~NdrAiParserPlugin() {}
 
 NdrNodeUniquePtr NdrAiParserPlugin::Parse(
     const NdrNodeDiscoveryResult& discoveryResult) {
-    std::cerr << "Parsing" << std::endl;
     return nullptr;
 }
 
