@@ -41,6 +41,7 @@ pxr_shared_library(usdAi
         aiShaderExport
         aiShapeAPI
         aiVolume
+        utils
 
     PUBLIC_HEADERS
         api.h

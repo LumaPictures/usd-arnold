@@ -376,7 +376,7 @@ findFirstChildrenOfType(OP_Node* op, const char* type) {
 // issues with the arnold universe and multiple threads accessing / creating
 // Arnold universes so we cache the description of the shaders into a simplified
 // USD tree.
-UsdStagePtr getArnoldShaderDesc() {
+UsdStageRefPtr getArnoldShaderDesc() {
     static UsdStageRefPtr shaderDescCache = nullptr;
     if (shaderDescCache == nullptr) {
         std::stringstream command; command << "usdAiShaderInfo --cout";
