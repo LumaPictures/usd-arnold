@@ -1,12 +1,41 @@
+// Copyright (c) 2018 Luma Pictures . All rights reserved.
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//
+// 1. Redistributions of source code must retain the above copyright notice,
+// this list of conditions and the following disclaimer.
+//
+// 2. Redistributions in binary form must reproduce the above copyright notice,
+// this list of conditions and the following disclaimer in the documentation
+// and/or other materials provided with the distribution.
+//
+// 3. All advertising materials mentioning features or use of this software
+// must display the following acknowledgement:
+// This product includes software developed by the the organization.
+//
+// 4. Neither the name of the copyright holder nor the names of its contributors
+// may be used to endorse or promote products derived from this software without
+// specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDER "AS IS" AND ANY EXPRESS OR
+// IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+// EVENT SHALL COPYRIGHT HOLDER BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+// OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+// OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+// ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <pxr/pxr.h>
 #include <pxr/usd/usd/stage.h>
 #include <pxr/usd/usdGeom/xform.h>
-#include <pxr/usd/usdShade/tokens.h>
-#include <pxr/usd/usdShade/material.h>
 #include <pxr/usd/usdShade/connectableAPI.h>
+#include <pxr/usd/usdShade/material.h>
+#include <pxr/usd/usdShade/tokens.h>
 
-#include "pxr/usd/usdAi/aiShaderExport.h"
 #include "pxr/usd/usdAi/aiMaterialAPI.h"
+#include "pxr/usd/usdAi/aiShaderExport.h"
 
 #include <pxr/base/gf/vec3f.h>
 
@@ -18,9 +47,9 @@ PXR_NAMESPACE_USING_DIRECTIVE
 
 constexpr auto framesPerSecond = 24.0;
 
-#define SETUP_BASE() \
-auto stage = UsdStage::CreateInMemory("test.usda"); \
-AiShaderExport shaderExport(stage)
+#define SETUP_BASE()                                    \
+    auto stage = UsdStage::CreateInMemory("test.usda"); \
+    AiShaderExport shaderExport(stage)
 
 struct ArnoldUniverse {
     ArnoldUniverse() {
@@ -30,8 +59,7 @@ struct ArnoldUniverse {
     ~ArnoldUniverse() { AiEnd(); }
 };
 
-#define SETUP_UNIVERSE() \
-ArnoldUniverse arnoldUniverse
+#define SETUP_UNIVERSE() ArnoldUniverse arnoldUniverse
 
 TEST(UsdAiShaderExport, CleanArnoldName) {
     auto cleanArnoldName = [](const std::string& name) -> std::string {
@@ -75,7 +103,9 @@ TEST(UsdAiShaderExport, BindMaterial) {
 }
 
 template <typename T>
-bool equalParam(const UsdPrim& prim, const std::string paramName, const T& paramValue, UsdTimeCode time = UsdTimeCode::Default()) {
+bool equalParam(
+    const UsdPrim& prim, const std::string paramName, const T& paramValue,
+    UsdTimeCode time = UsdTimeCode::Default()) {
     T ret;
     const auto attr = prim.GetAttribute(TfToken(paramName));
     attr.Get(&ret, time);
@@ -92,14 +122,16 @@ TEST(UsdAiShaderExport, ExportArnoldNode) {
     AiNodeSetFlt(standard1, AtString("specular"), 0.7f);
     AiNodeSetRGB(standard1, AtString("specular_color"), 0.5f, 0.12f, 0.4f);
 
-    auto standard1Path = shaderExport.export_arnold_node(standard1, SdfPath("/"));
+    auto standard1Path =
+        shaderExport.export_arnold_node(standard1, SdfPath("/"));
     EXPECT_EQ(standard1Path, SdfPath("/standard1"));
     auto prim = stage->GetPrimAtPath(standard1Path);
     EXPECT_TRUE(prim);
     EXPECT_TRUE(equalParam(prim, "info:id", TfToken("standard_surface")));
     EXPECT_TRUE(equalParam(prim, "inputs:base", 0.8f));
     EXPECT_TRUE(equalParam(prim, "inputs:specular", 0.7f));
-    EXPECT_TRUE(equalParam(prim, "inputs:specular_color", GfVec3f(0.5f, 0.12f, 0.4f)));
+    EXPECT_TRUE(
+        equalParam(prim, "inputs:specular_color", GfVec3f(0.5f, 0.12f, 0.4f)));
 
     auto* standard2 = AiNode(AtString("standard_surface"));
     AiNodeSetStr(standard2, AtString("name"), AtString("standard2"));
@@ -107,7 +139,8 @@ TEST(UsdAiShaderExport, ExportArnoldNode) {
     AiNodeSetFlt(standard2, AtString("specular"), 0.42f);
 
     std::set<std::string> exportableParams = {"base"};
-    auto standard2Path = shaderExport.export_arnold_node(standard2, SdfPath("/"), &exportableParams);
+    auto standard2Path = shaderExport.export_arnold_node(
+        standard2, SdfPath("/"), &exportableParams);
     EXPECT_EQ(standard2Path, SdfPath("/standard2"));
     prim = stage->GetPrimAtPath(standard2Path);
     EXPECT_TRUE(prim);
@@ -151,8 +184,10 @@ TEST(UsdAiShaderExport, ExportMaterial) {
     EXPECT_EQ(materialPrim.GetPath(), SdfPath("/Looks/myMaterial"));
     auto materialAPI = UsdAiMaterialAPI::Apply(materialPrim);
     EXPECT_TRUE(materialAPI);
-    EXPECT_TRUE(checkRelationship(materialAPI.GetSurfaceRel(), SdfPath("/Looks/hair")));
-    EXPECT_TRUE(checkRelationship(materialAPI.GetDisplacementRel(), SdfPath("/Looks/noise")));
+    EXPECT_TRUE(
+        checkRelationship(materialAPI.GetSurfaceRel(), SdfPath("/Looks/hair")));
+    EXPECT_TRUE(checkRelationship(
+        materialAPI.GetDisplacementRel(), SdfPath("/Looks/noise")));
 }
 
 TEST(UsdAiShaderExport, ParentScope) {
@@ -176,20 +211,23 @@ TEST(UsdAiShaderExport, ParentScope) {
 
     EXPECT_EQ(materialPath, SdfPath("/something/else/myMaterial"));
     UsdAiMaterialAPI materialAPI(materialPrim);
-    EXPECT_TRUE(checkRelationship(materialAPI.GetSurfaceRel(), SdfPath("/something/else/hair")));
-    EXPECT_TRUE(checkRelationship(materialAPI.GetDisplacementRel(), SdfPath("/something/else/noise")));
+    EXPECT_TRUE(checkRelationship(
+        materialAPI.GetSurfaceRel(), SdfPath("/something/else/hair")));
+    EXPECT_TRUE(checkRelationship(
+        materialAPI.GetDisplacementRel(), SdfPath("/something/else/noise")));
 }
 
 bool validateConnection(
-    const UsdShadeConnectableAPI& api,
-    const std::string& paramName,
+    const UsdShadeConnectableAPI& api, const std::string& paramName,
     const std::string& target) {
     auto input = api.GetInput(TfToken(paramName));
     if (input.GetBaseName() == paramName) {
         SdfPathVector sourcePaths;
         input.GetRawConnectedSourcePaths(&sourcePaths);
         return sourcePaths.size() == 1 && sourcePaths[0] == SdfPath(target);
-    } else { return false; }
+    } else {
+        return false;
+    }
 };
 
 TEST(UsdAiShaderExport, ParameterConnections) {
@@ -210,10 +248,13 @@ TEST(UsdAiShaderExport, ParameterConnections) {
     AiNodeLinkOutput(image1, AtString("g"), standard, AtString("base"));
     AiNodeLinkOutput(image2, AtString("b"), standard, AtString("specular"));
 
-    AiNodeLinkOutput(image1, AtString("g"), standard, AtString("transmission_color.b"));
-    AiNodeLinkOutput(image2, AtString("r"), standard, AtString("transmission_color.r"));
+    AiNodeLinkOutput(
+        image1, AtString("g"), standard, AtString("transmission_color.b"));
+    AiNodeLinkOutput(
+        image2, AtString("r"), standard, AtString("transmission_color.r"));
 
-    auto standardPath = shaderExport.export_arnold_node(standard, SdfPath("/Looks"));
+    auto standardPath =
+        shaderExport.export_arnold_node(standard, SdfPath("/Looks"));
     EXPECT_EQ(standardPath, SdfPath("/Looks/standard"));
 
     auto standardPrim = stage->GetPrimAtPath(standardPath);
@@ -235,11 +276,15 @@ TEST(UsdAiShaderExport, ParameterConnections) {
     EXPECT_TRUE(api);
 
     EXPECT_TRUE(validateConnection(api, "specular", "/Looks/image2.outputs:b"));
-    EXPECT_TRUE(validateConnection(api, "specular_color", "/Looks/image2.outputs:out"));
+    EXPECT_TRUE(
+        validateConnection(api, "specular_color", "/Looks/image2.outputs:out"));
     EXPECT_TRUE(validateConnection(api, "base", "/Looks/image1.outputs:g"));
-    EXPECT_TRUE(validateConnection(api, "base_color", "/Looks/image1.outputs:out"));
-    EXPECT_TRUE(validateConnection(api, "transmission_color:r", "/Looks/image2.outputs:r"));
-    EXPECT_TRUE(validateConnection(api, "transmission_color:b", "/Looks/image1.outputs:g"));
+    EXPECT_TRUE(
+        validateConnection(api, "base_color", "/Looks/image1.outputs:out"));
+    EXPECT_TRUE(validateConnection(
+        api, "transmission_color:r", "/Looks/image2.outputs:r"));
+    EXPECT_TRUE(validateConnection(
+        api, "transmission_color:b", "/Looks/image1.outputs:g"));
 }
 
 // By default there isn't really a node in the arnold core
@@ -247,23 +292,19 @@ TEST(UsdAiShaderExport, ParameterConnections) {
 
 AI_SHADER_NODE_EXPORT_METHODS(UsdAiArrayShader);
 
-node_parameters
-{
-    AiParameterArray("arr", AiArray(1, 1, AI_TYPE_FLOAT, 1.0f));
-}
+node_parameters { AiParameterArray("arr", AiArray(1, 1, AI_TYPE_FLOAT, 1.0f)); }
 
-node_initialize { }
-node_update { }
-node_finish { }
-shader_evaluate { }
+node_initialize {}
+node_update {}
+node_finish {}
+shader_evaluate {}
 
 TEST(UsdAiShaderExport, ArrayConnections) {
     SETUP_UNIVERSE();
     SETUP_BASE();
 
     AiNodeEntryInstall(
-        AI_NODE_SHADER, AI_TYPE_RGB,
-        "UsdAiArrayShader", "UsdAi",
+        AI_NODE_SHADER, AI_TYPE_RGB, "UsdAiArrayShader", "UsdAi",
         UsdAiArrayShader, AI_VERSION);
 
     auto* array = AiNode(AtString("UsdAiArrayShader"));
@@ -277,7 +318,8 @@ TEST(UsdAiShaderExport, ArrayConnections) {
     // We use the already set array to figure out which connections to
     // look for. Without this there isn't really a way to list
     // all the connections to an array.
-    AiNodeSetArray(array, AtString("arr"), AiArray(2, 1, AI_TYPE_FLOAT, 0.5f, 0.8f));
+    AiNodeSetArray(
+        array, AtString("arr"), AiArray(2, 1, AI_TYPE_FLOAT, 0.5f, 0.8f));
     AiNodeLinkOutput(image1, AtString("g"), array, AtString("arr[0]"));
     AiNodeLinkOutput(image2, AtString("b"), array, AtString("arr[1]"));
 
