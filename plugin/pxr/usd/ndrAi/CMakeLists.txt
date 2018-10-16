@@ -16,6 +16,7 @@ pxr_plugin(ndrAi
         tf
         ndr
         sdr
+        sdf
         usd
         usdAi
 

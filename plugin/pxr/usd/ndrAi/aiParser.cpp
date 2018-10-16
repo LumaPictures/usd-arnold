@@ -27,11 +27,26 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+/*
+ * TODO:
+ *  - Properly parse type and array size.
+ *  - Generate output types based on shader output type.
+ * */
 #include "pxr/usd/ndrAi/aiParser.h"
 
 #include <pxr/base/tf/staticTokens.h>
 
 #include <pxr/usd/ndr/node.h>
+
+#include <pxr/usd/sdr/shaderNode.h>
+#include <pxr/usd/sdr/shaderProperty.h>
+
+#include <pxr/usd/sdf/propertySpec.h>
+
+#include <pxr/usd/usd/attribute.h>
+#include <pxr/usd/usd/property.h>
+
+#include "pxr/usd/ndrAi/utils.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -45,7 +60,42 @@ NdrAiParserPlugin::~NdrAiParserPlugin() {}
 
 NdrNodeUniquePtr NdrAiParserPlugin::Parse(
     const NdrNodeDiscoveryResult& discoveryResult) {
-    return nullptr;
+    auto shaderDefs = NdrAiGetShaderDefs();
+    auto prim = shaderDefs->GetPrimAtPath(SdfPath(
+        TfStringPrintf("/%s", discoveryResult.identifier.GetText() + 3)));
+    if (!prim) { return nullptr; }
+    NdrPropertyUniquePtrVec properties;
+    const auto props = prim.GetAuthoredProperties();
+    properties.reserve(props.size());
+    for (const auto& property : props) {
+        const auto& propertyName = property.GetName();
+        if (TfStringContains(propertyName.GetString(), ":")) { continue; }
+        const auto propertyStack = property.GetPropertyStack();
+        if (propertyStack.empty()) { continue; }
+        const auto attr = prim.GetAttribute(propertyName);
+        VtValue v;
+        attr.Get(&v);
+        properties.emplace_back(
+            SdrShaderPropertyUniquePtr(new SdrShaderProperty(
+                propertyName,                                 // name
+                propertyStack[0]->GetTypeName().GetAsToken(), // type
+                v,                                            // defaultValue
+                false,                                        // isOutput
+                0,                                            // arraySize
+                NdrTokenMap(),                                // metadata
+                NdrTokenMap(),                                // hints
+                NdrOptionVec()                                // options
+                )));
+    }
+    return NdrNodeUniquePtr(new SdrShaderNode(
+        discoveryResult.identifier,    // identifier
+        discoveryResult.version,       // version
+        discoveryResult.name,          // name
+        discoveryResult.family,        // family
+        discoveryResult.discoveryType, // context
+        discoveryResult.sourceType,    //
+        discoveryResult.uri,           // uri
+        std::move(properties)));
 }
 
 const NdrTokenVec& NdrAiParserPlugin::GetDiscoveryTypes() const {
