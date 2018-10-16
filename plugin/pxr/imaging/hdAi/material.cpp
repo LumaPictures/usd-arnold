@@ -92,7 +92,9 @@ AtNode* HdAiMaterial::ReadMaterialNetwork(const HdMaterialNetwork& network) {
 
 AtNode* HdAiMaterial::ReadMaterial(const HdMaterialNode& material) {
     const auto nodeName = GetLocalNodeName(material.path);
-    const AtString nodeType(material.identifier.GetText());
+    const auto* nodeTypeStr = material.identifier.GetText();
+    const AtString nodeType(
+        strncmp(nodeTypeStr, "ai:", 3) == 0 ? nodeTypeStr + 3 : nodeTypeStr);
     AtNode* ret = nullptr;
     const auto nodeIt = _nodes.find(nodeName);
     if (nodeIt != _nodes.end()) {
@@ -105,7 +107,7 @@ AtNode* HdAiMaterial::ReadMaterial(const HdMaterialNode& material) {
         }
     }
     if (ret == nullptr) {
-        ret = AiNode(_delegate->GetUniverse(), material.identifier.GetText());
+        ret = AiNode(_delegate->GetUniverse(), nodeType);
         if (ret == nullptr) { return nullptr; }
         AiNodeSetStr(ret, nameStr, nodeName);
         _nodes.emplace(nodeName, ret);

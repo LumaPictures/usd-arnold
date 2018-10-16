@@ -63,9 +63,8 @@ NdrNodeDiscoveryResultVec NdrAiDiscoveryPlugin::DiscoverNodes(
         TfToken filename("<built-in>");
         prim.GetMetadata(UsdAiTokens->filename, &filename);
         ret.emplace_back(
-            NdrIdentifier(TfStringPrintf(
-                "arnold_%i_%i_%s", AI_VERSION_ARCH_NUM, AI_VERSION_MAJOR_NUM,
-                shaderName.GetText())),                            // identifier
+            NdrIdentifier(
+                TfStringPrintf("ai:%s", shaderName.GetText())),    // identifier
             NdrVersion(AI_VERSION_ARCH_NUM, AI_VERSION_MAJOR_NUM), // version
             shaderName,                                            // name
             _tokens->shader,                                       // family
