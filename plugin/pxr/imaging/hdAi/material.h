@@ -72,6 +72,9 @@ protected:
     AtNode* ReadMaterial(const HdMaterialNode& node);
 
     HDAI_API
+    AtNode* FindMaterial(const SdfPath& id) const;
+
+    HDAI_API
     AtString GetLocalNodeName(const SdfPath& path) const;
 
     std::unordered_map<AtString, AtNode*, AtStringHash> _nodes;

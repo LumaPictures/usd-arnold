@@ -85,7 +85,15 @@ AtNode* HdAiMaterial::ReadMaterialNetwork(const HdMaterialNetwork& network) {
         ReadMaterial(*it);
     }
 
-    // TODO: Build connections.
+    // Currently USD can't describe partial connections, so we just do a full
+    // link.
+    for (const auto& relationship : network.relationships) {
+        auto* inputNode = FindMaterial(relationship.inputId);
+        if (inputNode == nullptr) { continue; }
+        auto* outputNode = FindMaterial(relationship.outputId);
+        if (outputNode == nullptr) { continue; }
+        AiNodeLink(inputNode, relationship.outputName.GetText(), outputNode);
+    }
 
     return ret;
 }
@@ -122,6 +130,11 @@ AtNode* HdAiMaterial::ReadMaterial(const HdMaterialNode& material) {
         HdAiSetParameter(ret, pentry, param.second);
     }
     return ret;
+}
+
+AtNode* HdAiMaterial::FindMaterial(const SdfPath& path) const {
+    const auto nodeIt = _nodes.find(GetLocalNodeName(path));
+    return nodeIt == _nodes.end() ? nullptr : nodeIt->second;
 }
 
 AtString HdAiMaterial::GetLocalNodeName(const SdfPath& path) const {
