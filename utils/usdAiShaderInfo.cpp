@@ -130,8 +130,12 @@ int main(int argc, char* argv[]) {
 
     while (!AiNodeEntryIteratorFinished(nentryIter)) {
         const auto* nentry = AiNodeEntryIteratorGetNext(nentryIter);
+        const auto filename = AiNodeEntryGetFilename(nentry);
         const std::string nodeName = AiNodeEntryGetName(nentry);
         auto prim = stage->DefinePrim(SdfPath("/" + nodeName));
+        prim.SetMetadata(
+            UsdAiTokens->filename,
+            VtValue(TfToken(filename == nullptr ? "<built-in>" : filename)));
         UsdAiShader shaderAPI(prim);
         shaderAPI.CreateIdAttr().Set(TfToken(nodeName));
 

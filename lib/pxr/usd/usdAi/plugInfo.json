@@ -23,6 +23,15 @@
                         "displayGroup": "Arnold", 
                         "documentation": "Arnold parameter type identifier.", 
                         "type": "token"
+                    },
+                    "filename": {
+                        "appliesTo": [
+                            "prims"
+                        ],
+                        "default": "<built-in>",
+                        "displayGroup": "Arnold",
+                        "documentation": "Arnold plugin location for a node.",
+                        "type": "token"
                     }
                 }, 
                 "Types": {

@@ -31,7 +31,7 @@ auto stage = UsdStage::CreateInMemory("test.usda"); \
 stage->SetFramesPerSecond(framesPerSecond); \
 auto something = UsdGeomMesh::Define(stage, primPath); \
 EXPECT_TRUE(something); \
-UsdAiNodeAPI nodeAPI(something.GetPrim()); \
+auto nodeAPI = UsdAiNodeAPI::Apply(something.GetPrim()); \
 EXPECT_TRUE(nodeAPI);
 
 #define SETUP_PARAMETERS() \

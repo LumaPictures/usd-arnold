@@ -74,6 +74,11 @@ UsdAiFilter::Define(
         stage->DefinePrim(path, usdPrimTypeName));
 }
 
+/* virtual */
+UsdSchemaType UsdAiFilter::_GetSchemaType() const {
+    return UsdAiFilter::schemaType;
+}
+
 /* static */
 const TfType &
 UsdAiFilter::_GetStaticTfType()

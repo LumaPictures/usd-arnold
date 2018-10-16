@@ -74,6 +74,11 @@ UsdAiDriver::Define(
         stage->DefinePrim(path, usdPrimTypeName));
 }
 
+/* virtual */
+UsdSchemaType UsdAiDriver::_GetSchemaType() const {
+    return UsdAiDriver::schemaType;
+}
+
 /* static */
 const TfType &
 UsdAiDriver::_GetStaticTfType()

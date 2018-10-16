@@ -149,7 +149,7 @@ TEST(UsdAiShaderExport, ExportMaterial) {
     EXPECT_TRUE(equalParam(noisePrim, "info:id", TfToken("noise")));
 
     EXPECT_EQ(materialPrim.GetPath(), SdfPath("/Looks/myMaterial"));
-    UsdAiMaterialAPI materialAPI(materialPrim);
+    auto materialAPI = UsdAiMaterialAPI::Apply(materialPrim);
     EXPECT_TRUE(materialAPI);
     EXPECT_TRUE(checkRelationship(materialAPI.GetSurfaceRel(), SdfPath("/Looks/hair")));
     EXPECT_TRUE(checkRelationship(materialAPI.GetDisplacementRel(), SdfPath("/Looks/noise")));

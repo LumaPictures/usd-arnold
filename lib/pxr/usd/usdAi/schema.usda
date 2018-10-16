@@ -29,6 +29,9 @@ def "GLOBAL" (
             dictionary elemType = {
                 string doc = """Stores the arnold parameter type for an array."""
             }
+            dictionary filename = {
+                string doc = """Stores the file the plugin was loaded from."""
+            }
         }
     }
 )
@@ -36,6 +39,7 @@ def "GLOBAL" (
 }
 
 class "AiNodeAPI" (
+    inherits = </APISchemaBase>
     doc = """API for handling prims as Arnold nodes. Provides a consistent
              interface for getting and setting user parameters."""
     customData = {
@@ -54,6 +58,7 @@ struct AtMetaDataEntry;"""
 }
 
 class "AiShapeAPI" (
+    inherits = </APISchemaBase>
     doc = """API for interacting with common Arnold shape parameters on prims.
 
              Currently handles:
@@ -452,6 +457,7 @@ class "AiShapeAPI" (
 }
 
 class "AiLightAPI" (
+    inherits = </APISchemaBase>
     doc = """API for interacting with common Arnold light parameters."""
 ) {
     uniform string ai:aov = "" (
@@ -460,6 +466,7 @@ class "AiLightAPI" (
 }
 
 class "AiMaterialAPI" (
+    inherits = </APISchemaBase>
     doc = """API for Material prims encapsulating Arnold shading networks."""
 ) {
     rel ai:surface (

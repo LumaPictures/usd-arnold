@@ -61,6 +61,11 @@ UsdAiMaterialAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 
+/* virtual */
+UsdSchemaType UsdAiMaterialAPI::_GetSchemaType() const {
+    return UsdAiMaterialAPI::schemaType;
+}
+
 /* static */
 UsdAiMaterialAPI
 UsdAiMaterialAPI::Apply(const UsdPrim &prim)

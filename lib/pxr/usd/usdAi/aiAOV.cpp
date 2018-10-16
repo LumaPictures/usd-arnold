@@ -74,6 +74,11 @@ UsdAiAOV::Define(
         stage->DefinePrim(path, usdPrimTypeName));
 }
 
+/* virtual */
+UsdSchemaType UsdAiAOV::_GetSchemaType() const {
+    return UsdAiAOV::schemaType;
+}
+
 /* static */
 const TfType &
 UsdAiAOV::_GetStaticTfType()

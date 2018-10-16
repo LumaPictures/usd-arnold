@@ -59,7 +59,7 @@ auto stage = UsdStage::CreateInMemory("test.usda"); \
 stage->SetFramesPerSecond(framesPerSecond); \
 auto something = UsdGeomMesh::Define(stage, primPath); \
 EXPECT_TRUE(something); \
-UsdAiShapeAPI shapeAPI(something.GetPrim()); \
+auto shapeAPI = UsdAiShapeAPI::Apply(something.GetPrim()); \
 EXPECT_TRUE(shapeAPI);
 
 TEST(USDAiShapeAPI, DefaultVisibility) {

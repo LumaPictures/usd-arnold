@@ -74,6 +74,11 @@ UsdAiShader::Define(
         stage->DefinePrim(path, usdPrimTypeName));
 }
 
+/* virtual */
+UsdSchemaType UsdAiShader::_GetSchemaType() const {
+    return UsdAiShader::schemaType;
+}
+
 /* static */
 const TfType &
 UsdAiShader::_GetStaticTfType()

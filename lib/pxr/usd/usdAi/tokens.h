@@ -304,7 +304,7 @@ struct UsdAiTokensType {
     const TfToken elemType;
     /// \brief "filename"
     /// 
-    /// UsdAiVolume
+    /// Stores the file the plugin was loaded from., UsdAiVolume
     const TfToken filename;
     /// \brief "filepath"
     /// 

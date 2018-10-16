@@ -74,6 +74,11 @@ UsdAiProcedural::Define(
         stage->DefinePrim(path, usdPrimTypeName));
 }
 
+/* virtual */
+UsdSchemaType UsdAiProcedural::_GetSchemaType() const {
+    return UsdAiProcedural::schemaType;
+}
+
 /* static */
 const TfType &
 UsdAiProcedural::_GetStaticTfType()

@@ -61,6 +61,11 @@ UsdAiNodeAPI::Get(const UsdStagePtr &stage, const SdfPath &path)
 }
 
 
+/* virtual */
+UsdSchemaType UsdAiNodeAPI::_GetSchemaType() const {
+    return UsdAiNodeAPI::schemaType;
+}
+
 /* static */
 UsdAiNodeAPI
 UsdAiNodeAPI::Apply(const UsdPrim &prim)
