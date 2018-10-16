@@ -16,6 +16,8 @@ pxr_plugin(ndrAi
         tf
         ndr
         sdr
+        usd
+        usdAi
 
     INCLUDE_DIRS
         ${Boost_INCLUDE_DIRS}
@@ -25,6 +27,9 @@ pxr_plugin(ndrAi
     PUBLIC_CLASSES
         aiDiscovery
         aiParser
+
+    PRIVATE_CLASSES
+        utils
 
     PUBLIC_HEADERS
         api.h

@@ -27,40 +27,17 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#include "pxr/usd/ndrAi/aiDiscovery.h"
-
-#include <pxr/base/tf/getenv.h>
-#include <pxr/base/tf/staticTokens.h>
-#include <pxr/base/tf/stringUtils.h>
-
 #include "pxr/usd/ndrAi/utils.h"
 
-#include <iostream>
+#include "pxr/usd/usdAi/utils.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(_tokens, (shader)(arnold)(binary));
-
-NDR_REGISTER_DISCOVERY_PLUGIN(NdrAiDiscoveryPlugin);
-
-NdrAiDiscoveryPlugin::NdrAiDiscoveryPlugin() {}
-
-NdrAiDiscoveryPlugin::~NdrAiDiscoveryPlugin() {}
-
-NdrNodeDiscoveryResultVec NdrAiDiscoveryPlugin::DiscoverNodes(
-    const Context& context) {
-    NdrNodeDiscoveryResultVec ret;
-    auto shaderDefs = NdrAiGetShaderDefs();
-    return ret;
-}
-
-const NdrStringVec& NdrAiDiscoveryPlugin::GetSearchURIs() const {
-    static const auto result = []() -> NdrStringVec {
-        NdrStringVec ret = TfStringSplit(TfGetenv("ARNOLD_PLUGIN_PATH"), ":");
-        ret.push_back("<built-in>");
-        return ret;
+UsdStageRefPtr NdrAiGetShaderDefs() {
+    static auto cache = []() -> UsdStageRefPtr {
+        return UsdAiGetArnoldShaderDesc();
     }();
-    return result;
+    return cache;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
