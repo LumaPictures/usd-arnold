@@ -95,13 +95,18 @@ void HdAiMesh::Sync(
         }
     }
 
+    if (*dirtyBits & HdChangeTracker::DirtyPrimvar) {
+        // TODO: Implement and handle uv / st
+    }
+
     *dirtyBits = ~HdChangeTracker::AllSceneDirtyBits;
 }
 
 HdDirtyBits HdAiMesh::GetInitialDirtyBitsMask() const {
     return HdChangeTracker::Clean | HdChangeTracker::InitRepr |
            HdChangeTracker::DirtyPoints | HdChangeTracker::DirtyTopology |
-           HdChangeTracker::DirtyTransform | HdChangeTracker::DirtyMaterialId;
+           HdChangeTracker::DirtyTransform | HdChangeTracker::DirtyMaterialId |
+           HdChangeTracker::DirtyPrimvar;
 }
 
 void HdAiMesh::_UpdateRepr(
