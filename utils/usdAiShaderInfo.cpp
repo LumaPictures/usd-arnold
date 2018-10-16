@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    auto* nentryIter = AiUniverseGetNodeEntryIterator(AI_NODE_ALL);
+    auto* nentryIter = AiUniverseGetNodeEntryIterator(AI_NODE_SHADER);
 
     while (!AiNodeEntryIteratorFinished(nentryIter)) {
         const auto* nentry = AiNodeEntryIteratorGetNext(nentryIter);

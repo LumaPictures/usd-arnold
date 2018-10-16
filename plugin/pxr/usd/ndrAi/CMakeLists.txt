@@ -20,6 +20,7 @@ pxr_plugin(ndrAi
         usdAi
 
     INCLUDE_DIRS
+        ${ARNOLD_INCLUDE_DIRS}
         ${Boost_INCLUDE_DIRS}
         ${PYTHON_INCLUDE_DIRS}
         ${CMAKE_CURRENT_SOURCE_DIR}/../../../lib

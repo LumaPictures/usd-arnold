@@ -33,13 +33,20 @@
 #include <pxr/base/tf/staticTokens.h>
 #include <pxr/base/tf/stringUtils.h>
 
+#include <pxr/usd/usd/prim.h>
+#include <pxr/usd/usd/primRange.h>
+
+#include "pxr/usd/usdAi/tokens.h"
+
 #include "pxr/usd/ndrAi/utils.h"
 
 #include <iostream>
 
+#include <ai.h>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(_tokens, (shader)(arnold)(binary));
+TF_DEFINE_PRIVATE_TOKENS(_tokens, (shader)(arnold));
 
 NDR_REGISTER_DISCOVERY_PLUGIN(NdrAiDiscoveryPlugin);
 
@@ -51,6 +58,23 @@ NdrNodeDiscoveryResultVec NdrAiDiscoveryPlugin::DiscoverNodes(
     const Context& context) {
     NdrNodeDiscoveryResultVec ret;
     auto shaderDefs = NdrAiGetShaderDefs();
+    for (const UsdPrim& prim : shaderDefs->Traverse()) {
+        const auto shaderName = prim.GetName();
+        TfToken filename("<built-in>");
+        prim.GetMetadata(UsdAiTokens->filename, &filename);
+        ret.emplace_back(
+            NdrIdentifier(TfStringPrintf(
+                "arnold_%i_%i_%s", AI_VERSION_ARCH_NUM, AI_VERSION_MAJOR_NUM,
+                shaderName.GetText())),                            // identifier
+            NdrVersion(AI_VERSION_ARCH_NUM, AI_VERSION_MAJOR_NUM), // version
+            shaderName,                                            // name
+            _tokens->shader,                                       // family
+            _tokens->arnold, // discoveryType
+            _tokens->arnold, // sourceType
+            filename,        // uri
+            filename         // resolvedUri
+        );
+    }
     return ret;
 }
 

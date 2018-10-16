@@ -31,8 +31,9 @@
 #define NDRAI_UTILS_H
 
 #include <pxr/pxr.h>
-#include <pxr/usd/usd/common.h>
 #include "pxr/usd/ndrAi/api.h"
+
+#include <pxr/usd/usd/stage.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
