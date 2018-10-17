@@ -223,7 +223,14 @@ void HdAiLight::Sync(
 }
 
 void HdAiLight::SetupTexture(const VtValue& value) {
-    AiNodeSetPtr(_light, shaderStr, nullptr);
+    const auto* nentry = AiNodeGetNodeEntry(_light);
+    const auto hasShader =
+        AiNodeEntryLookUpParameter(nentry, shaderStr) != nullptr;
+    if (hasShader) {
+        AiNodeSetPtr(_light, shaderStr, nullptr);
+    } else {
+        AiNodeUnlink(_light, colorStr);
+    }
     if (_texture != nullptr) {
         AiNodeDestroy(_texture);
         _texture = nullptr;
@@ -231,20 +238,16 @@ void HdAiLight::SetupTexture(const VtValue& value) {
     if (!value.IsHolding<SdfAssetPath>()) { return; }
     const auto& assetPath = value.UncheckedGet<SdfAssetPath>();
     auto path = assetPath.GetResolvedPath();
-    if (path.empty()) {
-        path = assetPath.GetAssetPath();
-    }
+    if (path.empty()) { path = assetPath.GetAssetPath(); }
 
     if (path.empty()) { return; }
     _texture = AiNode(_delegate->GetUniverse(), imageStr);
     AiNodeSetStr(_texture, filenameStr, path.c_str());
-    const auto* nentry = AiNodeGetNodeEntry(_light);
-    if (AiNodeEntryLookUpParameter(nentry, shaderStr) != nullptr) {
+    if (hasShader) {
         AiNodeSetPtr(_light, shaderStr, _texture);
     } else { // Connect to color if filename doesn't exists.
         AiNodeLink(_texture, colorStr, _light);
     }
-
 }
 
 HdDirtyBits HdAiLight::GetInitialDirtyBitsMask() const {
