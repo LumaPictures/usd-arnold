@@ -29,10 +29,19 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pxr/imaging/hdAi/mesh.h"
 
+#include "pxr/base/gf/vec2f.h"
+
 #include "pxr/imaging/hdAi/material.h"
 #include "pxr/imaging/hdAi/utils.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
+TF_DEFINE_PRIVATE_TOKENS(_tokens, (st)(uv));
+
+namespace {
+const AtString uvlistStr("uvlist");
+const AtString uvidxsStr("uvidxs");
+} // namespace
 
 HdAiMesh::HdAiMesh(
     HdAiRenderDelegate* delegate, const SdfPath& id, const SdfPath& instancerId)
@@ -95,8 +104,27 @@ void HdAiMesh::Sync(
         }
     }
 
+    // TODO: Implement all the primvars.
     if (*dirtyBits & HdChangeTracker::DirtyPrimvar) {
-        // TODO: Implement and handle uv / st
+        for (const auto& primvar : sceneDelegate->GetPrimvarDescriptors(
+                 id, HdInterpolation::HdInterpolationFaceVarying)) {
+            if (primvar.name == _tokens->st || primvar.name == _tokens->uv) {
+                const auto v = sceneDelegate->Get(id, primvar.name);
+                if (v.IsHolding<VtArray<GfVec2f>>()) {
+                    const auto& uv = v.UncheckedGet<VtArray<GfVec2f>>();
+                    const auto numUVs = static_cast<unsigned int>(uv.size());
+                    // Same memory layout and this data is flattened.
+                    auto* uvlist =
+                        AiArrayConvert(numUVs, 1, AI_TYPE_VECTOR2, uv.data());
+                    auto* uvidxs = AiArrayAllocate(numUVs, 1, AI_TYPE_UINT);
+                    for (auto i = decltype(numUVs){0}; i < numUVs; ++i) {
+                        AiArraySetUInt(uvidxs, i, i);
+                    }
+                    AiNodeSetArray(_mesh, uvlistStr, uvlist);
+                    AiNodeSetArray(_mesh, uvidxsStr, uvidxs);
+                }
+            }
+        }
     }
 
     *dirtyBits = ~HdChangeTracker::AllSceneDirtyBits;
