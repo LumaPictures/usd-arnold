@@ -408,13 +408,13 @@ SdfPath
 AiShaderExport::export_arnold_node(const AtNode* arnold_node, const SdfPath& parent_path,
                                    const std::set<std::string>* exportable_params) {
     if (arnold_node == nullptr) {
-        std::cerr << "Arnold node is zero " << std::endl;
+        TF_WARN("Arnold node is zero.");
         return SdfPath();
     }
     const auto nentry = AiNodeGetNodeEntry(arnold_node);
     const auto entry_type = AiNodeEntryGetType(nentry);
     if (entry_type != AI_NODE_SHADER && entry_type != AI_NODE_DRIVER && entry_type != AI_NODE_FILTER) {
-        std::cerr << "Arnold node is the incorrect type " << std::endl;
+        TF_WARN("%s node is the incorrect type.", AiNodeGetName(arnold_node));
         return SdfPath();
     }
     const auto it = m_shader_to_usd_path.find(arnold_node);
@@ -423,7 +423,7 @@ AiShaderExport::export_arnold_node(const AtNode* arnold_node, const SdfPath& par
     }
     std::string node_name(AiNodeGetName(arnold_node));
     if (node_name.empty()) {
-        std::cerr << "Node name is empty " << std::endl;
+        TF_WARN("Node name is empty.");
         // TODO: raise error
         return SdfPath();
     }
@@ -579,8 +579,8 @@ void AiShaderExport::collapse_shaders() {
         }
         stage_iter.PruneChildren();
     }
-    std::cerr << "[usdAi] Collapsing shader assignments took: "
-              << (tbb::tick_count::now() - tc).seconds() << std::endl;
+    TF_STATUS("Collapsing shader assignments took: %f",
+              (tbb::tick_count::now() - tc).seconds());
 }
 
 const AiShaderExport::ParamConversion*
