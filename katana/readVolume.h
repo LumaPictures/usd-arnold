@@ -3,18 +3,18 @@
 
 #include <pxr/pxr.h>
 
+#include <usdKatana/usdInPrivateData.h>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
-class PxrUsdKatanaAttrMap;
 class PxrUsdKatanaUsdInPrivateData;
-class UsdAiVolume;
 
-/// \brief read \p volume into \p attrs.
+
 void
 readVolume(
-    const UsdAiVolume& procedural,
-    const PxrUsdKatanaUsdInPrivateData& data,
-    PxrUsdKatanaAttrMap& attrs);
+    FnKat::GeolibCookInterface& interface,
+    FnKat::GroupAttribute opArgs,
+    const PxrUsdKatanaUsdInPrivateData& privateData);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

@@ -32,12 +32,7 @@ PXRUSDKATANA_USDIN_PLUGIN_DECLARE(AiVolumeOp)
 DEFINE_GEOLIBOP_PLUGIN(AiVolumeOp)
 PXRUSDKATANA_USDIN_PLUGIN_DEFINE(AiVolumeOp, privateData, opArgs, interface)
 {
-    PxrUsdKatanaAttrMap attrs;
-
-    readVolume(
-        UsdAiVolume(privateData.GetUsdPrim()), privateData, attrs);
-
-    attrs.toInterface(interface);
+    readVolume(interface, opArgs, privateData);
 }
 
 PXRUSDKATANA_USDIN_PLUGIN_DECLARE(AiAOVOp)
