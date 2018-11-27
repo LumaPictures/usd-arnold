@@ -73,6 +73,7 @@ void wrapUsdAiTokens()
     _AddToken(cls, "aiAutobump_visibilitySpecular_transmit", UsdAiTokens->aiAutobump_visibilitySpecular_transmit);
     _AddToken(cls, "aiAutobump_visibilitySubsurface", UsdAiTokens->aiAutobump_visibilitySubsurface);
     _AddToken(cls, "aiAutobump_visibilityVolume", UsdAiTokens->aiAutobump_visibilityVolume);
+    _AddToken(cls, "aiCompress", UsdAiTokens->aiCompress);
     _AddToken(cls, "aiDisp_autobump", UsdAiTokens->aiDisp_autobump);
     _AddToken(cls, "aiDisp_height", UsdAiTokens->aiDisp_height);
     _AddToken(cls, "aiDisp_padding", UsdAiTokens->aiDisp_padding);
@@ -94,6 +95,8 @@ void wrapUsdAiTokens()
     _AddToken(cls, "aiSidednessSubsurface", UsdAiTokens->aiSidednessSubsurface);
     _AddToken(cls, "aiSidednessVolume", UsdAiTokens->aiSidednessVolume);
     _AddToken(cls, "aiSmoothing", UsdAiTokens->aiSmoothing);
+    _AddToken(cls, "aiStep_scale", UsdAiTokens->aiStep_scale);
+    _AddToken(cls, "aiStep_size", UsdAiTokens->aiStep_size);
     _AddToken(cls, "aiSubdiv_adaptive_error", UsdAiTokens->aiSubdiv_adaptive_error);
     _AddToken(cls, "aiSubdiv_adaptive_metric", UsdAiTokens->aiSubdiv_adaptive_metric);
     _AddToken(cls, "aiSubdiv_adaptive_space", UsdAiTokens->aiSubdiv_adaptive_space);
@@ -106,6 +109,9 @@ void wrapUsdAiTokens()
     _AddToken(cls, "aiTransform_type", UsdAiTokens->aiTransform_type);
     _AddToken(cls, "aiUse_light_group", UsdAiTokens->aiUse_light_group);
     _AddToken(cls, "aiUse_shadow_group", UsdAiTokens->aiUse_shadow_group);
+    _AddToken(cls, "aiVelocity_fps", UsdAiTokens->aiVelocity_fps);
+    _AddToken(cls, "aiVelocity_outlier_threshold", UsdAiTokens->aiVelocity_outlier_threshold);
+    _AddToken(cls, "aiVelocity_scale", UsdAiTokens->aiVelocity_scale);
     _AddToken(cls, "aiVisibilityCamera", UsdAiTokens->aiVisibilityCamera);
     _AddToken(cls, "aiVisibilityDiffuse_reflect", UsdAiTokens->aiVisibilityDiffuse_reflect);
     _AddToken(cls, "aiVisibilityDiffuse_transmit", UsdAiTokens->aiVisibilityDiffuse_transmit);
@@ -115,6 +121,7 @@ void wrapUsdAiTokens()
     _AddToken(cls, "aiVisibilitySubsurface", UsdAiTokens->aiVisibilitySubsurface);
     _AddToken(cls, "aiVisibilityVolume", UsdAiTokens->aiVisibilityVolume);
     _AddToken(cls, "aiVolume", UsdAiTokens->aiVolume);
+    _AddToken(cls, "aiVolume_padding", UsdAiTokens->aiVolume_padding);
     _AddToken(cls, "aRRAY", UsdAiTokens->aRRAY);
     _AddToken(cls, "auto_", UsdAiTokens->auto_);
     _AddToken(cls, "bOOL", UsdAiTokens->bOOL);

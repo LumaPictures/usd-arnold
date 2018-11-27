@@ -2,7 +2,7 @@
 (
     "WARNING: THIS FILE IS GENERATED.  DO NOT EDIT."
     customLayerData = {
-        string[] appliedAPISchemas = ["AiNodeAPI", "AiShapeAPI", "AiLightAPI", "AiMaterialAPI"]
+        string[] appliedAPISchemas = ["AiNodeAPI", "AiShapeAPI", "AiVolumeAPI", "AiLightAPI", "AiMaterialAPI"]
         string[] multipleApplyAPISchemas = []
     }
 )
@@ -26,7 +26,7 @@ class "AiShapeAPI" (
              - The bitmasks `visibility` and `sidedness`
              - The boolean flags `matte`, `opaque`, `self_shadows`, and
                `receive_shadows`.
-            
+
             To access the ray types without installing arnold,
             include rayTypes.h and use the namespace arnold.
 
@@ -181,6 +181,19 @@ class "AiShapeAPI" (
     uniform bool ai:visibility:volume = 1 (
         doc = "Whether the object is visible to volume scattering rays."
     )
+}
+
+class "AiVolumeAPI" (
+    doc = "API for interacting with common Arnold volume node parameters on prims."
+)
+{
+    uniform bool ai:compress = 1
+    float ai:step_scale = 1
+    float ai:step_size = 0
+    float ai:velocity_fps = 24
+    float ai:velocity_outlier_threshold = 0.001
+    float ai:velocity_scale = 1
+    float ai:volume_padding = 0
 }
 
 class "AiLightAPI" (

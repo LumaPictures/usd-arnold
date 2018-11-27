@@ -41,6 +41,7 @@ pxr_shared_library(usdAi
         aiShaderExport
         aiShapeAPI
         aiVolume
+        aiVolumeAPI
         utils
 
     PUBLIC_HEADERS
@@ -64,6 +65,7 @@ pxr_shared_library(usdAi
         wrapAiShaderExport.cpp
         wrapAiShapeAPI.cpp
         wrapAiVolume.cpp
+        wrapAiVolumeAPI.cpp
         wrapTokens.cpp
 
     PYTHON_FILES

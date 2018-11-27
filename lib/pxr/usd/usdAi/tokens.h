@@ -98,6 +98,10 @@ struct UsdAiTokensType {
     /// 
     /// UsdAiShapeAPI
     const TfToken aiAutobump_visibilityVolume;
+    /// \brief "ai:compress"
+    /// 
+    /// UsdAiVolumeAPI
+    const TfToken aiCompress;
     /// \brief "ai:disp_autobump"
     /// 
     /// UsdAiShapeAPI
@@ -182,6 +186,14 @@ struct UsdAiTokensType {
     /// 
     /// UsdAiShapeAPI
     const TfToken aiSmoothing;
+    /// \brief "ai:step_scale"
+    /// 
+    /// UsdAiVolumeAPI
+    const TfToken aiStep_scale;
+    /// \brief "ai:step_size"
+    /// 
+    /// UsdAiVolumeAPI
+    const TfToken aiStep_size;
     /// \brief "ai:subdiv_adaptive_error"
     /// 
     /// UsdAiShapeAPI
@@ -230,6 +242,18 @@ struct UsdAiTokensType {
     /// 
     /// UsdAiShapeAPI
     const TfToken aiUse_shadow_group;
+    /// \brief "ai:velocity_fps"
+    /// 
+    /// UsdAiVolumeAPI
+    const TfToken aiVelocity_fps;
+    /// \brief "ai:velocity_outlier_threshold"
+    /// 
+    /// UsdAiVolumeAPI
+    const TfToken aiVelocity_outlier_threshold;
+    /// \brief "ai:velocity_scale"
+    /// 
+    /// UsdAiVolumeAPI
+    const TfToken aiVelocity_scale;
     /// \brief "ai:visibility:camera"
     /// 
     /// UsdAiShapeAPI
@@ -266,6 +290,10 @@ struct UsdAiTokensType {
     /// 
     /// UsdAiMaterialAPI
     const TfToken aiVolume;
+    /// \brief "ai:volume_padding"
+    /// 
+    /// UsdAiVolumeAPI
+    const TfToken aiVolume_padding;
     /// \brief "ARRAY"
     /// 
     /// Possible value for UsdAiAOV::GetDataTypeAttr()
