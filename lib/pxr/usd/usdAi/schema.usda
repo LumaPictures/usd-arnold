@@ -65,7 +65,7 @@ class "AiShapeAPI" (
              - The bitmasks `visibility` and `sidedness`
              - The boolean flags `matte`, `opaque`, `self_shadows`, and
                `receive_shadows`.
-            
+
             To access the ray types without installing arnold,
             include rayTypes.h and use the namespace arnold.
 
@@ -454,6 +454,53 @@ class "AiShapeAPI" (
 
     rel ai:subdiv_dicing_camera
 
+}
+
+class "AiVolumeAPI" (
+    inherits = </APISchemaBase>
+    doc = """API for interacting with common Arnold volume node parameters on prims."""
+) {
+    float ai:volume_padding = 0 (
+        customData = {
+            string apiName = "aiVolumePadding"
+        }
+    )
+
+    float ai:step_size = 0 (
+        customData = {
+            string apiName = "aiVolumeStepSize"
+        }
+    )
+
+    float ai:step_scale = 1 (
+        customData = {
+            string apiName = "aiVolumeStepScale"
+        }
+    )
+
+    uniform bool ai:compress = true (
+        customData = {
+            string apiName = "aiVolumeCompress"
+        }
+    )
+
+    float ai:velocity_scale = 1 (
+        customData = {
+            string apiName = "aiVolumeVelocityScale"
+        }
+    )
+
+    float ai:velocity_fps = 24 (
+        customData = {
+            string apiName = "aiVolumeVelocityFPS"
+        }
+    )
+
+    float ai:velocity_outlier_threshold = 0.001 (
+        customData = {
+            string apiName = "aiVolumeVelocityOutlierThresh"
+        }
+    )
 }
 
 class "AiLightAPI" (
