@@ -1,4 +1,4 @@
-#include "readVolume.h"
+#include "readAiVolume.h"
 
 #include <usdKatana/attrMap.h>
 #include <usdKatana/readPrim.h>
@@ -12,7 +12,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 
 void
-readVolume(
+readAiVolume(
         FnKat::GeolibCookInterface& interface,
         FnKat::GroupAttribute opArgs,
         const PxrUsdKatanaUsdInPrivateData& privateData)

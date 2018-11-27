@@ -12,7 +12,7 @@
 #include "readAOV.h"
 #include "readProcedural.h"
 #include "readPrim.h"
-#include "readVolume.h"
+#include "readAiVolume.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
@@ -32,7 +32,7 @@ PXRUSDKATANA_USDIN_PLUGIN_DECLARE(AiVolumeOp)
 DEFINE_GEOLIBOP_PLUGIN(AiVolumeOp)
 PXRUSDKATANA_USDIN_PLUGIN_DEFINE(AiVolumeOp, privateData, opArgs, interface)
 {
-    readVolume(interface, opArgs, privateData);
+    readAiVolume(interface, opArgs, privateData);
 }
 
 PXRUSDKATANA_USDIN_PLUGIN_DECLARE(AiAOVOp)
