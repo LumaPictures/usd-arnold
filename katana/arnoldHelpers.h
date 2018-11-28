@@ -25,6 +25,24 @@ size_t applyProceduralArgsAttrs(
         FnKat::GroupBuilder& argsBuilder,
         const double time);
 
+// Helper to initialize a GroupBuilder with most of the argument defaults needed
+// to execute an ArnoldOpenVDBVolume op.
+inline void setDefaultArnoldVDBVolumeOpArgs(
+        FnKat::GroupBuilder& argsBuilder) 
+{
+    argsBuilder.set("grids", FnKat::StringAttribute());
+    argsBuilder.set("step_size", FnKat::FloatAttribute(0.0f));
+    argsBuilder.set("step_scale", FnKat::FloatAttribute(1.0f));
+    argsBuilder.set("volume_padding", FnKat::FloatAttribute(0.0f));
+    argsBuilder.set("compress", FnKat::IntAttribute(1));
+    argsBuilder.set("velocity_grids", FnKat::StringAttribute());
+    argsBuilder.set("velocity_scale", FnKat::FloatAttribute(1.0f));
+    argsBuilder.set("velocity_fps", FnKat::FloatAttribute(24));
+    argsBuilder.set("velocity_outlier_threshold", FnKat::FloatAttribute(0.001));
+    argsBuilder.set("override_motion_range", FnKat::IntAttribute(0));
+    argsBuilder.set("makeInteractive", FnKat::StringAttribute("No"));
+}
+
 // Given a prim, return a new GroupAttribute to populate the `arnoldStatements`
 // attribute group in Katana.
 FnKat::Attribute getArnoldStatementsGroup(const UsdPrim& prim);
