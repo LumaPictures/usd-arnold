@@ -4,15 +4,18 @@
 #include <usdKatana/attrMap.h>
 #include <usdKatana/usdInPluginRegistry.h>
 
+#include <pxr/usd/usdVol/volume.h>
+
 #include <pxr/usd/usdAi/aiAOV.h>
 #include <pxr/usd/usdAi/aiProcedural.h>
 #include <pxr/usd/usdAi/aiProceduralNode.h>
 #include <pxr/usd/usdAi/aiVolume.h>
 
+#include "readAiVolume.h"
 #include "readAOV.h"
 #include "readProcedural.h"
 #include "readPrim.h"
-#include "readAiVolume.h"
+#include "readUSDVolVolume.h"
 
 PXR_NAMESPACE_USING_DIRECTIVE
 
@@ -50,6 +53,14 @@ PXRUSDKATANA_USDIN_PLUGIN_DEFINE(AiAOVOp, privateData, opArgs, interface)
     interface.setAttr("__UsdIn.skipAllChildren", FnAttribute::IntAttribute(1));
 }
 
+// Might need to rename this op if usdKatana grows support for usdVol
+PXRUSDKATANA_USDIN_PLUGIN_DECLARE(USDVolVolumeOp)
+DEFINE_GEOLIBOP_PLUGIN(USDVolVolumeOp)
+PXRUSDKATANA_USDIN_PLUGIN_DEFINE(USDVolVolumeOp, privateData, opArgs, interface)
+{
+    readUSDVolVolume(interface, opArgs, privateData);
+}
+
 PXRUSDKATANA_USDIN_PLUGIN_DECLARE(UsdArnold_LocationDecorator)
 DEFINE_GEOLIBOP_PLUGIN(UsdArnold_LocationDecorator);
 PXRUSDKATANA_USDIN_PLUGIN_DEFINE(UsdArnold_LocationDecorator,
@@ -67,6 +78,8 @@ void registerPlugins()
     PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiVolume>("AiVolumeOp");
     USD_OP_REGISTER_PLUGIN(AiAOVOp, "AiAOVOp", 0, 1);
     PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdAiAOV>("AiAOVOp");
+    USD_OP_REGISTER_PLUGIN(USDVolVolumeOp, "USDVolVolumeOp", 0, 1);
+    PxrUsdKatanaUsdInPluginRegistry::RegisterUsdType<UsdVolVolume>("USDVolVolumeOp");
 
     USD_OP_REGISTER_PLUGIN(UsdArnold_LocationDecorator, "UsdArnold_LocationDecorator", 0, 1);
     PxrUsdKatanaUsdInPluginRegistry::RegisterLocationDecoratorOp("UsdArnold_LocationDecorator");
