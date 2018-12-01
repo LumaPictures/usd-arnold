@@ -209,15 +209,7 @@ static void resolveAOVs(
     ("kd_Color", "out@MyTexture")
     ("inputs:i1", "out@Checker")
     ("kd_Color.r", "out.g@MyTexture")
-
-
-    AOVS
-
-    Arnold stores the AOV settings on the root node.
-    In "arnoldGlobalStatements.Channel Definitions.outputChannels"
-    Note the space in the name.
-
-*/ 
+*/
 void readPrimLocation(
         FnKat::GeolibCookInterface& interface,
         FnKat::GroupAttribute opArgs,
@@ -241,6 +233,8 @@ void readPrimLocation(
 
     // We are handling connections here, because usd-arnold stores the connections in it's own way.
     // So we check for the materials connected to the node.
+    // TODO: Shouldn't we just register our own op to handle the extra material
+    // connection requirements?
     const UsdShadeMaterial material(prim);
     if (material) {
         UsdAiMaterialAPI aiMaterialAPI(prim);

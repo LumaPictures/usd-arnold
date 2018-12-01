@@ -110,11 +110,13 @@ applyProceduralArgsAttrs(
 
 
 FnKat::Attribute
-getArnoldStatementsGroup(const UsdPrim& prim) {
-    FnKat::GroupBuilder builder;
-
+getArnoldStatementsGroup(const UsdPrim& prim) 
+{
     UsdAiShapeAPI shapeAPI(prim);
-    if (!shapeAPI) { return FnKat::Attribute(); }
+    if (!shapeAPI) {
+        // API Schema was not applied to `prim`
+        return FnKat::Attribute(); 
+    }
 
     // Sadly std::array needs the size passed as a parameter, so a static const
     // std::vector will do the same in our case.
@@ -174,10 +176,12 @@ getArnoldStatementsGroup(const UsdPrim& prim) {
         {&UsdAiShapeAPI::GetAiTransformTypeAttr, "transform_type", TfToken("rotate_about_center")},
     };
 
-    auto needToBuild = handleAttributes(boolAttrs, shapeAPI, builder);
-    needToBuild |= handleAttributes(floatAttrs, shapeAPI, builder);
-    needToBuild |= handleAttributes(uintAttrs, shapeAPI, builder);
-    needToBuild |= handleAttributes(stringAttrs, shapeAPI, builder);
+    FnKat::GroupBuilder builder;
+
+    handleAttributes(boolAttrs, shapeAPI, builder);
+    handleAttributes(floatAttrs, shapeAPI, builder);
+    handleAttributes(uintAttrs, shapeAPI, builder);
+    handleAttributes(stringAttrs, shapeAPI, builder);
 
     // SubdivAdaptiveMetricAttr will require special handling,
     // if we decide to setup parameters even with the
@@ -193,53 +197,61 @@ getArnoldStatementsGroup(const UsdPrim& prim) {
 
     if (basisCurves) {
         TfToken type;
-        basisCurves.GetTypeAttr().Get(&type);
+        basisCurves.GetTypeAttr().Get<TfToken>(&type);
 
         std::string curveBasis;
-
         if (type == UsdGeomTokens->linear) {
             curveBasis = "linear";
-        } else {
+        } 
+        else {
             TfToken basis;
-            basisCurves.GetBasisAttr().Get(&basis);
+            basisCurves.GetBasisAttr().Get<TfToken>(&basis);
             if (basis == UsdGeomTokens->bezier) {
                 curveBasis = "bezier";
-            } else if (basis == UsdGeomTokens->bspline) {
+            } 
+            else if (basis == UsdGeomTokens->bspline) {
                 curveBasis = "b-spline";
-            } else if (basis == UsdGeomTokens->catmullRom) {
+            } 
+            else if (basis == UsdGeomTokens->catmullRom) {
                 curveBasis = "catmull-rom";
-            } else {
+            } 
+            else {
                 TF_WARN("Can't translate basis type %s on %s, falling back to linear.",
                         basis.data(), prim.GetPath().GetString().c_str());
                 curveBasis = "linear";
             }
         }
-
         builder.set("curve_basis", FnKat::StringAttribute(curveBasis));
-        needToBuild = true;
     }
 
-    return needToBuild ? builder.build() : FnKat::Attribute();
+    return builder.isValid() ? builder.build() : FnKat::Attribute();
 }
 
-void updateOrCreateAttr(
-    FnKat::GeolibCookInterface& interface,
-    const std::string& attrName,
-    const FnKat::Attribute& attr) {
-    if (!attr.isValid()) { return;  }
+void 
+updateOrCreateAttr(
+        FnKat::GeolibCookInterface& interface,
+        const std::string& attrName,
+        const FnKat::Attribute& attr)
+{
+    if (!attr.isValid()) {
+        return;
+    }
 
     if (attr.getType() == kFnKatAttributeTypeGroup) {
         FnAttribute::GroupAttribute existingAttr = interface.getOutputAttr(attrName);
         if (existingAttr.isValid()) {
-            interface.setAttr(attrName
-                , FnAttribute::GroupBuilder()
-                                  .update(existingAttr)
-                                  .deepUpdate(attr)
-                                  .build());
-        } else {
+            interface.setAttr(
+                attrName,
+                FnAttribute::GroupBuilder()
+                    .update(existingAttr)
+                    .deepUpdate(attr)
+                    .build());
+        }
+        else {
             interface.setAttr(attrName, attr);
         }
-    } else {
+    }
+    else {
         interface.setAttr(attrName, attr);
     }
 }

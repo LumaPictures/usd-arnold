@@ -7,8 +7,6 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class PxrUsdKatanaUsdInPrivateData;
-
 
 void
 readAiVolume(

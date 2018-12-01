@@ -95,13 +95,16 @@ FnKat::Attribute createAttribute(const TfToken& v) {
 }
 
 template <typename T, typename S> inline
-bool handleAttributes(const std::vector<OptionalAttributeDefinition<T, S>>& attributes,
-                       const S& api,
-                       FnKat::GroupBuilder& builder) {
-    auto attributeSet = false;
+void handleAttributes(
+        const std::vector<OptionalAttributeDefinition<T, S>>& attributes,
+        const S& api,
+        FnKat::GroupBuilder& builder)
+{
     for (const auto& each : attributes) {
         const auto attr = ((api).*(each.queryFn))();
-        if (!attr.IsValid()) { continue; }
+        if (!attr.IsValid()) {
+            continue;
+        }
         T v = each.defaultValue;
         // TODO: Check if we need to filter the defaultValues.
         // I think because of how Katana behaves we have to set these up,
@@ -109,27 +112,24 @@ bool handleAttributes(const std::vector<OptionalAttributeDefinition<T, S>>& attr
         // the concept of an attribute not being set. Which doesn't work in Arnold.
         if (attr.Get(&v) && v != each.defaultValue) {
             builder.set(each.paramName, createAttribute(v));
-            attributeSet = true;
         }
     }
-    return attributeSet;
 }
 
 template <typename T, typename S> inline
-bool handleAttributes(const std::vector<AttributeDefinition<S>>& attributes,
-                      const S& api,
-                      FnKat::GroupBuilder& builder) {
-    auto attributeSet = false;
+void handleAttributes(
+        const std::vector<AttributeDefinition<S>>& attributes,
+        const S& api,
+        FnKat::GroupBuilder& builder)
+{
     for (const auto& each : attributes) {
-        const auto attr = ((api).*(each.queryFn))();
-        if (!attr.IsValid()) { continue; }
-        T v;
-        if (attr.Get(&v)) {
-            builder.set(each.paramName, createAttribute(v));
-            attributeSet = true;
+        if (const auto attr = ((api).*(each.queryFn))()) {
+            T value;
+            if (attr.Get<T>(&value)) {
+                builder.set(each.paramName, createAttribute(value));
+            }
         }
     }
-    return attributeSet;
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
