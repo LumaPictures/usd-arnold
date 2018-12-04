@@ -31,6 +31,7 @@ readUSDVolVolume(
     }
 
     const auto stagePtr = prim.GetStage();
+    const auto volumePath = prim.GetPath();
 
     std::unordered_set<std::string> vdbPaths;
     std::vector<std::string> vdbFieldNames;
@@ -47,7 +48,9 @@ readUSDVolVolume(
         if (!vdbField) {
             continue;
         }
-        skipChildren.set(fieldPrim.GetName().GetText(), FnKat::IntAttribute(1));
+        if (fieldPair.second.GetParentPath() == volumePath) {
+            skipChildren.set(fieldPrim.GetName().GetText(), FnKat::IntAttribute(1));
+        }
         vdbField.GetFilePathAttr().Get<SdfAssetPath>(&filePath, currentTime);
         if (vdbPaths.insert(filePath.GetResolvedPath()).second
                 && vdbPaths.size() > 1) {
@@ -55,8 +58,8 @@ readUSDVolVolume(
                         "UsdVolVolume has VDB fields with differing asset paths");
             return;
         }
-        // Trust the field name on the VDB asset over the relationship name.
-        // Note that Houdini 17 currently writes time samples for this
+        // Trust the field name attribute on the VDB asset over the relationship
+        // name. Note that Houdini 17 currently writes time samples for this
         // attribute, so we just use the first available sample in that case.
         if (!vdbField.GetFieldNameAttr().Get<TfToken>(&fieldName)) {
             vdbField.GetFieldNameAttr().Get<TfToken>(&fieldName, 
@@ -66,21 +69,12 @@ readUSDVolVolume(
     }
 
     interface.setAttr("type", FnKat::StringAttribute("volume"));
-    //TODO Doc this
-    if (skipChildren.isValid()) {
-        interface.setAttr("__UsdIn.skipChild", skipChildren.build());
-    }
-    // interface.setAttr("__UsdIn.execKindOp", FnKat::IntAttribute(0));
-
+    
     if (vdbPaths.size() != 1) {
         TF_WARN("UsdVolVolume %s has no VDB asset fields. No Arnold volume "
-                "will be configured.", prim.GetPath().GetText());
+                "will be configured.", volumePath.GetText());
         return;
     }
-
-    // Advertise the connected field names
-    interface.setAttr("info.usdAi.vdbFields", 
-                      FnKat::StringAttribute(vdbFieldNames));
 
     // Read in the generic prim attributes. This handles things like material
     // binding, visibility, primvars, etc.
@@ -88,20 +82,32 @@ readUSDVolVolume(
     PxrUsdKatanaReadPrim(prim, privateData, attrs);
     attrs.toInterface(interface);
 
+    // Advertise the connected field names
+    interface.setAttr("info.usdAi.vdbFields", 
+                      FnKat::StringAttribute(vdbFieldNames));
+
+    // If any of the VDB field prims are children of the Volume prim (which is
+    // the recommended organization), tell the `pxrUsdIn` op to skip over them,
+    // to avoid generating extra empty groups that may cause confusion.
+    if (skipChildren.isValid()) {
+        interface.setAttr("__UsdIn.skipChild", skipChildren.build());
+    }
+
     // Build up the arguments required to execute an ArnoldOpenVDBVolume op.
     FnKat::GroupBuilder argsBuilder;
     getArnoldVDBVolumeOpArgs(prim, argsBuilder);
     argsBuilder.set("filename", FnKat::StringAttribute(*vdbPaths.begin()));
+
+    FnKat::GroupAttribute xform;
+    if (PxrUsdKatanaReadXformable(volume, privateData, xform)) {
+        argsBuilder.set("xform", xform);
+    }
 
     // Forward the time slice information to the Arnold op so the motion range 
     // gets set up properly on the volume.
     FnKat::GroupAttribute timeSlice = interface.getOpArg("system.timeSlice");;
     argsBuilder.set("system", FnKat::GroupAttribute("timeSlice", timeSlice, false), false);
 
-    FnKat::GroupAttribute xform;
-    if (PxrUsdKatanaReadXformable(volume, privateData, xform)) {
-        argsBuilder.set("xform", xform);
-    }
     interface.execOp("ArnoldOpenVDBVolume", argsBuilder.build());
 }
 
