@@ -187,13 +187,36 @@ class "AiVolumeAPI" (
     doc = "API for interacting with common Arnold volume node parameters on prims."
 )
 {
-    uniform bool ai:compress = 1
-    float ai:step_scale = 1
-    float ai:step_size = 0
-    float ai:velocity_fps = 24
-    float ai:velocity_outlier_threshold = 0.001
-    float ai:velocity_scale = 1
-    float ai:volume_padding = 0
+    uniform bool ai:compress = 1 (
+        doc = """Whether to compress grids to reduce memory usage. This is a
+                 lossy compression, however in most cases renders will be almost
+                 the same."""
+    )
+    float ai:step_scale = 1 (
+        doc = """A scaling factor applied to the step size, mostly useful when 
+                 `step_size` is set to 0 to modulate the automatic value."""
+    )
+    float ai:step_size = 0 (
+        doc = """The step size for sampling inside the volume. If this is set to
+                 0, a step size will be automatically calculated based on the
+                 volume's grid information."""
+    )
+    float ai:velocity_fps = 24 (
+        doc = "The frame rate of the velocity value."
+    )
+    float ai:velocity_outlier_threshold = 0.001 (
+        doc = """Controls the filtering of noisy velocities, which can result in
+                 faster rendering of motion blur from physics simulations. The
+                 default value of 0.001 should have little to no visual impact.
+                 Setting this to zero disables filtering entirely."""
+    )
+    float ai:velocity_scale = 1 (
+        doc = """A scale factor for the velocity field. A value of 0 disables 
+                 motion blur."""
+    )
+    float ai:volume_padding = 0 (
+        doc = "Amount to enlarge the volume bounds by."
+    )
 }
 
 class "AiLightAPI" (

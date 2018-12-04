@@ -143,7 +143,7 @@ public:
     // --------------------------------------------------------------------- //
     // AIVOLUMEPADDING 
     // --------------------------------------------------------------------- //
-    /// 
+    /// Amount to enlarge the volume bounds by.
     ///
     /// \n  C++ Type: float
     /// \n  Usd Type: SdfValueTypeNames->Float
@@ -162,129 +162,138 @@ public:
 
 public:
     // --------------------------------------------------------------------- //
-    // AIVOLUMESTEPSIZE 
+    // AISTEPSIZE 
     // --------------------------------------------------------------------- //
-    /// 
+    /// The step size for sampling inside the volume. If this is set to
+    /// 0, a step size will be automatically calculated based on the
+    /// volume's grid information.
     ///
     /// \n  C++ Type: float
     /// \n  Usd Type: SdfValueTypeNames->Float
     /// \n  Variability: SdfVariabilityVarying
     /// \n  Fallback Value: 0.0
     USDAI_API
-    UsdAttribute GetAiVolumeStepSizeAttr() const;
+    UsdAttribute GetAiStepSizeAttr() const;
 
-    /// See GetAiVolumeStepSizeAttr(), and also 
+    /// See GetAiStepSizeAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateAiVolumeStepSizeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAiStepSizeAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // AIVOLUMESTEPSCALE 
+    // AISTEPSCALE 
     // --------------------------------------------------------------------- //
-    /// 
+    /// A scaling factor applied to the step size, mostly useful when 
+    /// `step_size` is set to 0 to modulate the automatic value.
     ///
     /// \n  C++ Type: float
     /// \n  Usd Type: SdfValueTypeNames->Float
     /// \n  Variability: SdfVariabilityVarying
     /// \n  Fallback Value: 1.0
     USDAI_API
-    UsdAttribute GetAiVolumeStepScaleAttr() const;
+    UsdAttribute GetAiStepScaleAttr() const;
 
-    /// See GetAiVolumeStepScaleAttr(), and also 
+    /// See GetAiStepScaleAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateAiVolumeStepScaleAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAiStepScaleAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // AIVOLUMECOMPRESS 
+    // AICOMPRESS 
     // --------------------------------------------------------------------- //
-    /// 
+    /// Whether to compress grids to reduce memory usage. This is a
+    /// lossy compression, however in most cases renders will be almost
+    /// the same.
     ///
     /// \n  C++ Type: bool
     /// \n  Usd Type: SdfValueTypeNames->Bool
     /// \n  Variability: SdfVariabilityUniform
     /// \n  Fallback Value: True
     USDAI_API
-    UsdAttribute GetAiVolumeCompressAttr() const;
+    UsdAttribute GetAiCompressAttr() const;
 
-    /// See GetAiVolumeCompressAttr(), and also 
+    /// See GetAiCompressAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateAiVolumeCompressAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAiCompressAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // AIVOLUMEVELOCITYSCALE 
+    // AIVELOCITYSCALE 
     // --------------------------------------------------------------------- //
-    /// 
+    /// A scale factor for the velocity field. A value of 0 disables 
+    /// motion blur.
     ///
     /// \n  C++ Type: float
     /// \n  Usd Type: SdfValueTypeNames->Float
     /// \n  Variability: SdfVariabilityVarying
     /// \n  Fallback Value: 1.0
     USDAI_API
-    UsdAttribute GetAiVolumeVelocityScaleAttr() const;
+    UsdAttribute GetAiVelocityScaleAttr() const;
 
-    /// See GetAiVolumeVelocityScaleAttr(), and also 
+    /// See GetAiVelocityScaleAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateAiVolumeVelocityScaleAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAiVelocityScaleAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // AIVOLUMEVELOCITYFPS 
+    // AIVELOCITYFPS 
     // --------------------------------------------------------------------- //
-    /// 
+    /// The frame rate of the velocity value.
     ///
     /// \n  C++ Type: float
     /// \n  Usd Type: SdfValueTypeNames->Float
     /// \n  Variability: SdfVariabilityVarying
     /// \n  Fallback Value: 24.0
     USDAI_API
-    UsdAttribute GetAiVolumeVelocityFPSAttr() const;
+    UsdAttribute GetAiVelocityFPSAttr() const;
 
-    /// See GetAiVolumeVelocityFPSAttr(), and also 
+    /// See GetAiVelocityFPSAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateAiVolumeVelocityFPSAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAiVelocityFPSAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // --------------------------------------------------------------------- //
-    // AIVOLUMEVELOCITYOUTLIERTHRESH 
+    // AIVELOCITYOUTLIERTHRESHOLD 
     // --------------------------------------------------------------------- //
-    /// 
+    /// Controls the filtering of noisy velocities, which can result in
+    /// faster rendering of motion blur from physics simulations. The
+    /// default value of 0.001 should have little to no visual impact.
+    /// Setting this to zero disables filtering entirely.
     ///
     /// \n  C++ Type: float
     /// \n  Usd Type: SdfValueTypeNames->Float
     /// \n  Variability: SdfVariabilityVarying
     /// \n  Fallback Value: 0.0010000000475
     USDAI_API
-    UsdAttribute GetAiVolumeVelocityOutlierThreshAttr() const;
+    UsdAttribute GetAiVelocityOutlierThresholdAttr() const;
 
-    /// See GetAiVolumeVelocityOutlierThreshAttr(), and also 
+    /// See GetAiVelocityOutlierThresholdAttr(), and also 
     /// \ref Usd_Create_Or_Get_Property for when to use Get vs Create.
     /// If specified, author \p defaultValue as the attribute's default,
     /// sparsely (when it makes sense to do so) if \p writeSparsely is \c true -
     /// the default for \p writeSparsely is \c false.
     USDAI_API
-    UsdAttribute CreateAiVolumeVelocityOutlierThreshAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
+    UsdAttribute CreateAiVelocityOutlierThresholdAttr(VtValue const &defaultValue = VtValue(), bool writeSparsely=false) const;
 
 public:
     // ===================================================================== //

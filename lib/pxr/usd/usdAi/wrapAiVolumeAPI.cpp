@@ -57,44 +57,44 @@ _CreateAiVolumePaddingAttr(UsdAiVolumeAPI &self,
 }
         
 static UsdAttribute
-_CreateAiVolumeStepSizeAttr(UsdAiVolumeAPI &self,
+_CreateAiStepSizeAttr(UsdAiVolumeAPI &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateAiVolumeStepSizeAttr(
+    return self.CreateAiStepSizeAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
 }
         
 static UsdAttribute
-_CreateAiVolumeStepScaleAttr(UsdAiVolumeAPI &self,
+_CreateAiStepScaleAttr(UsdAiVolumeAPI &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateAiVolumeStepScaleAttr(
+    return self.CreateAiStepScaleAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
 }
         
 static UsdAttribute
-_CreateAiVolumeCompressAttr(UsdAiVolumeAPI &self,
+_CreateAiCompressAttr(UsdAiVolumeAPI &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateAiVolumeCompressAttr(
+    return self.CreateAiCompressAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Bool), writeSparsely);
 }
         
 static UsdAttribute
-_CreateAiVolumeVelocityScaleAttr(UsdAiVolumeAPI &self,
+_CreateAiVelocityScaleAttr(UsdAiVolumeAPI &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateAiVolumeVelocityScaleAttr(
+    return self.CreateAiVelocityScaleAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
 }
         
 static UsdAttribute
-_CreateAiVolumeVelocityFPSAttr(UsdAiVolumeAPI &self,
+_CreateAiVelocityFPSAttr(UsdAiVolumeAPI &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateAiVolumeVelocityFPSAttr(
+    return self.CreateAiVelocityFPSAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
 }
         
 static UsdAttribute
-_CreateAiVolumeVelocityOutlierThreshAttr(UsdAiVolumeAPI &self,
+_CreateAiVelocityOutlierThresholdAttr(UsdAiVolumeAPI &self,
                                       object defaultVal, bool writeSparsely) {
-    return self.CreateAiVolumeVelocityOutlierThreshAttr(
+    return self.CreateAiVelocityOutlierThresholdAttr(
         UsdPythonToSdfType(defaultVal, SdfValueTypeNames->Float), writeSparsely);
 }
 
@@ -138,45 +138,45 @@ void wrapUsdAiVolumeAPI()
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
-        .def("GetAiVolumeStepSizeAttr",
-             &This::GetAiVolumeStepSizeAttr)
-        .def("CreateAiVolumeStepSizeAttr",
-             &_CreateAiVolumeStepSizeAttr,
+        .def("GetAiStepSizeAttr",
+             &This::GetAiStepSizeAttr)
+        .def("CreateAiStepSizeAttr",
+             &_CreateAiStepSizeAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
-        .def("GetAiVolumeStepScaleAttr",
-             &This::GetAiVolumeStepScaleAttr)
-        .def("CreateAiVolumeStepScaleAttr",
-             &_CreateAiVolumeStepScaleAttr,
+        .def("GetAiStepScaleAttr",
+             &This::GetAiStepScaleAttr)
+        .def("CreateAiStepScaleAttr",
+             &_CreateAiStepScaleAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
-        .def("GetAiVolumeCompressAttr",
-             &This::GetAiVolumeCompressAttr)
-        .def("CreateAiVolumeCompressAttr",
-             &_CreateAiVolumeCompressAttr,
+        .def("GetAiCompressAttr",
+             &This::GetAiCompressAttr)
+        .def("CreateAiCompressAttr",
+             &_CreateAiCompressAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
-        .def("GetAiVolumeVelocityScaleAttr",
-             &This::GetAiVolumeVelocityScaleAttr)
-        .def("CreateAiVolumeVelocityScaleAttr",
-             &_CreateAiVolumeVelocityScaleAttr,
+        .def("GetAiVelocityScaleAttr",
+             &This::GetAiVelocityScaleAttr)
+        .def("CreateAiVelocityScaleAttr",
+             &_CreateAiVelocityScaleAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
-        .def("GetAiVolumeVelocityFPSAttr",
-             &This::GetAiVolumeVelocityFPSAttr)
-        .def("CreateAiVolumeVelocityFPSAttr",
-             &_CreateAiVolumeVelocityFPSAttr,
+        .def("GetAiVelocityFPSAttr",
+             &This::GetAiVelocityFPSAttr)
+        .def("CreateAiVelocityFPSAttr",
+             &_CreateAiVelocityFPSAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
         
-        .def("GetAiVolumeVelocityOutlierThreshAttr",
-             &This::GetAiVolumeVelocityOutlierThreshAttr)
-        .def("CreateAiVolumeVelocityOutlierThreshAttr",
-             &_CreateAiVolumeVelocityOutlierThreshAttr,
+        .def("GetAiVelocityOutlierThresholdAttr",
+             &This::GetAiVelocityOutlierThresholdAttr)
+        .def("CreateAiVelocityOutlierThresholdAttr",
+             &_CreateAiVelocityOutlierThresholdAttr,
              (arg("defaultValue")=object(),
               arg("writeSparsely")=false))
 

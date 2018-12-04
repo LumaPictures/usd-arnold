@@ -115,13 +115,13 @@ UsdAiVolumeAPI::CreateAiVolumePaddingAttr(VtValue const &defaultValue, bool writ
 }
 
 UsdAttribute
-UsdAiVolumeAPI::GetAiVolumeStepSizeAttr() const
+UsdAiVolumeAPI::GetAiStepSizeAttr() const
 {
     return GetPrim().GetAttribute(UsdAiTokens->aiStep_size);
 }
 
 UsdAttribute
-UsdAiVolumeAPI::CreateAiVolumeStepSizeAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiVolumeAPI::CreateAiStepSizeAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
     return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiStep_size,
                        SdfValueTypeNames->Float,
@@ -132,13 +132,13 @@ UsdAiVolumeAPI::CreateAiVolumeStepSizeAttr(VtValue const &defaultValue, bool wri
 }
 
 UsdAttribute
-UsdAiVolumeAPI::GetAiVolumeStepScaleAttr() const
+UsdAiVolumeAPI::GetAiStepScaleAttr() const
 {
     return GetPrim().GetAttribute(UsdAiTokens->aiStep_scale);
 }
 
 UsdAttribute
-UsdAiVolumeAPI::CreateAiVolumeStepScaleAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiVolumeAPI::CreateAiStepScaleAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
     return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiStep_scale,
                        SdfValueTypeNames->Float,
@@ -149,13 +149,13 @@ UsdAiVolumeAPI::CreateAiVolumeStepScaleAttr(VtValue const &defaultValue, bool wr
 }
 
 UsdAttribute
-UsdAiVolumeAPI::GetAiVolumeCompressAttr() const
+UsdAiVolumeAPI::GetAiCompressAttr() const
 {
     return GetPrim().GetAttribute(UsdAiTokens->aiCompress);
 }
 
 UsdAttribute
-UsdAiVolumeAPI::CreateAiVolumeCompressAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiVolumeAPI::CreateAiCompressAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
     return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiCompress,
                        SdfValueTypeNames->Bool,
@@ -166,13 +166,13 @@ UsdAiVolumeAPI::CreateAiVolumeCompressAttr(VtValue const &defaultValue, bool wri
 }
 
 UsdAttribute
-UsdAiVolumeAPI::GetAiVolumeVelocityScaleAttr() const
+UsdAiVolumeAPI::GetAiVelocityScaleAttr() const
 {
     return GetPrim().GetAttribute(UsdAiTokens->aiVelocity_scale);
 }
 
 UsdAttribute
-UsdAiVolumeAPI::CreateAiVolumeVelocityScaleAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiVolumeAPI::CreateAiVelocityScaleAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
     return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVelocity_scale,
                        SdfValueTypeNames->Float,
@@ -183,13 +183,13 @@ UsdAiVolumeAPI::CreateAiVolumeVelocityScaleAttr(VtValue const &defaultValue, boo
 }
 
 UsdAttribute
-UsdAiVolumeAPI::GetAiVolumeVelocityFPSAttr() const
+UsdAiVolumeAPI::GetAiVelocityFPSAttr() const
 {
     return GetPrim().GetAttribute(UsdAiTokens->aiVelocity_fps);
 }
 
 UsdAttribute
-UsdAiVolumeAPI::CreateAiVolumeVelocityFPSAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiVolumeAPI::CreateAiVelocityFPSAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
     return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVelocity_fps,
                        SdfValueTypeNames->Float,
@@ -200,13 +200,13 @@ UsdAiVolumeAPI::CreateAiVolumeVelocityFPSAttr(VtValue const &defaultValue, bool 
 }
 
 UsdAttribute
-UsdAiVolumeAPI::GetAiVolumeVelocityOutlierThreshAttr() const
+UsdAiVolumeAPI::GetAiVelocityOutlierThresholdAttr() const
 {
     return GetPrim().GetAttribute(UsdAiTokens->aiVelocity_outlier_threshold);
 }
 
 UsdAttribute
-UsdAiVolumeAPI::CreateAiVolumeVelocityOutlierThreshAttr(VtValue const &defaultValue, bool writeSparsely) const
+UsdAiVolumeAPI::CreateAiVelocityOutlierThresholdAttr(VtValue const &defaultValue, bool writeSparsely) const
 {
     return UsdSchemaBase::_CreateAttr(UsdAiTokens->aiVelocity_outlier_threshold,
                        SdfValueTypeNames->Float,

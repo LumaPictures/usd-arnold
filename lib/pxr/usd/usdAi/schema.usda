@@ -461,44 +461,60 @@ class "AiVolumeAPI" (
     doc = """API for interacting with common Arnold volume node parameters on prims."""
 ) {
     float ai:volume_padding = 0 (
+        doc = """Amount to enlarge the volume bounds by."""
         customData = {
             string apiName = "aiVolumePadding"
         }
     )
 
     float ai:step_size = 0 (
+        doc = """The step size for sampling inside the volume. If this is set to
+                 0, a step size will be automatically calculated based on the
+                 volume's grid information."""
         customData = {
-            string apiName = "aiVolumeStepSize"
+            string apiName = "aiStepSize"
         }
     )
 
     float ai:step_scale = 1 (
+        doc = """A scaling factor applied to the step size, mostly useful when 
+                 `step_size` is set to 0 to modulate the automatic value."""
         customData = {
-            string apiName = "aiVolumeStepScale"
+            string apiName = "aiStepScale"
         }
     )
 
     uniform bool ai:compress = true (
+        doc = """Whether to compress grids to reduce memory usage. This is a
+                 lossy compression, however in most cases renders will be almost
+                 the same."""
         customData = {
-            string apiName = "aiVolumeCompress"
+            string apiName = "aiCompress"
         }
     )
 
     float ai:velocity_scale = 1 (
+        doc = """A scale factor for the velocity field. A value of 0 disables 
+                 motion blur."""
         customData = {
-            string apiName = "aiVolumeVelocityScale"
+            string apiName = "aiVelocityScale"
         }
     )
 
     float ai:velocity_fps = 24 (
+        doc = """The frame rate of the velocity value."""
         customData = {
-            string apiName = "aiVolumeVelocityFPS"
+            string apiName = "aiVelocityFPS"
         }
     )
 
     float ai:velocity_outlier_threshold = 0.001 (
+        doc = """Controls the filtering of noisy velocities, which can result in
+                 faster rendering of motion blur from physics simulations. The
+                 default value of 0.001 should have little to no visual impact.
+                 Setting this to zero disables filtering entirely."""
         customData = {
-            string apiName = "aiVolumeVelocityOutlierThresh"
+            string apiName = "aiVelocityOutlierThreshold"
         }
     )
 }

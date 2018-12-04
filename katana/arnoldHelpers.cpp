@@ -124,16 +124,16 @@ getArnoldVDBVolumeOpArgs(
     );
 
     static const std::vector<OptionalAttributeDefinition<float, UsdAiVolumeAPI>> floatAttrs = {
-        {&UsdAiVolumeAPI::GetAiVolumeStepSizeAttr, "step_size", 0.0f},
-        {&UsdAiVolumeAPI::GetAiVolumeStepScaleAttr, "step_scale", 1.0f},
+        {&UsdAiVolumeAPI::GetAiStepSizeAttr, "step_size", 0.0f},
+        {&UsdAiVolumeAPI::GetAiStepScaleAttr, "step_scale", 1.0f},
         {&UsdAiVolumeAPI::GetAiVolumePaddingAttr, "volume_padding", 0.0f},
-        {&UsdAiVolumeAPI::GetAiVolumeVelocityScaleAttr, "velocity_scale", 1.0f},
-        {&UsdAiVolumeAPI::GetAiVolumeVelocityFPSAttr, "velocity_fps", 24.0f},
-        {&UsdAiVolumeAPI::GetAiVolumeVelocityOutlierThreshAttr, "velocity_outlier_threshold", 0.001f},
+        {&UsdAiVolumeAPI::GetAiVelocityScaleAttr, "velocity_scale", 1.0f},
+        {&UsdAiVolumeAPI::GetAiVelocityFPSAttr, "velocity_fps", 24.0f},
+        {&UsdAiVolumeAPI::GetAiVelocityOutlierThresholdAttr, "velocity_outlier_threshold", 0.001f},
     };
 
     static const std::vector<OptionalAttributeDefinition<bool, UsdAiVolumeAPI>> boolAttrs = {
-        {&UsdAiVolumeAPI::GetAiVolumeCompressAttr, "compress", true},
+        {&UsdAiVolumeAPI::GetAiCompressAttr, "compress", true},
     };
 
     argsBuilder.update(fixedDefaults);
