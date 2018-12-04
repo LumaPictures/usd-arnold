@@ -31,7 +31,7 @@ readAiVolume(
 
     // Build up the arguments required to execute an ArnoldOpenVDBVolume op.
     FnKat::GroupBuilder argsBuilder;
-    setDefaultArnoldVDBVolumeOpArgs(argsBuilder);
+    getArnoldVDBVolumeOpArgs(prim, argsBuilder);
 
     SdfAssetPath filename;
     volume.GetFilenameAttr().Get(&filename, currentTime);

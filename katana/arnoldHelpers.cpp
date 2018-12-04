@@ -4,6 +4,7 @@
 
 #include <pxr/usd/usdAi/aiNodeAPI.h>
 #include <pxr/usd/usdAi/aiShapeAPI.h>
+#include <pxr/usd/usdAi/aiVolumeAPI.h>
 
 #include <pxr/usd/usdGeom/basisCurves.h>
 #include <pxr/usd/usdGeom/tokens.h>
@@ -106,6 +107,54 @@ applyProceduralArgsAttrs(
         }
     }
     return count;
+}
+
+
+void
+getArnoldVDBVolumeOpArgs(
+        const UsdPrim& prim,
+        FnKat::GroupBuilder& argsBuilder)
+{
+    static FnKat::GroupAttribute fixedDefaults(
+        "grids", FnKat::StringAttribute(),
+        "velocity_grids", FnKat::StringAttribute(),
+        "override_motion_range", FnKat::IntAttribute(0),
+        "makeInteractive", FnKat::StringAttribute("No"),
+        true
+    );
+
+    static const std::vector<OptionalAttributeDefinition<float, UsdAiVolumeAPI>> floatAttrs = {
+        {&UsdAiVolumeAPI::GetAiVolumeStepSizeAttr, "step_size", 0.0f},
+        {&UsdAiVolumeAPI::GetAiVolumeStepScaleAttr, "step_scale", 1.0f},
+        {&UsdAiVolumeAPI::GetAiVolumePaddingAttr, "volume_padding", 0.0f},
+        {&UsdAiVolumeAPI::GetAiVolumeVelocityScaleAttr, "velocity_scale", 1.0f},
+        {&UsdAiVolumeAPI::GetAiVolumeVelocityFPSAttr, "velocity_fps", 24.0f},
+        {&UsdAiVolumeAPI::GetAiVolumeVelocityOutlierThreshAttr, "velocity_outlier_threshold", 0.001f},
+    };
+
+    static const std::vector<OptionalAttributeDefinition<bool, UsdAiVolumeAPI>> boolAttrs = {
+        {&UsdAiVolumeAPI::GetAiVolumeCompressAttr, "compress", true},
+    };
+
+    argsBuilder.update(fixedDefaults);
+    UsdAiVolumeAPI volumeAPI(prim);
+    if (volumeAPI) {
+        handleAttributes(floatAttrs, volumeAPI, argsBuilder, /*applyDefaults=*/ true);
+        handleAttributes(boolAttrs, volumeAPI, argsBuilder, /*applyDefaults=*/ true);
+    }
+    else {
+        // API Schema was not applied to `prim`, but we still want to fill in
+        // the defaults. We could skip the above API validity test and just use
+        // `handleAttributes` to check all of the attributes directly, but I 
+        // would rather standardize on this approach initially, so that authored
+        // values are only read if the API was properly applied to the prim.
+        for (const auto& entry : floatAttrs) {
+            argsBuilder.set(entry.paramName, createAttribute(entry.defaultValue));
+        }
+        for (const auto& entry : boolAttrs) {
+            argsBuilder.set(entry.paramName, createAttribute(entry.defaultValue));
+        }
+    }
 }
 
 

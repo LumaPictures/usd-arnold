@@ -25,23 +25,12 @@ size_t applyProceduralArgsAttrs(
         FnKat::GroupBuilder& argsBuilder,
         const double time);
 
-// Helper to initialize a GroupBuilder with most of the argument defaults needed
-// to execute an ArnoldOpenVDBVolume op.
-inline void setDefaultArnoldVDBVolumeOpArgs(
-        FnKat::GroupBuilder& argsBuilder) 
-{
-    argsBuilder.set("grids", FnKat::StringAttribute());
-    argsBuilder.set("step_size", FnKat::FloatAttribute(0.0f));
-    argsBuilder.set("step_scale", FnKat::FloatAttribute(1.0f));
-    argsBuilder.set("volume_padding", FnKat::FloatAttribute(0.0f));
-    argsBuilder.set("compress", FnKat::IntAttribute(1));
-    argsBuilder.set("velocity_grids", FnKat::StringAttribute());
-    argsBuilder.set("velocity_scale", FnKat::FloatAttribute(1.0f));
-    argsBuilder.set("velocity_fps", FnKat::FloatAttribute(24));
-    argsBuilder.set("velocity_outlier_threshold", FnKat::FloatAttribute(0.001));
-    argsBuilder.set("override_motion_range", FnKat::IntAttribute(0));
-    argsBuilder.set("makeInteractive", FnKat::StringAttribute("No"));
-}
+// Helper to populate a GroupBuilder with most of the argument defaults needed
+// to execute an ArnoldOpenVDBVolume op. This uses the UsdAiVolumeAPI to query
+// the given prim
+void getArnoldVDBVolumeOpArgs(
+        const UsdPrim& prim,
+        FnKat::GroupBuilder& argsBuilder);
 
 // Given a prim, return a new GroupAttribute to populate the `arnoldStatements`
 // attribute group in Katana.
@@ -98,20 +87,19 @@ template <typename T, typename S> inline
 void handleAttributes(
         const std::vector<OptionalAttributeDefinition<T, S>>& attributes,
         const S& api,
-        FnKat::GroupBuilder& builder)
+        FnKat::GroupBuilder& builder,
+        bool applyDefaults=false)
 {
     for (const auto& each : attributes) {
         const auto attr = ((api).*(each.queryFn))();
-        if (!attr.IsValid()) {
-            continue;
-        }
-        T v = each.defaultValue;
+        T value = each.defaultValue;
         // TODO: Check if we need to filter the defaultValues.
         // I think because of how Katana behaves we have to set these up,
         // even if they are the default value, because the USD API handles
         // the concept of an attribute not being set. Which doesn't work in Arnold.
-        if (attr.Get(&v) && v != each.defaultValue) {
-            builder.set(each.paramName, createAttribute(v));
+        const bool success = attr.IsValid() && attr.template Get<T>(&value);
+        if (applyDefaults || (success && value != each.defaultValue)) {
+            builder.set(each.paramName, createAttribute(value));
         }
     }
 }
@@ -125,7 +113,7 @@ void handleAttributes(
     for (const auto& each : attributes) {
         if (const auto attr = ((api).*(each.queryFn))()) {
             T value;
-            if (attr.Get<T>(&value)) {
+            if (attr.template Get<T>(&value)) {
                 builder.set(each.paramName, createAttribute(value));
             }
         }

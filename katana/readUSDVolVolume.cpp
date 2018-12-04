@@ -1,7 +1,5 @@
 #include "readUSDVolVolume.h"
 
-#include <pxr/usd/usdAi/aiVolumeAPI.h>
-
 #include <usdKatana/attrMap.h>
 #include <usdKatana/readPrim.h>
 #include <usdKatana/readXformable.h>
@@ -45,11 +43,11 @@ readUSDVolVolume(
         if (!fieldPrim) {
             continue;
         }
-        skipChildren.set(fieldPrim.GetName().GetText(), FnKat::IntAttribute(1));
         const auto vdbField = UsdVolOpenVDBAsset(fieldPrim);
         if (!vdbField) {
             continue;
         }
+        skipChildren.set(fieldPrim.GetName().GetText(), FnKat::IntAttribute(1));
         vdbField.GetFilePathAttr().Get<SdfAssetPath>(&filePath, currentTime);
         if (vdbPaths.insert(filePath.GetResolvedPath()).second
                 && vdbPaths.size() > 1) {
@@ -69,7 +67,9 @@ readUSDVolVolume(
 
     interface.setAttr("type", FnKat::StringAttribute("volume"));
     //TODO Doc this
-    interface.setAttr("__UsdIn.skipChild", skipChildren.build());
+    if (skipChildren.isValid()) {
+        interface.setAttr("__UsdIn.skipChild", skipChildren.build());
+    }
     // interface.setAttr("__UsdIn.execKindOp", FnKat::IntAttribute(0));
 
     if (vdbPaths.size() != 1) {
@@ -90,22 +90,11 @@ readUSDVolVolume(
 
     // Build up the arguments required to execute an ArnoldOpenVDBVolume op.
     FnKat::GroupBuilder argsBuilder;
-    setDefaultArnoldVDBVolumeOpArgs(argsBuilder);
+    getArnoldVDBVolumeOpArgs(prim, argsBuilder);
     argsBuilder.set("filename", FnKat::StringAttribute(*vdbPaths.begin()));
 
-    UsdAiVolumeAPI volumeAPI(prim);
-    if (volumeAPI) {
-        printf("schema attribute names:\n");
-        for (auto& name : volumeAPI.GetSchemaAttributeNames()) {
-            printf("%s\n", name.GetText());
-        }
-    }
-    else {
-        TF_WARN("Failed to bind volume API to prim %s", prim.GetPath().GetText());
-    }
-
-    // // Forward the time slice information to the Arnold op so the motion range 
-    // // gets set up properly on the volume.
+    // Forward the time slice information to the Arnold op so the motion range 
+    // gets set up properly on the volume.
     FnKat::GroupAttribute timeSlice = interface.getOpArg("system.timeSlice");;
     argsBuilder.set("system", FnKat::GroupAttribute("timeSlice", timeSlice, false), false);
 
