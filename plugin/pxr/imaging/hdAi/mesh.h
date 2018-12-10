@@ -52,25 +52,18 @@ public:
     ~HdAiMesh() override = default;
 
     void Sync(
-        HdSceneDelegate* sceneDelegate, HdRenderParam* renderParam,
-        HdDirtyBits* dirtyBits, const HdReprSelector& reprSelector,
-        bool forcedRepr) override;
+        HdSceneDelegate* delegate, HdRenderParam* renderParam,
+        HdDirtyBits* dirtyBits, const TfToken& reprToken) override;
 
     HDAI_API
     HdDirtyBits GetInitialDirtyBitsMask() const override;
 
 protected:
     HDAI_API
-    void _UpdateRepr(
-        HdSceneDelegate* sceneDelegate, const HdReprSelector& reprSelector,
-        HdDirtyBits* dirtyBits) override;
-
-    HDAI_API
     HdDirtyBits _PropagateDirtyBits(HdDirtyBits bits) const override;
 
     HDAI_API
-    void _InitRepr(
-        const HdReprSelector& reprSelector, HdDirtyBits* dirtyBits) override;
+    void _InitRepr(const TfToken& reprToken, HdDirtyBits* dirtyBits) override;
 
     HdAiRenderDelegate* _delegate;
     AtNode* _mesh;

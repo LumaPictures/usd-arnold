@@ -51,14 +51,12 @@ HdAiMesh::HdAiMesh(
 }
 
 void HdAiMesh::Sync(
-    HdSceneDelegate* sceneDelegate, HdRenderParam* renderParam,
-    HdDirtyBits* dirtyBits, const HdReprSelector& reprSelector,
-    bool forcedRepr) {
-    TF_UNUSED(forcedRepr);
+    HdSceneDelegate* delegate, HdRenderParam* renderParam,
+    HdDirtyBits* dirtyBits, const TfToken& reprToken) {
     const auto& id = GetId();
 
     if (HdChangeTracker::IsPrimvarDirty(*dirtyBits, id, HdTokens->points)) {
-        auto value = sceneDelegate->Get(id, HdTokens->points);
+        auto value = delegate->Get(id, HdTokens->points);
         const auto& vecArray = value.Get<VtVec3fArray>();
         AiNodeSetArray(
             _mesh, "vlist",
@@ -67,7 +65,7 @@ void HdAiMesh::Sync(
     }
 
     if (HdChangeTracker::IsTopologyDirty(*dirtyBits, id)) {
-        const auto topology = GetMeshTopology(sceneDelegate);
+        const auto topology = GetMeshTopology(delegate);
         const auto& vertexCounts = topology.GetFaceVertexCounts();
         const auto& vertexIndices = topology.GetFaceVertexIndices();
         const auto numFaces = topology.GetNumFaces();
@@ -88,13 +86,13 @@ void HdAiMesh::Sync(
     }
 
     if (HdChangeTracker::IsTransformDirty(*dirtyBits, id)) {
-        HdAiSetTransform(_mesh, sceneDelegate, GetId());
+        HdAiSetTransform(_mesh, delegate, GetId());
     }
 
     if (*dirtyBits & HdChangeTracker::DirtyMaterialId) {
         const auto* material = reinterpret_cast<const HdAiMaterial*>(
-            sceneDelegate->GetRenderIndex().GetSprim(
-                HdPrimTypeTokens->material, sceneDelegate->GetMaterialId(id)));
+            delegate->GetRenderIndex().GetSprim(
+                HdPrimTypeTokens->material, delegate->GetMaterialId(id)));
         if (material != nullptr) {
             AiNodeSetPtr(_mesh, "shader", material->GetSurfaceShader());
             AiNodeSetPtr(_mesh, "disp_map", material->GetDisplacementShader());
@@ -106,10 +104,10 @@ void HdAiMesh::Sync(
 
     // TODO: Implement all the primvars.
     if (*dirtyBits & HdChangeTracker::DirtyPrimvar) {
-        for (const auto& primvar : sceneDelegate->GetPrimvarDescriptors(
+        for (const auto& primvar : delegate->GetPrimvarDescriptors(
                  id, HdInterpolation::HdInterpolationFaceVarying)) {
             if (primvar.name == _tokens->st || primvar.name == _tokens->uv) {
-                const auto v = sceneDelegate->Get(id, primvar.name);
+                const auto v = delegate->Get(id, primvar.name);
                 if (v.IsHolding<VtArray<GfVec2f>>()) {
                     const auto& uv = v.UncheckedGet<VtArray<GfVec2f>>();
                     const auto numUVs = static_cast<unsigned int>(uv.size());
@@ -137,21 +135,12 @@ HdDirtyBits HdAiMesh::GetInitialDirtyBitsMask() const {
            HdChangeTracker::DirtyPrimvar;
 }
 
-void HdAiMesh::_UpdateRepr(
-    HdSceneDelegate* sceneDelegate, const HdReprSelector& reprSelector,
-    HdDirtyBits* dirtyBits) {
-    TF_UNUSED(sceneDelegate);
-    TF_UNUSED(reprSelector);
-    TF_UNUSED(dirtyBits);
-}
-
 HdDirtyBits HdAiMesh::_PropagateDirtyBits(HdDirtyBits bits) const {
     return bits & HdChangeTracker::AllDirty;
 }
 
-void HdAiMesh::_InitRepr(
-    const HdReprSelector& reprSelector, HdDirtyBits* dirtyBits) {
-    TF_UNUSED(reprSelector);
+void HdAiMesh::_InitRepr(const TfToken& reprToken, HdDirtyBits* dirtyBits) {
+    TF_UNUSED(reprToken);
     TF_UNUSED(dirtyBits);
 }
 
