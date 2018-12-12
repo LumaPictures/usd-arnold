@@ -46,6 +46,7 @@
 #include "pxr/imaging/hdAi/renderBuffer.h"
 #include "pxr/imaging/hdAi/renderPass.h"
 
+#include <unordered_map>
 #include <unordered_set>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -69,6 +70,25 @@ std::unordered_set<AtString, AtStringHash> _ignoredParameters{
     AtString("fps"),
     AtString("enable_progressive_render"),
     AtString("enable_progressive_pattern")};
+
+std::unordered_map<AtString, TfToken, AtStringHash> _parameterNameMap{
+    {AtString("GI_diffuse_depth"), TfToken("Diffuse Depth")},
+    {AtString("GI_specular_depth"), TfToken("Specular Depth")},
+    {AtString("GI_transmission_depth"), TfToken("Transmission Depth")},
+    {AtString("GI_volume_depth"), TfToken("Volume Depth")},
+    {AtString("GI_total_depth"), TfToken("Total Depth")},
+    {AtString("GI_diffuse_samples"), TfToken("Diffuse Samples")},
+    {AtString("GI_specular_samples"), TfToken("Specular Samples")},
+    {AtString("GI_transmission_samples"), TfToken("Transmission Samples")},
+    {AtString("GI_sss_samples"), TfToken("SSS Samples")},
+    {AtString("GI_volume_samples"), TfToken("Volume Samples")},
+};
+
+TfToken _GetParameterLabel(const AtString& name) {
+    const auto& it = _parameterNameMap.find(name);
+    return it == _parameterNameMap.end() ? TfToken(name.c_str()) : it->second;
+}
+
 } // namespace
 
 const TfTokenVector HdAiRenderDelegate::SUPPORTED_RPRIM_TYPES = {
@@ -199,7 +219,7 @@ HdRenderSettingDescriptorList HdAiRenderDelegate::GetRenderSettingDescriptors()
         } else {
             continue;
         }
-        desc.name = pname.c_str();
+        desc.name = _GetParameterLabel(pname).GetText();
         desc.key = TfToken(pname.c_str());
         ret.push_back(desc);
     }
