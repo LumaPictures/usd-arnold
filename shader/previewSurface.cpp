@@ -42,18 +42,40 @@ node_parameters {
 
 node_initialize {}
 
+#include <iostream>
+
 node_update {}
 
 node_finish {}
 
 shader_evaluate {
+    auto& closures = sg->out.CLOSURE();
+    const auto opacity = AiShaderEvalParamFlt(p_opacity);
+    if (opacity < AI_OPACITY_EPSILON) {
+        closures.add(AiClosureTransparent(sg, AI_RGB_WHITE));
+        return;
+    }
+
+    if (sg->Rt & AI_RAY_SHADOW) {
+        if (opacity < (1.0f - AI_OPACITY_EPSILON)) {
+            closures.add(
+                AiClosureTransparent(sg, AI_RGB_WHITE * (1.0f - opacity)));
+        }
+        return;
+    }
+
     // TODO: implement the full shader.
     const auto diffuseColor = AiShaderEvalParamRGB(p_diffuseColor);
     if (!AiColorIsSmall(diffuseColor)) {
-        sg->out.CLOSURE().add(AiOrenNayarBSDF(sg, diffuseColor, sg->Nf));
+        closures.add(AiOrenNayarBSDF(sg, diffuseColor, sg->Nf));
     }
     const auto emissiveColor = AiShaderEvalParamRGB(p_emissiveColor);
     if (!AiColorIsSmall(emissiveColor)) {
-        sg->out.CLOSURE().add(AiClosureEmission(sg, emissiveColor));
+        closures.add(AiClosureEmission(sg, emissiveColor));
+    }
+
+    if (opacity < (1.0f - AI_OPACITY_EPSILON)) {
+        closures *= opacity;
+        closures.add(AiClosureTransparent(sg, AI_RGB_WHITE * (1.0f - opacity)));
     }
 }

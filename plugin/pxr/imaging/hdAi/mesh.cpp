@@ -39,15 +39,27 @@ PXR_NAMESPACE_OPEN_SCOPE
 TF_DEFINE_PRIVATE_TOKENS(_tokens, (st)(uv));
 
 namespace {
-const AtString uvlistStr("uvlist");
-const AtString uvidxsStr("uvidxs");
+namespace Str {
+const AtString name("name");
+const AtString polymesh("polymesh");
+const AtString vlist("vlist");
+const AtString vidxs("vidxs");
+const AtString nsides("nsides");
+const AtString uvlist("uvlist");
+const AtString uvidxs("uvidxs");
+const AtString shader("shader");
+const AtString disp_map("disp_map");
+const AtString opaque("opaque");
+
+} // namespace Str
+
 } // namespace
 
 HdAiMesh::HdAiMesh(
     HdAiRenderDelegate* delegate, const SdfPath& id, const SdfPath& instancerId)
     : HdMesh(id, instancerId), _delegate(delegate) {
-    _mesh = AiNode(delegate->GetUniverse(), "polymesh");
-    AiNodeSetStr(_mesh, "name", id.GetText());
+    _mesh = AiNode(delegate->GetUniverse(), Str::polymesh);
+    AiNodeSetStr(_mesh, Str::name, id.GetText());
 }
 
 void HdAiMesh::Sync(
@@ -59,7 +71,7 @@ void HdAiMesh::Sync(
         auto value = delegate->Get(id, HdTokens->points);
         const auto& vecArray = value.Get<VtVec3fArray>();
         AiNodeSetArray(
-            _mesh, "vlist",
+            _mesh, Str::vlist,
             AiArrayConvert(
                 vecArray.size(), 1, AI_TYPE_VECTOR, vecArray.data()));
     }
@@ -81,8 +93,8 @@ void HdAiMesh::Sync(
             AiArraySetUInt(
                 vidxs, i, static_cast<unsigned int>(vertexIndices[i]));
         }
-        AiNodeSetArray(_mesh, "nsides", nsides);
-        AiNodeSetArray(_mesh, "vidxs", vidxs);
+        AiNodeSetArray(_mesh, Str::nsides, nsides);
+        AiNodeSetArray(_mesh, Str::vidxs, vidxs);
     }
 
     if (HdChangeTracker::IsTransformDirty(*dirtyBits, id)) {
@@ -94,12 +106,15 @@ void HdAiMesh::Sync(
             delegate->GetRenderIndex().GetSprim(
                 HdPrimTypeTokens->material, delegate->GetMaterialId(id)));
         if (material != nullptr) {
-            AiNodeSetPtr(_mesh, "shader", material->GetSurfaceShader());
-            AiNodeSetPtr(_mesh, "disp_map", material->GetDisplacementShader());
+            AiNodeSetPtr(_mesh, Str::shader, material->GetSurfaceShader());
+            AiNodeSetPtr(
+                _mesh, Str::disp_map, material->GetDisplacementShader());
         } else {
-            AiNodeSetPtr(_mesh, "shader", _delegate->GetFallbackShader());
-            AiNodeSetPtr(_mesh, "disp_map", nullptr);
+            AiNodeSetPtr(_mesh, Str::shader, _delegate->GetFallbackShader());
+            AiNodeSetPtr(_mesh, Str::disp_map, nullptr);
         }
+        // TODO: We need a way to detect this.
+        AiNodeSetBool(_mesh, Str::opaque, false);
     }
 
     // TODO: Implement all the primvars.
@@ -118,8 +133,8 @@ void HdAiMesh::Sync(
                     for (auto i = decltype(numUVs){0}; i < numUVs; ++i) {
                         AiArraySetUInt(uvidxs, i, i);
                     }
-                    AiNodeSetArray(_mesh, uvlistStr, uvlist);
-                    AiNodeSetArray(_mesh, uvidxsStr, uvidxs);
+                    AiNodeSetArray(_mesh, Str::uvlist, uvlist);
+                    AiNodeSetArray(_mesh, Str::uvidxs, uvidxs);
                 }
             }
         }
