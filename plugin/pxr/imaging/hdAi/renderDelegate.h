@@ -56,6 +56,12 @@ public:
     HDAI_API
     const TfTokenVector& GetSupportedBprimTypes() const override;
     HDAI_API
+    void SetRenderSetting(const TfToken& key, const VtValue& value) override;
+    HDAI_API
+    VtValue GetRenderSetting(const TfToken& key) const override;
+    HDAI_API
+    HdRenderSettingDescriptorList GetRenderSettingDescriptors() const override;
+    HDAI_API
     HdResourceRegistrySharedPtr GetResourceRegistry() const override;
     HDAI_API
     HdRenderPassSharedPtr CreateRenderPass(

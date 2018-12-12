@@ -46,7 +46,30 @@
 #include "pxr/imaging/hdAi/renderBuffer.h"
 #include "pxr/imaging/hdAi/renderPass.h"
 
+#include <unordered_set>
+
 PXR_NAMESPACE_OPEN_SCOPE
+
+namespace {
+namespace Str {
+const AtString GI_diffuse_depth("GI_diffuse_depth");
+const AtString GI_specular_depth("GI_specular_depth");
+} // namespace Str
+
+std::unordered_set<AtString, AtStringHash> _ignoredParameters{
+    AtString("xres"),
+    AtString("yres"),
+    AtString("region_min_x"),
+    AtString("region_min_y"),
+    AtString("region_max_x"),
+    AtString("region_max_y"),
+    AtString("pixel_aspect_ratio"),
+    AtString("reference_time"),
+    AtString("frame"),
+    AtString("fps"),
+    AtString("enable_progressive_render"),
+    AtString("enable_progressive_pattern")};
+} // namespace
 
 const TfTokenVector HdAiRenderDelegate::SUPPORTED_RPRIM_TYPES = {
     HdPrimTypeTokens->mesh,
@@ -84,8 +107,8 @@ HdAiRenderDelegate::HdAiRenderDelegate() {
     _universe = nullptr;
 
     _options = AiUniverseGetOptions(_universe);
-    AiNodeSetInt(_options, "GI_diffuse_depth", 1);
-    AiNodeSetInt(_options, "GI_specular_depth", 1);
+    AiNodeSetInt(_options, Str::GI_diffuse_depth, 1);
+    AiNodeSetInt(_options, Str::GI_specular_depth, 1);
 
     _fallbackShader = AiNode(_universe, "ambient_occlusion");
     AiNodeSetInt(_fallbackShader, "samples", 1);
@@ -117,6 +140,71 @@ const TfTokenVector& HdAiRenderDelegate::GetSupportedSprimTypes() const {
 
 const TfTokenVector& HdAiRenderDelegate::GetSupportedBprimTypes() const {
     return SUPPORTED_BPRIM_TYPES;
+}
+
+void HdAiRenderDelegate::SetRenderSetting(
+    const TfToken& key, const VtValue& value) {
+    if (value.IsHolding<int>()) {
+        AiNodeSetInt(_options, key.GetText(), value.UncheckedGet<int>());
+    } else if (value.IsHolding<float>()) {
+        AiNodeSetFlt(_options, key.GetText(), value.UncheckedGet<float>());
+    } else if (value.IsHolding<bool>()) {
+        AiNodeSetBool(_options, key.GetText(), value.UncheckedGet<bool>());
+    }
+}
+
+VtValue HdAiRenderDelegate::GetRenderSetting(const TfToken& key) const {
+    const auto* nentry = AiNodeGetNodeEntry(_options);
+    const auto* pentry = AiNodeEntryLookUpParameter(nentry, key.GetText());
+    if (pentry == nullptr) { return {}; }
+    const auto ptype = AiParamGetType(pentry);
+    if (ptype == AI_TYPE_INT) {
+        // We are changing the default values of these.
+        return VtValue(AiNodeGetInt(_options, key.GetText()));
+    } else if (ptype == AI_TYPE_FLOAT) {
+        return VtValue(AiNodeGetFlt(_options, key.GetText()));
+    } else if (ptype == AI_TYPE_BOOLEAN) {
+        return VtValue(AiNodeGetBool(_options, key.GetText()));
+    }
+    return {};
+}
+
+// For now we only support a few parameter types, that are expected to have
+// UI code in usdview / Maya to Hydra.
+HdRenderSettingDescriptorList HdAiRenderDelegate::GetRenderSettingDescriptors()
+    const {
+    HdRenderSettingDescriptorList ret;
+    const auto* nentry = AiNodeGetNodeEntry(_options);
+    auto* piter = AiNodeEntryGetParamIterator(nentry);
+    while (!AiParamIteratorFinished(piter)) {
+        const auto* pentry = AiParamIteratorGetNext(piter);
+        const auto pname = AiParamGetName(pentry);
+        if (_ignoredParameters.find(pname) != _ignoredParameters.end()) {
+            continue;
+        }
+        const auto ptype = AiParamGetType(pentry);
+        HdRenderSettingDescriptor desc;
+        if (ptype == AI_TYPE_INT) {
+            // We are changing the default values of these.
+            if (pname == Str::GI_diffuse_depth ||
+                pname == Str::GI_specular_depth) {
+                desc.defaultValue = VtValue(1);
+            } else {
+                desc.defaultValue = VtValue(AiParamGetDefault(pentry)->INT());
+            }
+        } else if (ptype == AI_TYPE_FLOAT) {
+            desc.defaultValue = VtValue(AiParamGetDefault(pentry)->FLT());
+        } else if (ptype == AI_TYPE_BOOLEAN) {
+            desc.defaultValue = VtValue(AiParamGetDefault(pentry)->BOOL());
+        } else {
+            continue;
+        }
+        desc.name = pname.c_str();
+        desc.key = TfToken(pname.c_str());
+        ret.push_back(desc);
+    }
+    AiParamIteratorDestroy(piter);
+    return ret;
 }
 
 HdResourceRegistrySharedPtr HdAiRenderDelegate::GetResourceRegistry() const {
@@ -208,9 +296,7 @@ HdSprim* HdAiRenderDelegate::CreateFallbackSprim(const TfToken& typeId) {
     return nullptr;
 }
 
-void HdAiRenderDelegate::DestroySprim(HdSprim* sPrim) {
-    delete sPrim;
-}
+void HdAiRenderDelegate::DestroySprim(HdSprim* sPrim) { delete sPrim; }
 
 HdBprim* HdAiRenderDelegate::CreateBprim(
     const TfToken& typeId, const SdfPath& bprimId) {
