@@ -93,7 +93,7 @@ NdrNodeUniquePtr NdrAiParserPlugin::Parse(
         discoveryResult.name,          // name
         discoveryResult.family,        // family
         discoveryResult.discoveryType, // context
-        discoveryResult.sourceType,    //
+        discoveryResult.sourceType,    // sourceType
         discoveryResult.uri,           // uri
         std::move(properties)));
 }
