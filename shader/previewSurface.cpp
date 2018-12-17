@@ -65,10 +65,7 @@ shader_evaluate {
     }
 
     // TODO: implement the full shader.
-    const auto diffuseColor = AiShaderEvalParamRGB(p_diffuseColor);
-    if (!AiColorIsSmall(diffuseColor)) {
-        closures.add(AiOrenNayarBSDF(sg, diffuseColor, sg->Nf));
-    }
+    closures.add(AiOrenNayarBSDF(sg, AiShaderEvalParamRGB(p_diffuseColor), sg->Nf));
     const auto emissiveColor = AiShaderEvalParamRGB(p_emissiveColor);
     if (!AiColorIsSmall(emissiveColor)) {
         closures.add(AiClosureEmission(sg, emissiveColor));
