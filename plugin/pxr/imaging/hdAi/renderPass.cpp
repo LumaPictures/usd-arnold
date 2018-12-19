@@ -115,10 +115,15 @@ void HdAiRenderPass::_Execute(
 
     AiRender();
 
-    // Blitting to the OpenGL buffer.
-    std::vector<uint8_t> color(_width * _height * 4, 0);
-    std::vector<float> depth(_width * _height, 1.0f - AI_EPSILON);
-    hdAiEmptyBucketQueue([this, &color, &depth](const HdAiBucketData* data) {
+    const auto numPixels = static_cast<size_t>(_width * _height);
+    const auto numPixelBytes = numPixels * 4;
+    if (_colorBuffer.size() != numPixelBytes) {
+        _colorBuffer.resize(numPixelBytes, 0);
+    }
+    if (_depthBuffer.size() != numPixels) {
+        _depthBuffer.resize(numPixels, 1.0f);
+    }
+    hdAiEmptyBucketQueue([this](const HdAiBucketData* data) {
         const auto xo = AiClamp(data->xo, 0, _width - 1);
         const auto xe = AiClamp(data->xo + data->sizeX, 0, _width - 1);
         if (xe == xo) { return; }
@@ -133,8 +138,8 @@ void HdAiRenderPass::_Execute(
                 const auto* strideIn = reinterpret_cast<const float*>(
                     data->data.data() +
                     pixelSizeIn * data->sizeX * (y - data->yo));
-                auto* strideOut =
-                    color.data() + pixelSizeOut * _width * (_height - y - 1);
+                auto* strideOut = _colorBuffer.data() +
+                                  pixelSizeOut * _width * (_height - y - 1);
                 for (auto x = xo; x < xe; ++x) {
                     const auto* in = strideIn + numChannels * (x - data->xo);
                     auto* out = strideOut + numChannels * x;
@@ -149,7 +154,8 @@ void HdAiRenderPass::_Execute(
                 const auto* strideIn = reinterpret_cast<const float*>(
                     data->data.data() +
                     pixelSize * data->sizeX * (y - data->yo));
-                auto* strideOut = depth.data() + _width * (_height - y - 1);
+                auto* strideOut =
+                    _depthBuffer.data() + _width * (_height - y - 1);
                 for (auto x = xo; x < xe; ++x) {
                     strideOut[x] = strideIn[x - data->xo];
                 }
@@ -158,15 +164,12 @@ void HdAiRenderPass::_Execute(
     });
 
     // Quick workaround for handling depth.
-    const auto numPixels = _width * _height;
     for (auto i = decltype(numPixels){0}; i < numPixels; ++i) {
-        if (color[i * 4 + 3] < 1) {
-            depth[i] = 1.0f;
-        }
+        if (_colorBuffer[i * 4 + 3] < 1) { _depthBuffer[i] = 1.0f; }
     }
-    _compositor.UpdateColor(_width, _height, color.data());
+    _compositor.UpdateColor(_width, _height, _colorBuffer.data());
     _compositor.UpdateDepth(
-        _width, _height, reinterpret_cast<uint8_t*>(depth.data()));
+        _width, _height, reinterpret_cast<uint8_t*>(_depthBuffer.data()));
     _compositor.Draw();
 }
 

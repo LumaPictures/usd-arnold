@@ -58,6 +58,8 @@ protected:
         const TfTokenVector& renderTags) override;
 
 private:
+    std::vector<uint8_t> _colorBuffer;
+    std::vector<float> _depthBuffer;
     HdAiRenderDelegate* _delegate;
     AtNode* _camera = nullptr;
     AtNode* _beautyFilter = nullptr;
