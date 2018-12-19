@@ -133,7 +133,6 @@ HdAiRenderDelegate::HdAiRenderDelegate() {
     _fallbackShader = AiNode(_universe, "ambient_occlusion");
     AiNodeSetInt(_fallbackShader, "samples", 1);
     _renderParam.reset(new HdAiRenderParam());
-    AiNodeSetBool(_options, "enable_progressive_render", true);
 }
 
 HdAiRenderDelegate::~HdAiRenderDelegate() {
@@ -141,6 +140,7 @@ HdAiRenderDelegate::~HdAiRenderDelegate() {
     if (_counterResourceRegistry.fetch_sub(1) == 1) {
         _resourceRegistry.reset();
     }
+    _renderParam->Stop();
     hdAiUninstallNodes();
     AiUniverseDestroy(_universe);
     AiEnd();
@@ -175,6 +175,7 @@ void HdAiRenderDelegate::SetRenderSetting(
     } else if (value.IsHolding<bool>()) {
         AiNodeSetBool(_options, key.GetText(), value.UncheckedGet<bool>());
     }
+    _renderParam->Stop();
 }
 
 VtValue HdAiRenderDelegate::GetRenderSetting(const TfToken& key) const {
