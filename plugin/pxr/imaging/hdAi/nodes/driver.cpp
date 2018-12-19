@@ -34,12 +34,26 @@
 #include <memory>
 
 #include "pxr/imaging/hdAi/nodes/nodes.h"
+#include "pxr/imaging/hdAi/utils.h"
+
+PXR_NAMESPACE_USING_DIRECTIVE
 
 AI_DRIVER_NODE_EXPORT_METHODS(HdAiDriverMtd);
 
+AtString HdAiDriver::projMtx("projMtx");
+AtString HdAiDriver::viewMtx("viewMtx");
+
 namespace {
 const char* supportedExtensions[] = {nullptr};
-}
+
+struct DriverData {
+    // I think we just uncovered a bug in Arnold.
+    // This fails with AtMatrix, looks like as if the [3][3] of the proj
+    // matrix is used incorrectly.
+    GfMatrix4f projMtx;
+    GfMatrix4f viewMtx;
+};
+} // namespace
 
 tbb::concurrent_queue<HdAiBucketData*> bucketQueue;
 
@@ -54,15 +68,31 @@ void hdAiEmptyBucketQueue(const std::function<void(const HdAiBucketData*)>& f) {
     }
 }
 
-node_parameters {}
+node_parameters {
+    AiParameterMtx(HdAiDriver::projMtx, AiM4Identity());
+    AiParameterMtx(HdAiDriver::viewMtx, AiM4Identity());
+}
 
-node_initialize { AiDriverInitialize(node, false); }
+node_initialize {
+    AiDriverInitialize(node, true);
+    AiNodeSetLocalData(node, new DriverData());
+}
 
-node_update {}
+#include <iostream>
+
+node_update {
+    auto* data = reinterpret_cast<DriverData*>(AiNodeGetLocalData(node));
+    data->projMtx =
+        HdAiConvertMatrix(AiNodeGetMatrix(node, HdAiDriver::projMtx));
+    data->viewMtx =
+        HdAiConvertMatrix(AiNodeGetMatrix(node, HdAiDriver::viewMtx));
+}
 
 node_finish {}
 
-driver_supports_pixel_type { return pixel_type == AI_TYPE_RGBA; }
+driver_supports_pixel_type {
+    return pixel_type == AI_TYPE_RGBA || pixel_type == AI_TYPE_VECTOR;
+}
 
 driver_extension { return supportedExtensions; }
 
@@ -73,24 +103,48 @@ driver_needs_bucket { return true; }
 driver_prepare_bucket {}
 
 driver_process_bucket {
+    const auto* driverData =
+        reinterpret_cast<const DriverData*>(AiNodeGetLocalData(node));
     const char* outputName = nullptr;
     int pixelType = AI_TYPE_RGBA;
     const void* bucketData = nullptr;
     while (AiOutputIteratorGetNext(
         iterator, &outputName, &pixelType, &bucketData)) {
-        if (pixelType != AI_TYPE_RGBA) { continue; }
+        if (pixelType != AI_TYPE_RGBA && pixelType != AI_TYPE_VECTOR) {
+            continue;
+        }
         auto* data = new HdAiBucketData();
-        data->dataType = AI_TYPE_RGBA;
+
         data->xo = bucket_xo;
         data->yo = bucket_yo;
         data->sizeX = bucket_size_x;
         data->sizeY = bucket_size_y;
-        const size_t memSize =
-            bucket_size_x * bucket_size_y * sizeof(float) * 4;
-        data->data.resize(memSize, 0);
-        memcpy(data->data.data(), bucketData, memSize);
+        if (pixelType == AI_TYPE_RGBA) {
+            data->dataType = AI_TYPE_RGBA;
+            const size_t memSize =
+                bucket_size_x * bucket_size_y * sizeof(float) * 4;
+            data->data.resize(memSize, 0);
+            memcpy(data->data.data(), bucketData, memSize);
+        } else if (pixelType == AI_TYPE_VECTOR) {
+            data->dataType = AI_TYPE_FLOAT;
+            // We are converting position to Z.
+            const auto bucketSize = bucket_size_x * bucket_size_y;
+            const size_t memSize = bucketSize * sizeof(float);
+            data->data.resize(memSize, 0);
+            const auto* pp = reinterpret_cast<const GfVec3f*>(bucketData);
+            auto* pz = reinterpret_cast<float*>(data->data.data());
+            for (auto i = decltype(bucketSize){0}; i < bucketSize; ++i) {
+                // Rays hitting the background will return a (0,0,0) vector.
+                const auto p = driverData->projMtx.Transform(
+                    driverData->viewMtx.Transform(pp[i]));
+                pz[i] = std::min(1.0f, p[2]);
+                if (pz[i] < 0.0f) { pz[i] = 1.0f; }
+            }
+        } else {
+            delete data;
+            continue;
+        }
         bucketQueue.push(data);
-        break; // Only one buffer for now.
     }
 }
 

@@ -75,6 +75,27 @@ AtMatrix HdAiConvertMatrix(const GfMatrix4f& in) {
     return out;
 }
 
+GfMatrix4f HdAiConvertMatrix(const AtMatrix& in) {
+    GfMatrix4f out(1.0f);
+    out[0][0] = in.data[0][0];
+    out[0][1] = in.data[0][1];
+    out[0][2] = in.data[0][2];
+    out[0][3] = in.data[0][3];
+    out[1][0] = in.data[1][0];
+    out[1][1] = in.data[1][1];
+    out[1][2] = in.data[1][2];
+    out[1][3] = in.data[1][3];
+    out[2][0] = in.data[2][0];
+    out[2][1] = in.data[2][1];
+    out[2][2] = in.data[2][2];
+    out[2][3] = in.data[2][3];
+    out[3][0] = in.data[3][0];
+    out[3][1] = in.data[3][1];
+    out[3][2] = in.data[3][2];
+    out[3][3] = in.data[3][3];
+    return out;
+}
+
 void HdAiSetTransform(
     AtNode* node, HdSceneDelegate* delegate, const SdfPath& id) {
     constexpr size_t maxSamples = 3;

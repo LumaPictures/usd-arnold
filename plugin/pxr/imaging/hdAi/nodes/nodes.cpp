@@ -46,15 +46,22 @@ struct NodeDefinition {
     const AtNodeMethods* methods;
 };
 
-const std::array<NodeDefinition, 2> builtInNodes = {{
-    {AI_NODE_CAMERA, AI_TYPE_UNDEFINED, HdAiNodeNames::camera, HdAiCameraMtd},
-    {AI_NODE_DRIVER, AI_TYPE_UNDEFINED, HdAiNodeNames::driver, HdAiDriverMtd},
-}};
+using BuiltInNodes = std::array<NodeDefinition, 2>;
+
+const auto builtInNodes = []() -> const BuiltInNodes& {
+    static const BuiltInNodes ret = {{
+        {AI_NODE_CAMERA, AI_TYPE_UNDEFINED, HdAiNodeNames::camera,
+         HdAiCameraMtd},
+        {AI_NODE_DRIVER, AI_TYPE_UNDEFINED, HdAiNodeNames::driver,
+         HdAiDriverMtd},
+    }};
+    return ret;
+};
 
 } // namespace
 
 void hdAiInstallNodes() {
-    for (const auto& it : builtInNodes) {
+    for (const auto& it : builtInNodes()) {
         AiNodeEntryInstall(
             it.type, it.outputType, it.name, "<built-in>", it.methods,
             AI_VERSION);
@@ -62,5 +69,5 @@ void hdAiInstallNodes() {
 }
 
 void hdAiUninstallNodes() {
-    for (const auto& it : builtInNodes) { AiNodeEntryUninstall(it.name); }
+    for (const auto& it : builtInNodes()) { AiNodeEntryUninstall(it.name); }
 }

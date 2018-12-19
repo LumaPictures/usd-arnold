@@ -45,6 +45,11 @@ extern AtString projMtx;
 extern AtString frameAspect;
 } // namespace HdAiCamera
 
+namespace HdAiDriver {
+extern AtString projMtx;
+extern AtString viewMtx;
+} // namespace HdAiDriver
+
 void hdAiInstallNodes();
 void hdAiUninstallNodes();
 

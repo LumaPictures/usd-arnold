@@ -49,6 +49,8 @@ AtMatrix HdAiConvertMatrix(const GfMatrix4d& in);
 HDAI_API
 AtMatrix HdAiConvertMatrix(const GfMatrix4f& in);
 HDAI_API
+GfMatrix4f HdAiConvertMatrix(const AtMatrix& in);
+HDAI_API
 void HdAiSetTransform(
     AtNode* node, HdSceneDelegate* delegate, const SdfPath& id);
 HDAI_API

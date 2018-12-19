@@ -42,7 +42,8 @@
 
 namespace {
 const AtString cameraName("HdAiRenderPass_camera");
-const AtString filterName("HdAiRenderPass_filter");
+const AtString filterName("HdAiRenderPass_beautyFilter");
+const AtString closestName("HdAiRenderPass_closestFilter");
 const AtString driverName("HdAiRenderPass_driver");
 } // namespace
 
@@ -56,14 +57,26 @@ HdAiRenderPass::HdAiRenderPass(
     _camera = AiNode(universe, HdAiNodeNames::camera);
     AiNodeSetPtr(AiUniverseGetOptions(universe), "camera", _camera);
     AiNodeSetStr(_camera, "name", _delegate->GetLocalNodeName(cameraName));
-    _filter = AiNode(universe, "gaussian_filter");
-    AiNodeSetStr(_filter, "name", _delegate->GetLocalNodeName(filterName));
+    _beautyFilter = AiNode(universe, "gaussian_filter");
+    AiNodeSetStr(
+        _beautyFilter, "name", _delegate->GetLocalNodeName(filterName));
+    _closestFilter = AiNode(universe, "closest_filter");
+    AiNodeSetStr(
+        _closestFilter, "name", _delegate->GetLocalNodeName(closestName));
     _driver = AiNode(universe, HdAiNodeNames::driver);
     AiNodeSetStr(_driver, "name", _delegate->GetLocalNodeName(driverName));
     auto* options = _delegate->GetOptions();
-    const auto outputsString = TfStringPrintf(
-        "RGBA RGBA %s %s", AiNodeGetName(_filter), AiNodeGetName(_driver));
-    AiNodeSetStr(options, "outputs", outputsString.c_str());
+    auto* outputsArray = AiArrayAllocate(2, 1, AI_TYPE_STRING);
+    const auto beautyString = TfStringPrintf(
+        "RGBA RGBA %s %s", AiNodeGetName(_beautyFilter),
+        AiNodeGetName(_driver));
+    // We need NDC, and the easiest way is to use the position.
+    const auto positionString = TfStringPrintf(
+        "P VECTOR %s %s", AiNodeGetName(_closestFilter),
+        AiNodeGetName(_driver));
+    AiArraySetStr(outputsArray, 0, beautyString.c_str());
+    AiArraySetStr(outputsArray, 1, positionString.c_str());
+    AiNodeSetArray(options, "outputs", outputsArray);
 
     AiNodeSetFlt(_camera, "shutter_start", -0.25f);
     AiNodeSetFlt(_camera, "shutter_end", 0.25f);
@@ -84,6 +97,12 @@ void HdAiRenderPass::_Execute(
         HdAiConvertMatrix(
             renderPassState->GetWorldToViewMatrix().GetInverse()));
     AiNodeSetFlt(_camera, HdAiCamera::frameAspect, vp[2] / vp[3]);
+    AiNodeSetMatrix(
+        _driver, HdAiDriver::projMtx,
+        HdAiConvertMatrix(renderPassState->GetProjectionMatrix()));
+    AiNodeSetMatrix(
+        _driver, HdAiDriver::viewMtx,
+        HdAiConvertMatrix(renderPassState->GetWorldToViewMatrix()));
 
     _width = static_cast<int>(vp[2]);
     _height = static_cast<int>(vp[3]);
@@ -99,31 +118,52 @@ void HdAiRenderPass::_Execute(
     // Blitting to the OpenGL buffer.
     std::vector<uint8_t> color(_width * _height * 4, 0);
     std::vector<float> depth(_width * _height, 1.0f - AI_EPSILON);
-    hdAiEmptyBucketQueue([this, &color](const HdAiBucketData* data) {
+    hdAiEmptyBucketQueue([this, &color, &depth](const HdAiBucketData* data) {
         const auto xo = AiClamp(data->xo, 0, _width - 1);
         const auto xe = AiClamp(data->xo + data->sizeX, 0, _width - 1);
         if (xe == xo) { return; }
         const auto yo = AiClamp(data->yo, 0, _height - 1);
         const auto ye = AiClamp(data->yo + data->sizeY, 0, _height - 1);
         if (ye == yo) { return; }
-        constexpr auto numChannels = 4;
-        const auto pixelSizeIn = sizeof(float) * numChannels;
-        const auto pixelSizeOut = sizeof(uint8_t) * numChannels;
-        for (auto y = yo; y < ye; ++y) {
-            const auto* strideIn = reinterpret_cast<const float*>(
-                data->data.data() + pixelSizeIn * data->sizeX * (y - data->yo));
-            auto* strideOut =
-                color.data() + pixelSizeOut * _width * (_height - y - 1);
-            for (auto x = xo; x < xe; ++x) {
-                const auto* in = strideIn + numChannels * (x - data->xo);
-                auto* out = strideOut + numChannels * x;
-                for (auto i = 0; i < numChannels; ++i) {
-                    out[i] = AiQuantize8bit(x + xo, y + yo, i, in[i], true);
+        if (data->dataType == AI_TYPE_RGBA) {
+            constexpr auto numChannels = 4;
+            const auto pixelSizeIn = sizeof(float) * numChannels;
+            const auto pixelSizeOut = sizeof(uint8_t) * numChannels;
+            for (auto y = yo; y < ye; ++y) {
+                const auto* strideIn = reinterpret_cast<const float*>(
+                    data->data.data() +
+                    pixelSizeIn * data->sizeX * (y - data->yo));
+                auto* strideOut =
+                    color.data() + pixelSizeOut * _width * (_height - y - 1);
+                for (auto x = xo; x < xe; ++x) {
+                    const auto* in = strideIn + numChannels * (x - data->xo);
+                    auto* out = strideOut + numChannels * x;
+                    for (auto i = 0; i < numChannels; ++i) {
+                        out[i] = AiQuantize8bit(x + xo, y + yo, i, in[i], true);
+                    }
+                }
+            }
+        } else if (data->dataType == AI_TYPE_FLOAT) {
+            const auto pixelSize = sizeof(float);
+            for (auto y = yo; y < ye; ++y) {
+                const auto* strideIn = reinterpret_cast<const float*>(
+                    data->data.data() +
+                    pixelSize * data->sizeX * (y - data->yo));
+                auto* strideOut = depth.data() + _width * (_height - y - 1);
+                for (auto x = xo; x < xe; ++x) {
+                    strideOut[x] = strideIn[x - data->xo];
                 }
             }
         }
     });
 
+    // Quick workaround for handling depth.
+    const auto numPixels = _width * _height;
+    for (auto i = decltype(numPixels){0}; i < numPixels; ++i) {
+        if (color[i * 4 + 3] < 1) {
+            depth[i] = 1.0f;
+        }
+    }
     _compositor.UpdateColor(_width, _height, color.data());
     _compositor.UpdateDepth(
         _width, _height, reinterpret_cast<uint8_t*>(depth.data()));

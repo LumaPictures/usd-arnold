@@ -60,7 +60,8 @@ protected:
 private:
     HdAiRenderDelegate* _delegate;
     AtNode* _camera = nullptr;
-    AtNode* _filter = nullptr;
+    AtNode* _beautyFilter = nullptr;
+    AtNode* _closestFilter = nullptr;
     AtNode* _driver = nullptr;
 
     HdxCompositor _compositor;
