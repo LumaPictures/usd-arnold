@@ -117,10 +117,22 @@ driver_process_bucket {
     while (AiOutputIteratorGetNext(
         iterator, &outputName, &pixelType, &bucketData)) {
         if (pixelType == AI_TYPE_RGBA && strcmp(outputName, "RGBA") == 0) {
-            data->beauty.resize(bucketSize, AI_RGBA_ZERO);
+            data->beauty.resize(bucketSize);
             const auto* inRGBA = reinterpret_cast<const AtRGBA*>(bucketData);
-            std::copy(inRGBA, inRGBA + bucketSize, data->beauty.begin());
-        } else if (pixelType == AI_TYPE_VECTOR && strcmp(outputName, "P") == 0) {
+            for (auto i = decltype(bucketSize){0}; i < bucketSize; ++i) {
+                const auto in = inRGBA[i];
+                const auto x = bucket_xo + i % bucket_size_x;
+                const auto y = bucket_yo + i / bucket_size_x;
+                AtRGBA8 out;
+                out.r = AiQuantize8bit(x, y, 0, in.r, true);
+                out.g = AiQuantize8bit(x, y, 1, in.g, true);
+                out.b = AiQuantize8bit(x, y, 2, in.b, true);
+                out.a = AiQuantize8bit(x, y, 3, in.a, true);
+                data->beauty[i] = out;
+            }
+
+        } else if (
+            pixelType == AI_TYPE_VECTOR && strcmp(outputName, "P") == 0) {
             data->depth.resize(bucketSize, 1.0f);
             const auto* pp = reinterpret_cast<const GfVec3f*>(bucketData);
             auto* pz = data->depth.data();
@@ -136,9 +148,7 @@ driver_process_bucket {
         delete data;
     } else {
         for (auto i = decltype(bucketSize){0}; i < bucketSize; ++i) {
-            if (data->beauty[i].a < AI_EPSILON) {
-                data->depth[i] = 1.0f;
-            }
+            if (data->beauty[i].a == 0) { data->depth[i] = 1.0f; }
         }
         bucketQueue.push(data);
     }

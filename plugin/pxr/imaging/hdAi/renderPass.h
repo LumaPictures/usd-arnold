@@ -37,6 +37,7 @@
 #include <pxr/imaging/hd/renderPass.h>
 #include <pxr/imaging/hdx/compositor.h>
 
+#include "pxr/imaging/hdAi/nodes/nodes.h"
 #include "pxr/imaging/hdAi/renderDelegate.h"
 
 #include <ai.h>
@@ -61,7 +62,7 @@ protected:
         const TfTokenVector& renderTags) override;
 
 private:
-    std::vector<uint8_t> _colorBuffer;
+    std::vector<AtRGBA8> _colorBuffer;
     std::vector<float> _depthBuffer;
     HdAiRenderDelegate* _delegate;
     AtNode* _camera = nullptr;

@@ -53,6 +53,13 @@ extern AtString viewMtx;
 void hdAiInstallNodes();
 void hdAiUninstallNodes();
 
+struct AtRGBA8 {
+    uint8_t r = 0;
+    uint8_t g = 0;
+    uint8_t b = 0;
+    uint8_t a = 0;
+};
+
 struct HdAiBucketData {
     HdAiBucketData() = default;
     ~HdAiBucketData() = default;
@@ -63,7 +70,7 @@ struct HdAiBucketData {
     int yo = 0;
     int sizeX = 0;
     int sizeY = 0;
-    std::vector<AtRGBA> beauty;
+    std::vector<AtRGBA8> beauty;
     std::vector<float> depth;
 };
 
