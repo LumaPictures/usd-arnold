@@ -150,48 +150,47 @@ void HdAiRenderPass::_Execute(
 
     _isConverged = renderParam->Render();
 
-    hdAiEmptyBucketQueue([this](const HdAiBucketData* data) {
+    bool needsUpdate = false;
+    hdAiEmptyBucketQueue([this, &needsUpdate](const HdAiBucketData* data) {
         const auto xo = AiClamp(data->xo, 0, _width - 1);
         const auto xe = AiClamp(data->xo + data->sizeX, 0, _width - 1);
         if (xe == xo) { return; }
         const auto yo = AiClamp(data->yo, 0, _height - 1);
         const auto ye = AiClamp(data->yo + data->sizeY, 0, _height - 1);
         if (ye == yo) { return; }
-        {
-            constexpr auto numChannels = 4;
-            const auto pixelSizeOut = sizeof(uint8_t) * numChannels;
-            for (auto y = yo; y < ye; ++y) {
-                const auto* strideIn =
-                    data->beauty.data() + data->sizeX * (y - data->yo);
-                auto* strideOut = _colorBuffer.data() +
-                                  pixelSizeOut * _width * (_height - y - 1);
-                for (auto x = xo; x < xe; ++x) {
-                    const auto* in = strideIn + (x - data->xo);
-                    auto* out = strideOut + numChannels * x;
-                    out[0] = AiQuantize8bit(x + xo, y + yo, 0, in->r, true);
-                    out[1] = AiQuantize8bit(x + xo, y + yo, 1, in->g, true);
-                    out[2] = AiQuantize8bit(x + xo, y + yo, 2, in->b, true);
-                    out[3] = AiQuantize8bit(x + xo, y + yo, 3, in->a, true);
-                }
+        needsUpdate = true;
+        constexpr auto numChannels = 4;
+        const auto pixelSizeOut = sizeof(uint8_t) * numChannels;
+        for (auto y = yo; y < ye; ++y) {
+            const auto* strideIn =
+                data->beauty.data() + data->sizeX * (y - data->yo);
+            auto* strideOut = _colorBuffer.data() +
+                              pixelSizeOut * _width * (_height - y - 1);
+            for (auto x = xo; x < xe; ++x) {
+                const auto* in = strideIn + (x - data->xo);
+                auto* out = strideOut + numChannels * x;
+                out[0] = AiQuantize8bit(x + xo, y + yo, 0, in->r, true);
+                out[1] = AiQuantize8bit(x + xo, y + yo, 1, in->g, true);
+                out[2] = AiQuantize8bit(x + xo, y + yo, 2, in->b, true);
+                out[3] = AiQuantize8bit(x + xo, y + yo, 3, in->a, true);
             }
         }
-        {
-            for (auto y = yo; y < ye; ++y) {
-                const auto* strideIn = reinterpret_cast<const float*>(
-                    data->depth.data() + data->sizeX * (y - data->yo));
-                auto* strideOut =
-                    _depthBuffer.data() + _width * (_height - y - 1);
-                for (auto x = xo; x < xe; ++x) {
-                    strideOut[x] = strideIn[x - data->xo];
-                }
+        for (auto y = yo; y < ye; ++y) {
+            const auto* strideIn = reinterpret_cast<const float*>(
+                data->depth.data() + data->sizeX * (y - data->yo));
+            auto* strideOut =
+                _depthBuffer.data() + _width * (_height - y - 1);
+            for (auto x = xo; x < xe; ++x) {
+                strideOut[x] = strideIn[x - data->xo];
             }
         }
     });
 
-    // TODO: this needs to be updated only if data have changed.
-    _compositor.UpdateColor(_width, _height, _colorBuffer.data());
-    _compositor.UpdateDepth(
-        _width, _height, reinterpret_cast<uint8_t*>(_depthBuffer.data()));
+    if (needsUpdate) {
+        _compositor.UpdateColor(_width, _height, _colorBuffer.data());
+        _compositor.UpdateDepth(
+            _width, _height, reinterpret_cast<uint8_t*>(_depthBuffer.data()));
+    }
     _compositor.Draw();
 }
 
