@@ -19,7 +19,6 @@ USD Schemas and tools for exchanging Arnold shader information between multiple 
 * Arnold shader discovery and parsing.
 
 ### Planned
-* Supporting MtoA-2.x.
 * Adding a material importer for usdKatana. For more information, see building USD.
 * Making sure USD-Arnold works with a base installation of USD.
 * Build all the packages at once.
@@ -46,13 +45,14 @@ We use and test with the following library versions.
 
 | Name    | Version          |
 | ------- | ---------------- |
-| GCC     | 4.8.5            |
+| GCC     | 4.8.5 / 6.3.1    |
 | Boost   | 1.61.0           |
-| TBB     | 4.4.6            |
+| TBB     | 2017.x           |
 | OpenEXR | 2.2.0 - latest   |
-| MtoA    | 1.2.x and 1.4.2  |
-| Katana  | 2.5v6  - 3.0     |
-| Maya    | 2016.5 - 2018    |
+| MtoA    | 3.x              |
+| Katana  | 2.5v6  - 3.x     |
+| Maya    | 2018 - 2019      |
+| Arnold  | 5.2.x            |
 
 You can use configuration variables to enable/disable individual components during the build process. These are the following.
 * BUILD\_USD\_PLUGIN - Generating the schemas.
