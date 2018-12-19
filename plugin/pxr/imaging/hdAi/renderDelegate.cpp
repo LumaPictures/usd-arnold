@@ -132,6 +132,7 @@ HdAiRenderDelegate::HdAiRenderDelegate() {
 
     _fallbackShader = AiNode(_universe, "ambient_occlusion");
     AiNodeSetInt(_fallbackShader, "samples", 1);
+    _renderParam.reset(new HdAiRenderParam());
 }
 
 HdAiRenderDelegate::~HdAiRenderDelegate() {
@@ -144,7 +145,9 @@ HdAiRenderDelegate::~HdAiRenderDelegate() {
     AiEnd();
 }
 
-HdRenderParam* HdAiRenderDelegate::GetRenderParam() const { return nullptr; }
+HdRenderParam* HdAiRenderDelegate::GetRenderParam() const {
+    return _renderParam.get();
+}
 
 void HdAiRenderDelegate::CommitResources(HdChangeTracker* tracker) {
     TF_UNUSED(tracker);

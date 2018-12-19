@@ -27,46 +27,28 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#ifndef HDAI_NODES_H
-#define HDAI_NODES_H
+#ifndef HDAI_RENDER_PARAM_H
+#define HDAI_RENDER_PARAM_H
 
-#include <ai.h>
+#include <pxr/pxr.h>
 
-#include <functional>
-#include <vector>
+#include <pxr/imaging/hd/renderDelegate.h>
 
-namespace HdAiNodeNames {
-extern AtString camera;
-extern AtString driver;
-} // namespace HdAiNodeNames
+#include <atomic>
 
-namespace HdAiCamera {
-extern AtString projMtx;
-extern AtString frameAspect;
-} // namespace HdAiCamera
+PXR_NAMESPACE_OPEN_SCOPE
 
-namespace HdAiDriver {
-extern AtString projMtx;
-extern AtString viewMtx;
-} // namespace HdAiDriver
+class HdAiRenderParam final : public HdRenderParam {
+public:
+    HdAiRenderParam();
+    ~HdAiRenderParam() override = default;
 
-void hdAiInstallNodes();
-void hdAiUninstallNodes();
-
-struct HdAiBucketData {
-    HdAiBucketData() = default;
-    ~HdAiBucketData() = default;
-    HdAiBucketData(const HdAiBucketData&) = delete;
-    HdAiBucketData(HdAiBucketData&&) = delete;
-    HdAiBucketData& operator=(const HdAiBucketData&) = delete;
-    int xo = 0;
-    int yo = 0;
-    int sizeX = 0;
-    int sizeY = 0;
-    std::vector<AtRGBA> beauty;
-    std::vector<float> depth;
+    bool Render();
+    void StopRender();
+private:
+    std::atomic<bool> _needsRestart;
 };
 
-void hdAiEmptyBucketQueue(const std::function<void(const HdAiBucketData*)>& f);
+PXR_NAMESPACE_CLOSE_SCOPE
 
 #endif

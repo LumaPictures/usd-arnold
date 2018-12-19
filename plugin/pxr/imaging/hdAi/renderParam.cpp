@@ -27,46 +27,45 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#ifndef HDAI_NODES_H
-#define HDAI_NODES_H
+#include "pxr/imaging/hdAi/renderParam.h"
 
 #include <ai.h>
 
-#include <functional>
-#include <vector>
+PXR_NAMESPACE_OPEN_SCOPE
 
-namespace HdAiNodeNames {
-extern AtString camera;
-extern AtString driver;
-} // namespace HdAiNodeNames
+HdAiRenderParam::HdAiRenderParam() : HdRenderParam() {
+    _needsRestart = false;
+}
 
-namespace HdAiCamera {
-extern AtString projMtx;
-extern AtString frameAspect;
-} // namespace HdAiCamera
+bool HdAiRenderParam::Render() {
+    const auto status = AiRenderGetStatus();
+    const auto needsRestart = _needsRestart.exchange(false);
+    if (status == AI_RENDER_STATUS_FINISHED && !needsRestart) {
+        return true;
+        // Renders are only paused when stop render is called.
+    } else if (status == AI_RENDER_STATUS_RENDERING) {
+        return false;
+    } else if (status == AI_RENDER_STATUS_PAUSED ||
+        needsRestart) {
+        AiRenderRestart();
+    } else {
+        if (status != AI_RENDER_STATUS_NOT_STARTED) {
+            AiRenderEnd();
+        }
+        AiRenderBegin();
+    }
+    return false;
+}
 
-namespace HdAiDriver {
-extern AtString projMtx;
-extern AtString viewMtx;
-} // namespace HdAiDriver
+void HdAiRenderParam::StopRender() {
+    const auto status = AiRenderGetStatus();
+    if (status == AI_RENDER_STATUS_PAUSED) {
+        return;
+    } else if (status == AI_RENDER_STATUS_FINISHED) {
+        _needsRestart.store(true);
+    } else {
+        AiRenderInterrupt(AI_BLOCKING);
+    }
+}
 
-void hdAiInstallNodes();
-void hdAiUninstallNodes();
-
-struct HdAiBucketData {
-    HdAiBucketData() = default;
-    ~HdAiBucketData() = default;
-    HdAiBucketData(const HdAiBucketData&) = delete;
-    HdAiBucketData(HdAiBucketData&&) = delete;
-    HdAiBucketData& operator=(const HdAiBucketData&) = delete;
-    int xo = 0;
-    int yo = 0;
-    int sizeX = 0;
-    int sizeY = 0;
-    std::vector<AtRGBA> beauty;
-    std::vector<float> depth;
-};
-
-void hdAiEmptyBucketQueue(const std::function<void(const HdAiBucketData*)>& f);
-
-#endif
+PXR_NAMESPACE_CLOSE_SCOPE

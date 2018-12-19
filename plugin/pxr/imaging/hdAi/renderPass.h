@@ -33,6 +33,7 @@
 #include <pxr/pxr.h>
 #include "pxr/imaging/hdAi/api.h"
 
+#include <pxr/base/gf/matrix4d.h>
 #include <pxr/imaging/hd/renderPass.h>
 #include <pxr/imaging/hdx/compositor.h>
 
@@ -51,6 +52,8 @@ public:
     HDAI_API
     ~HdAiRenderPass() override = default;
 
+    bool IsConverged() const { return _isConverged; }
+
 protected:
     HDAI_API
     void _Execute(
@@ -68,8 +71,14 @@ private:
 
     HdxCompositor _compositor;
 
+    GfMatrix4d _viewMtx;
+    GfMatrix4d _viewInvMtx;
+    GfMatrix4d _projMtx;
+
     int _width = 0;
     int _height = 0;
+
+    bool _isConverged = false;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

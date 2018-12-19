@@ -43,6 +43,7 @@ pxr_plugin(hdAi
         rendererPlugin
         renderBuffer
         renderDelegate
+        renderParam
         renderPass
         utils
 
