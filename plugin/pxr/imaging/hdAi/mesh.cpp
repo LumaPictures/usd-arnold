@@ -65,9 +65,11 @@ HdAiMesh::HdAiMesh(
 void HdAiMesh::Sync(
     HdSceneDelegate* delegate, HdRenderParam* renderParam,
     HdDirtyBits* dirtyBits, const TfToken& reprToken) {
+    auto* param = reinterpret_cast<HdAiRenderParam*>(renderParam);
     const auto& id = GetId();
 
     if (HdChangeTracker::IsPrimvarDirty(*dirtyBits, id, HdTokens->points)) {
+        param->Stop();
         auto value = delegate->Get(id, HdTokens->points);
         const auto& vecArray = value.Get<VtVec3fArray>();
         AiNodeSetArray(
@@ -77,6 +79,7 @@ void HdAiMesh::Sync(
     }
 
     if (HdChangeTracker::IsTopologyDirty(*dirtyBits, id)) {
+        param->Stop();
         const auto topology = GetMeshTopology(delegate);
         const auto& vertexCounts = topology.GetFaceVertexCounts();
         const auto& vertexIndices = topology.GetFaceVertexIndices();
@@ -98,10 +101,12 @@ void HdAiMesh::Sync(
     }
 
     if (HdChangeTracker::IsTransformDirty(*dirtyBits, id)) {
+        param->Stop();
         HdAiSetTransform(_mesh, delegate, GetId());
     }
 
     if (*dirtyBits & HdChangeTracker::DirtyMaterialId) {
+        param->Stop();
         const auto* material = reinterpret_cast<const HdAiMaterial*>(
             delegate->GetRenderIndex().GetSprim(
                 HdPrimTypeTokens->material, delegate->GetMaterialId(id)));
@@ -119,6 +124,7 @@ void HdAiMesh::Sync(
 
     // TODO: Implement all the primvars.
     if (*dirtyBits & HdChangeTracker::DirtyPrimvar) {
+        param->Stop();
         for (const auto& primvar : delegate->GetPrimvarDescriptors(
                  id, HdInterpolation::HdInterpolationFaceVarying)) {
             if (primvar.name == _tokens->st || primvar.name == _tokens->uv) {

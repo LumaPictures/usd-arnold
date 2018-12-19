@@ -97,7 +97,7 @@ void HdAiRenderPass::_Execute(
         _projMtx = projMtx;
         _viewMtx = viewMtx;
         _viewInvMtx = _viewMtx.GetInverse();
-        renderParam->StopRender();
+        renderParam->Stop();
         AiNodeSetMatrix(
             _camera, HdAiCamera::projMtx, HdAiConvertMatrix(_projMtx));
         AiNodeSetMatrix(_camera, "matrix", HdAiConvertMatrix(_viewInvMtx));
@@ -111,7 +111,7 @@ void HdAiRenderPass::_Execute(
     const auto height = static_cast<int>(vp[3]);
     const auto numPixels = static_cast<size_t>(width * height);
     if (width != _width || height != _height) {
-        renderParam->StopRender();
+        renderParam->Stop();
         hdAiEmptyBucketQueue([](const HdAiBucketData*) {});
         const auto oldNumPixels = static_cast<size_t>(_width * _height);
         const auto oldNumPixelBytes = oldNumPixels * 4;
@@ -164,8 +164,8 @@ void HdAiRenderPass::_Execute(
         for (auto y = yo; y < ye; ++y) {
             const auto* strideIn =
                 data->beauty.data() + data->sizeX * (y - data->yo);
-            auto* strideOut = _colorBuffer.data() +
-                              pixelSizeOut * _width * (_height - y - 1);
+            auto* strideOut =
+                _colorBuffer.data() + pixelSizeOut * _width * (_height - y - 1);
             for (auto x = xo; x < xe; ++x) {
                 const auto* in = strideIn + (x - data->xo);
                 auto* out = strideOut + numChannels * x;
@@ -178,8 +178,7 @@ void HdAiRenderPass::_Execute(
         for (auto y = yo; y < ye; ++y) {
             const auto* strideIn = reinterpret_cast<const float*>(
                 data->depth.data() + data->sizeX * (y - data->yo));
-            auto* strideOut =
-                _depthBuffer.data() + _width * (_height - y - 1);
+            auto* strideOut = _depthBuffer.data() + _width * (_height - y - 1);
             for (auto x = xo; x < xe; ++x) {
                 strideOut[x] = strideIn[x - data->xo];
             }

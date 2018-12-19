@@ -33,9 +33,7 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdAiRenderParam::HdAiRenderParam() : HdRenderParam() {
-    _needsRestart = false;
-}
+HdAiRenderParam::HdAiRenderParam() : HdRenderParam() { _needsRestart = false; }
 
 bool HdAiRenderParam::Render() {
     const auto status = AiRenderGetStatus();
@@ -45,19 +43,16 @@ bool HdAiRenderParam::Render() {
         // Renders are only paused when stop render is called.
     } else if (status == AI_RENDER_STATUS_RENDERING) {
         return false;
-    } else if (status == AI_RENDER_STATUS_PAUSED ||
-        needsRestart) {
+    } else if (status == AI_RENDER_STATUS_PAUSED || needsRestart) {
         AiRenderRestart();
     } else {
-        if (status != AI_RENDER_STATUS_NOT_STARTED) {
-            AiRenderEnd();
-        }
+        if (status != AI_RENDER_STATUS_NOT_STARTED) { AiRenderEnd(); }
         AiRenderBegin();
     }
     return false;
 }
 
-void HdAiRenderParam::StopRender() {
+void HdAiRenderParam::Stop() {
     const auto status = AiRenderGetStatus();
     if (status == AI_RENDER_STATUS_PAUSED) {
         return;

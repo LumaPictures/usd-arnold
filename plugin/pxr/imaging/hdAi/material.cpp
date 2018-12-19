@@ -48,9 +48,10 @@ HdAiMaterial::HdAiMaterial(HdAiRenderDelegate* delegate, const SdfPath& id)
 void HdAiMaterial::Sync(
     HdSceneDelegate* sceneDelegate, HdRenderParam* renderParam,
     HdDirtyBits* dirtyBits) {
-    TF_UNUSED(renderParam);
+    auto* param = reinterpret_cast<HdAiRenderParam*>(renderParam);
     const auto id = GetId();
     if ((*dirtyBits & HdMaterial::DirtyResource) && !id.IsEmpty()) {
+        param->Stop();
         auto value = sceneDelegate->GetMaterialResource(GetId());
         if (value.IsHolding<HdMaterialNetworkMap>()) {
             const auto& map = value.UncheckedGet<HdMaterialNetworkMap>();

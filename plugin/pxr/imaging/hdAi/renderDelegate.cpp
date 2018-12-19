@@ -133,6 +133,7 @@ HdAiRenderDelegate::HdAiRenderDelegate() {
     _fallbackShader = AiNode(_universe, "ambient_occlusion");
     AiNodeSetInt(_fallbackShader, "samples", 1);
     _renderParam.reset(new HdAiRenderParam());
+    AiNodeSetBool(_options, "enable_progressive_render", true);
 }
 
 HdAiRenderDelegate::~HdAiRenderDelegate() {
