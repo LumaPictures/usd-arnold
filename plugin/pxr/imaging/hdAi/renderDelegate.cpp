@@ -140,7 +140,7 @@ HdAiRenderDelegate::~HdAiRenderDelegate() {
     if (_counterResourceRegistry.fetch_sub(1) == 1) {
         _resourceRegistry.reset();
     }
-    _renderParam->Stop();
+    _renderParam->Restart();
     hdAiUninstallNodes();
     AiUniverseDestroy(_universe);
     AiEnd();
@@ -175,7 +175,7 @@ void HdAiRenderDelegate::SetRenderSetting(
     } else if (value.IsHolding<bool>()) {
         AiNodeSetBool(_options, key.GetText(), value.UncheckedGet<bool>());
     }
-    _renderParam->Stop();
+    _renderParam->Restart();
 }
 
 VtValue HdAiRenderDelegate::GetRenderSetting(const TfToken& key) const {

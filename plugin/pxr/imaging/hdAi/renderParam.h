@@ -44,7 +44,7 @@ public:
     ~HdAiRenderParam() override = default;
 
     bool Render();
-    void Stop();
+    void Restart();
 
 private:
     std::atomic<bool> _needsRestart;

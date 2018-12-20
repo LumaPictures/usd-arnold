@@ -37,29 +37,34 @@ HdAiRenderParam::HdAiRenderParam() : HdRenderParam() { _needsRestart = false; }
 
 bool HdAiRenderParam::Render() {
     const auto status = AiRenderGetStatus();
-    const auto needsRestart = _needsRestart.exchange(false);
-    if (status == AI_RENDER_STATUS_FINISHED && !needsRestart) {
-        return true;
-        // Renders are only paused when stop render is called.
-    } else if (status == AI_RENDER_STATUS_RENDERING) {
-        return false;
-    } else if (status == AI_RENDER_STATUS_PAUSED || needsRestart) {
-        AiRenderRestart();
-    } else {
-        if (status != AI_RENDER_STATUS_NOT_STARTED) { AiRenderEnd(); }
+    if (status == AI_RENDER_STATUS_NOT_STARTED) {
+        _needsRestart.store(false);
         AiRenderBegin();
+        return false;
     }
+    if (_needsRestart.exchange(false)) {
+        if (status == AI_RENDER_STATUS_RENDERING ||
+            status == AI_RENDER_STATUS_PAUSED) {
+            AiRenderEnd();
+        }
+        AiRenderBegin();
+        return false;
+    }
+    if (status == AI_RENDER_STATUS_FINISHED) { return true; }
+    if (status == AI_RENDER_STATUS_RESTARTING) { return false; }
+    AiRenderBegin();
     return false;
 }
 
-void HdAiRenderParam::Stop() {
+void HdAiRenderParam::Restart() {
     const auto status = AiRenderGetStatus();
-    if (status == AI_RENDER_STATUS_PAUSED) {
-        return;
-    } else if (status == AI_RENDER_STATUS_FINISHED) {
+    if (status != AI_RENDER_STATUS_NOT_STARTED) {
         _needsRestart.store(true);
-    } else {
-        AiRenderInterrupt(AI_BLOCKING);
+        if (status == AI_RENDER_STATUS_RENDERING ||
+            status == AI_RENDER_STATUS_RESTARTING) {
+            AiRenderAbort(AI_BLOCKING);
+        }
+        AiRenderEnd();
     }
 }
 
