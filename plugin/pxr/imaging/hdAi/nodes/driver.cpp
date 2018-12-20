@@ -148,7 +148,7 @@ driver_process_bucket {
         delete data;
     } else {
         for (auto i = decltype(bucketSize){0}; i < bucketSize; ++i) {
-            if (data->beauty[i].a == 0) { data->depth[i] = 1.0f; }
+            if (data->beauty[i].a == 0) { data->depth[i] = 1.0f - AI_EPSILON; }
         }
         bucketQueue.push(data);
     }
