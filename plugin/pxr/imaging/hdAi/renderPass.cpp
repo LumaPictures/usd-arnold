@@ -29,9 +29,7 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /*
  * TODO:
- * - Restart rendering if proj / view mtx or the viewport changes.
  * - Writing to the render buffers directly.
- * - Handling the depth buffer.
  */
 #include "pxr/imaging/hdAi/renderPass.h"
 
