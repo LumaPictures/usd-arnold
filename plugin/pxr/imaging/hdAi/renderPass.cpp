@@ -83,6 +83,13 @@ HdAiRenderPass::HdAiRenderPass(
     AiNodeSetFlt(_camera, "shutter_end", 0.25f);
 }
 
+HdAiRenderPass::~HdAiRenderPass() {
+    AiNodeDestroy(_camera);
+    AiNodeDestroy(_beautyFilter);
+    AiNodeDestroy(_closestFilter);
+    AiNodeDestroy(_driver);
+}
+
 void HdAiRenderPass::_Execute(
     const HdRenderPassStateSharedPtr& renderPassState,
     const TfTokenVector& renderTags) {

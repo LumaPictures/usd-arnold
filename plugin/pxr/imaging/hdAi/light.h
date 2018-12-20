@@ -85,6 +85,9 @@ protected:
         bool supportsTexture = false);
 
     HDAI_API
+    ~HdAiLight() override;
+
+    HDAI_API
     void SetupTexture(const VtValue& value);
 
     SyncParams _syncParams;

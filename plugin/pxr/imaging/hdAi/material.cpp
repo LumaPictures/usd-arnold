@@ -45,6 +45,12 @@ HdAiMaterial::HdAiMaterial(HdAiRenderDelegate* delegate, const SdfPath& id)
     _surface = _delegate->GetFallbackShader();
 }
 
+HdAiMaterial::~HdAiMaterial() {
+    for (auto& node : _nodes) {
+        AiNodeDestroy(node.second);
+    }
+}
+
 void HdAiMaterial::Sync(
     HdSceneDelegate* sceneDelegate, HdRenderParam* renderParam,
     HdDirtyBits* dirtyBits) {

@@ -51,7 +51,7 @@ public:
         HdAiRenderDelegate* delegate, HdRenderIndex* index,
         const HdRprimCollection& collection);
     HDAI_API
-    ~HdAiRenderPass() override = default;
+    ~HdAiRenderPass() override;
 
     bool IsConverged() const { return _isConverged; }
 

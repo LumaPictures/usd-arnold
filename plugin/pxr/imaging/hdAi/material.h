@@ -48,7 +48,7 @@ public:
     HDAI_API
     HdAiMaterial(HdAiRenderDelegate* delegate, const SdfPath& id);
 
-    ~HdAiMaterial() override = default;
+    ~HdAiMaterial() override;
 
     HDAI_API
     void Sync(

@@ -49,7 +49,7 @@ public:
         const SdfPath& instancerId = SdfPath());
 
     HDAI_API
-    ~HdAiMesh() override = default;
+    ~HdAiMesh() override;
 
     void Sync(
         HdSceneDelegate* delegate, HdRenderParam* renderParam,

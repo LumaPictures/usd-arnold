@@ -261,6 +261,7 @@ void HdAiRenderDelegate::DestroyInstancer(HdInstancer* instancer) {
 
 HdRprim* HdAiRenderDelegate::CreateRprim(
     const TfToken& typeId, const SdfPath& rprimId, const SdfPath& instancerId) {
+    _renderParam->End();
     if (typeId == HdPrimTypeTokens->mesh) {
         return new HdAiMesh(this, rprimId, instancerId);
     }
@@ -268,10 +269,14 @@ HdRprim* HdAiRenderDelegate::CreateRprim(
     return nullptr;
 }
 
-void HdAiRenderDelegate::DestroyRprim(HdRprim* rPrim) { delete rPrim; }
+void HdAiRenderDelegate::DestroyRprim(HdRprim* rPrim) {
+    _renderParam->End();
+    delete rPrim;
+}
 
 HdSprim* HdAiRenderDelegate::CreateSprim(
     const TfToken& typeId, const SdfPath& sprimId) {
+    _renderParam->End();
     if (typeId == HdPrimTypeTokens->camera) { return new HdCamera(sprimId); }
     if (typeId == HdPrimTypeTokens->material) {
         return new HdAiMaterial(this, sprimId);
@@ -327,7 +332,10 @@ HdSprim* HdAiRenderDelegate::CreateFallbackSprim(const TfToken& typeId) {
     return nullptr;
 }
 
-void HdAiRenderDelegate::DestroySprim(HdSprim* sPrim) { delete sPrim; }
+void HdAiRenderDelegate::DestroySprim(HdSprim* sPrim) {
+    _renderParam->End();
+    delete sPrim;
+}
 
 HdBprim* HdAiRenderDelegate::CreateBprim(
     const TfToken& typeId, const SdfPath& bprimId) {
