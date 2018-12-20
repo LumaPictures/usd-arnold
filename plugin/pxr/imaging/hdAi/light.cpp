@@ -206,7 +206,7 @@ void HdAiLight::Sync(
     TF_UNUSED(sceneDelegate);
     TF_UNUSED(dirtyBits);
     if (*dirtyBits & HdLight::DirtyParams) {
-        param->Restart();
+        param->End();
         const auto id = GetId();
         const auto* nentry = AiNodeGetNodeEntry(_light);
         iterateParams(_light, nentry, id, sceneDelegate, genericParams);
@@ -218,7 +218,7 @@ void HdAiLight::Sync(
     }
 
     if (*dirtyBits & HdLight::DirtyTransform) {
-        param->Restart();
+        param->End();
         HdAiSetTransform(_light, sceneDelegate, GetId());
     }
     *dirtyBits = HdLight::Clean;

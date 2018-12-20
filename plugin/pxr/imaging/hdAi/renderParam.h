@@ -34,20 +34,14 @@
 
 #include <pxr/imaging/hd/renderDelegate.h>
 
-#include <atomic>
-
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HdAiRenderParam final : public HdRenderParam {
 public:
-    HdAiRenderParam();
     ~HdAiRenderParam() override = default;
 
     bool Render();
-    void Restart();
-
-private:
-    std::atomic<bool> _needsRestart;
+    void End();
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

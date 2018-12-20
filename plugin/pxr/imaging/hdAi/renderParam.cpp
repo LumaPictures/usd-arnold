@@ -33,20 +33,9 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-HdAiRenderParam::HdAiRenderParam() : HdRenderParam() { _needsRestart = false; }
-
 bool HdAiRenderParam::Render() {
     const auto status = AiRenderGetStatus();
     if (status == AI_RENDER_STATUS_NOT_STARTED) {
-        _needsRestart.store(false);
-        AiRenderBegin();
-        return false;
-    }
-    if (_needsRestart.exchange(false)) {
-        if (status == AI_RENDER_STATUS_RENDERING ||
-            status == AI_RENDER_STATUS_PAUSED) {
-            AiRenderEnd();
-        }
         AiRenderBegin();
         return false;
     }
@@ -56,10 +45,9 @@ bool HdAiRenderParam::Render() {
     return false;
 }
 
-void HdAiRenderParam::Restart() {
+void HdAiRenderParam::End() {
     const auto status = AiRenderGetStatus();
     if (status != AI_RENDER_STATUS_NOT_STARTED) {
-        _needsRestart.store(true);
         if (status == AI_RENDER_STATUS_RENDERING ||
             status == AI_RENDER_STATUS_RESTARTING) {
             AiRenderAbort(AI_BLOCKING);

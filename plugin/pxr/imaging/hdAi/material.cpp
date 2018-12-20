@@ -51,7 +51,7 @@ void HdAiMaterial::Sync(
     auto* param = reinterpret_cast<HdAiRenderParam*>(renderParam);
     const auto id = GetId();
     if ((*dirtyBits & HdMaterial::DirtyResource) && !id.IsEmpty()) {
-        param->Restart();
+        param->End();
         auto value = sceneDelegate->GetMaterialResource(GetId());
         if (value.IsHolding<HdMaterialNetworkMap>()) {
             const auto& map = value.UncheckedGet<HdMaterialNetworkMap>();
