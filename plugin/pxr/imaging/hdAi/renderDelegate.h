@@ -37,6 +37,8 @@
 #include <pxr/imaging/hd/renderThread.h>
 #include <pxr/imaging/hd/resourceRegistry.h>
 
+#include "pxr/imaging/hdAi/renderParam.h"
+
 #include <ai.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -120,6 +122,7 @@ private:
     HdAiRenderDelegate(const HdAiRenderDelegate&) = delete;
     HdAiRenderDelegate& operator=(const HdAiRenderDelegate&) = delete;
 
+    std::unique_ptr<HdAiRenderParam> _renderParam;
     SdfPath _id;
     AtUniverse* _universe;
     AtNode* _options;

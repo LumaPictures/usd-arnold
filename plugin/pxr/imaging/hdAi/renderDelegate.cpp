@@ -53,8 +53,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
 namespace Str {
+const AtString AA_samples("AA_samples");
 const AtString GI_diffuse_depth("GI_diffuse_depth");
 const AtString GI_specular_depth("GI_specular_depth");
+const AtString enable_progressive_render("enable_progressive_render");
 } // namespace Str
 
 std::unordered_set<AtString, AtStringHash> _ignoredParameters{
@@ -127,11 +129,14 @@ HdAiRenderDelegate::HdAiRenderDelegate() {
     _universe = nullptr;
 
     _options = AiUniverseGetOptions(_universe);
+    AiNodeSetBool(_options, Str::enable_progressive_render, true);
     AiNodeSetInt(_options, Str::GI_diffuse_depth, 1);
     AiNodeSetInt(_options, Str::GI_specular_depth, 1);
+    AiNodeSetInt(_options, Str::AA_samples, 5);
 
     _fallbackShader = AiNode(_universe, "ambient_occlusion");
     AiNodeSetInt(_fallbackShader, "samples", 1);
+    _renderParam.reset(new HdAiRenderParam());
 }
 
 HdAiRenderDelegate::~HdAiRenderDelegate() {
@@ -139,12 +144,15 @@ HdAiRenderDelegate::~HdAiRenderDelegate() {
     if (_counterResourceRegistry.fetch_sub(1) == 1) {
         _resourceRegistry.reset();
     }
+    _renderParam->End();
     hdAiUninstallNodes();
     AiUniverseDestroy(_universe);
     AiEnd();
 }
 
-HdRenderParam* HdAiRenderDelegate::GetRenderParam() const { return nullptr; }
+HdRenderParam* HdAiRenderDelegate::GetRenderParam() const {
+    return _renderParam.get();
+}
 
 void HdAiRenderDelegate::CommitResources(HdChangeTracker* tracker) {
     TF_UNUSED(tracker);
@@ -171,6 +179,7 @@ void HdAiRenderDelegate::SetRenderSetting(
     } else if (value.IsHolding<bool>()) {
         AiNodeSetBool(_options, key.GetText(), value.UncheckedGet<bool>());
     }
+    _renderParam->End();
 }
 
 VtValue HdAiRenderDelegate::GetRenderSetting(const TfToken& key) const {
@@ -209,6 +218,8 @@ HdRenderSettingDescriptorList HdAiRenderDelegate::GetRenderSettingDescriptors()
             if (pname == Str::GI_diffuse_depth ||
                 pname == Str::GI_specular_depth) {
                 desc.defaultValue = VtValue(1);
+            } else if (pname == Str::AA_samples) {
+                desc.defaultValue = VtValue(5);
             } else {
                 desc.defaultValue = VtValue(AiParamGetDefault(pentry)->INT());
             }

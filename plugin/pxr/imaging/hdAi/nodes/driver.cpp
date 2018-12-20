@@ -108,41 +108,47 @@ driver_process_bucket {
     const char* outputName = nullptr;
     int pixelType = AI_TYPE_RGBA;
     const void* bucketData = nullptr;
+    auto* data = new HdAiBucketData();
+    data->xo = bucket_xo;
+    data->yo = bucket_yo;
+    data->sizeX = bucket_size_x;
+    data->sizeY = bucket_size_y;
+    const auto bucketSize = bucket_size_x * bucket_size_y;
     while (AiOutputIteratorGetNext(
         iterator, &outputName, &pixelType, &bucketData)) {
-        if (pixelType != AI_TYPE_RGBA && pixelType != AI_TYPE_VECTOR) {
-            continue;
-        }
-        auto* data = new HdAiBucketData();
+        if (pixelType == AI_TYPE_RGBA && strcmp(outputName, "RGBA") == 0) {
+            data->beauty.resize(bucketSize);
+            const auto* inRGBA = reinterpret_cast<const AtRGBA*>(bucketData);
+            for (auto i = decltype(bucketSize){0}; i < bucketSize; ++i) {
+                const auto in = inRGBA[i];
+                const auto x = bucket_xo + i % bucket_size_x;
+                const auto y = bucket_yo + i / bucket_size_x;
+                AtRGBA8 out;
+                out.r = AiQuantize8bit(x, y, 0, in.r, true);
+                out.g = AiQuantize8bit(x, y, 1, in.g, true);
+                out.b = AiQuantize8bit(x, y, 2, in.b, true);
+                out.a = AiQuantize8bit(x, y, 3, in.a, true);
+                data->beauty[i] = out;
+            }
 
-        data->xo = bucket_xo;
-        data->yo = bucket_yo;
-        data->sizeX = bucket_size_x;
-        data->sizeY = bucket_size_y;
-        if (pixelType == AI_TYPE_RGBA) {
-            data->dataType = AI_TYPE_RGBA;
-            const size_t memSize =
-                bucket_size_x * bucket_size_y * sizeof(float) * 4;
-            data->data.resize(memSize, 0);
-            memcpy(data->data.data(), bucketData, memSize);
-        } else if (pixelType == AI_TYPE_VECTOR) {
-            data->dataType = AI_TYPE_FLOAT;
-            // We are converting position to Z.
-            const auto bucketSize = bucket_size_x * bucket_size_y;
-            const size_t memSize = bucketSize * sizeof(float);
-            data->data.resize(memSize, 0);
+        } else if (
+            pixelType == AI_TYPE_VECTOR && strcmp(outputName, "P") == 0) {
+            data->depth.resize(bucketSize, 1.0f);
             const auto* pp = reinterpret_cast<const GfVec3f*>(bucketData);
-            auto* pz = reinterpret_cast<float*>(data->data.data());
+            auto* pz = data->depth.data();
             for (auto i = decltype(bucketSize){0}; i < bucketSize; ++i) {
                 // Rays hitting the background will return a (0,0,0) vector.
                 const auto p = driverData->projMtx.Transform(
                     driverData->viewMtx.Transform(pp[i]));
-                pz[i] = std::min(1.0f, p[2]);
-                if (pz[i] < 0.0f) { pz[i] = 1.0f; }
+                pz[i] = std::max(-1.0f, std::min(1.0f, p[2]));
             }
-        } else {
-            delete data;
-            continue;
+        }
+    }
+    if (data->beauty.empty() || data->depth.empty()) {
+        delete data;
+    } else {
+        for (auto i = decltype(bucketSize){0}; i < bucketSize; ++i) {
+            if (data->beauty[i].a == 0) { data->depth[i] = 1.0f; }
         }
         bucketQueue.push(data);
     }

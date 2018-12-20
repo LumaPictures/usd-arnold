@@ -40,6 +40,9 @@
 #include "pxr/imaging/hdAi/nodes/nodes.h"
 #include "pxr/imaging/hdAi/utils.h"
 
+#include <algorithm>
+#include <cstring> // memset
+
 namespace {
 const AtString cameraName("HdAiRenderPass_camera");
 const AtString filterName("HdAiRenderPass_beautyFilter");
@@ -85,91 +88,96 @@ HdAiRenderPass::HdAiRenderPass(
 void HdAiRenderPass::_Execute(
     const HdRenderPassStateSharedPtr& renderPassState,
     const TfTokenVector& renderTags) {
-    if (AiRendering()) { AiRenderAbort(AI_BLOCKING); }
-
+    auto* renderParam =
+        reinterpret_cast<HdAiRenderParam*>(_delegate->GetRenderParam());
     const auto vp = renderPassState->GetViewport();
 
-    AiNodeSetMatrix(
-        _camera, HdAiCamera::projMtx,
-        HdAiConvertMatrix(renderPassState->GetProjectionMatrix()));
-    AiNodeSetMatrix(
-        _camera, "matrix",
-        HdAiConvertMatrix(
-            renderPassState->GetWorldToViewMatrix().GetInverse()));
-    AiNodeSetFlt(_camera, HdAiCamera::frameAspect, vp[2] / vp[3]);
-    AiNodeSetMatrix(
-        _driver, HdAiDriver::projMtx,
-        HdAiConvertMatrix(renderPassState->GetProjectionMatrix()));
-    AiNodeSetMatrix(
-        _driver, HdAiDriver::viewMtx,
-        HdAiConvertMatrix(renderPassState->GetWorldToViewMatrix()));
-
-    _width = static_cast<int>(vp[2]);
-    _height = static_cast<int>(vp[3]);
-
-    auto* options = _delegate->GetOptions();
-    AiNodeSetInt(options, "xres", _width);
-    AiNodeSetInt(options, "yres", _height);
-
-    AiNodeSetInt(options, "bucket_size", 24);
-
-    AiRender();
-
-    const auto numPixels = static_cast<size_t>(_width * _height);
-    const auto numPixelBytes = numPixels * 4;
-    if (_colorBuffer.size() != numPixelBytes) {
-        _colorBuffer.resize(numPixelBytes, 0);
+    auto ended = false;
+    const auto projMtx = renderPassState->GetProjectionMatrix();
+    const auto viewMtx = renderPassState->GetWorldToViewMatrix();
+    if (projMtx != _projMtx || viewMtx != _viewMtx) {
+        _projMtx = projMtx;
+        _viewMtx = viewMtx;
+        _viewInvMtx = _viewMtx.GetInverse();
+        renderParam->End();
+        ended = true;
+        AiNodeSetMatrix(
+            _camera, HdAiCamera::projMtx, HdAiConvertMatrix(_projMtx));
+        AiNodeSetMatrix(_camera, "matrix", HdAiConvertMatrix(_viewInvMtx));
+        AiNodeSetMatrix(
+            _driver, HdAiDriver::projMtx, HdAiConvertMatrix(_projMtx));
+        AiNodeSetMatrix(
+            _driver, HdAiDriver::viewMtx, HdAiConvertMatrix(_viewMtx));
     }
-    if (_depthBuffer.size() != numPixels) {
-        _depthBuffer.resize(numPixels, 1.0f);
+
+    const auto width = static_cast<int>(vp[2]);
+    const auto height = static_cast<int>(vp[3]);
+    const auto numPixels = static_cast<size_t>(width * height);
+    if (width != _width || height != _height) {
+        if (!ended) { renderParam->End(); }
+        hdAiEmptyBucketQueue([](const HdAiBucketData*) {});
+        const auto oldNumPixels = static_cast<size_t>(_width * _height);
+        _width = width;
+        _height = height;
+        AiNodeSetFlt(_camera, HdAiCamera::frameAspect, vp[2] / vp[3]);
+
+        auto* options = _delegate->GetOptions();
+        AiNodeSetInt(options, "xres", _width);
+        AiNodeSetInt(options, "yres", _height);
+
+        AiNodeSetInt(options, "bucket_size", 24);
+
+        if (oldNumPixels < numPixels) {
+            _colorBuffer.resize(numPixels, AtRGBA8());
+            _depthBuffer.resize(numPixels, 1.0f);
+            memset(_colorBuffer.data(), 0, oldNumPixels * sizeof(AtRGBA8));
+            std::fill(
+                _depthBuffer.begin(), _depthBuffer.begin() + oldNumPixels,
+                1.0f);
+        } else {
+            if (numPixels != oldNumPixels) {
+                _colorBuffer.resize(numPixels);
+                _depthBuffer.resize(numPixels);
+            }
+            memset(_colorBuffer.data(), 0, numPixels * sizeof(AtRGBA8));
+            std::fill(_depthBuffer.begin(), _depthBuffer.end(), 1.0f);
+        }
     }
-    hdAiEmptyBucketQueue([this](const HdAiBucketData* data) {
+
+    _isConverged = renderParam->Render();
+
+    bool needsUpdate = false;
+    hdAiEmptyBucketQueue([this, &needsUpdate](const HdAiBucketData* data) {
         const auto xo = AiClamp(data->xo, 0, _width - 1);
         const auto xe = AiClamp(data->xo + data->sizeX, 0, _width - 1);
         if (xe == xo) { return; }
         const auto yo = AiClamp(data->yo, 0, _height - 1);
         const auto ye = AiClamp(data->yo + data->sizeY, 0, _height - 1);
         if (ye == yo) { return; }
-        if (data->dataType == AI_TYPE_RGBA) {
-            constexpr auto numChannels = 4;
-            const auto pixelSizeIn = sizeof(float) * numChannels;
-            const auto pixelSizeOut = sizeof(uint8_t) * numChannels;
-            for (auto y = yo; y < ye; ++y) {
-                const auto* strideIn = reinterpret_cast<const float*>(
-                    data->data.data() +
-                    pixelSizeIn * data->sizeX * (y - data->yo));
-                auto* strideOut = _colorBuffer.data() +
-                                  pixelSizeOut * _width * (_height - y - 1);
-                for (auto x = xo; x < xe; ++x) {
-                    const auto* in = strideIn + numChannels * (x - data->xo);
-                    auto* out = strideOut + numChannels * x;
-                    for (auto i = 0; i < numChannels; ++i) {
-                        out[i] = AiQuantize8bit(x + xo, y + yo, i, in[i], true);
-                    }
-                }
-            }
-        } else if (data->dataType == AI_TYPE_FLOAT) {
-            const auto pixelSize = sizeof(float);
-            for (auto y = yo; y < ye; ++y) {
-                const auto* strideIn = reinterpret_cast<const float*>(
-                    data->data.data() +
-                    pixelSize * data->sizeX * (y - data->yo));
-                auto* strideOut =
-                    _depthBuffer.data() + _width * (_height - y - 1);
-                for (auto x = xo; x < xe; ++x) {
-                    strideOut[x] = strideIn[x - data->xo];
-                }
-            }
+        needsUpdate = true;
+        const auto beautyWidth = (xe - xo) * sizeof(AtRGBA8);
+        const auto depthWidth = (xe - xo) * sizeof(float);
+        const auto inOffsetG = xo - data->xo - data->sizeX * data->yo;
+        const auto outOffsetG = _width * (_height - 1);
+        for (auto y = yo; y < ye; ++y) {
+            const auto inOffset = data->sizeX * y + inOffsetG;
+            const auto outOffset = xo + outOffsetG - _width * y;
+            memcpy(
+                _colorBuffer.data() + outOffset, data->beauty.data() + inOffset,
+                beautyWidth);
+            memcpy(
+                _depthBuffer.data() + outOffset, data->depth.data() + inOffset,
+                depthWidth);
         }
     });
 
-    // Quick workaround for handling depth.
-    for (auto i = decltype(numPixels){0}; i < numPixels; ++i) {
-        if (_colorBuffer[i * 4 + 3] < 1) { _depthBuffer[i] = 1.0f; }
+    // If the buffers are empty, needsUpdate will be false.
+    if (needsUpdate) {
+        _compositor.UpdateColor(
+            _width, _height, reinterpret_cast<uint8_t*>(_colorBuffer.data()));
+        _compositor.UpdateDepth(
+            _width, _height, reinterpret_cast<uint8_t*>(_depthBuffer.data()));
     }
-    _compositor.UpdateColor(_width, _height, _colorBuffer.data());
-    _compositor.UpdateDepth(
-        _width, _height, reinterpret_cast<uint8_t*>(_depthBuffer.data()));
     _compositor.Draw();
 }
 

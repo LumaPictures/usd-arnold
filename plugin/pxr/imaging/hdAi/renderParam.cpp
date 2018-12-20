@@ -27,61 +27,33 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#ifndef HDAI_RENDER_PASS_H
-#define HDAI_RENDER_PASS_H
-
-#include <pxr/pxr.h>
-#include "pxr/imaging/hdAi/api.h"
-
-#include <pxr/base/gf/matrix4d.h>
-#include <pxr/imaging/hd/renderPass.h>
-#include <pxr/imaging/hdx/compositor.h>
-
-#include "pxr/imaging/hdAi/nodes/nodes.h"
-#include "pxr/imaging/hdAi/renderDelegate.h"
+#include "pxr/imaging/hdAi/renderParam.h"
 
 #include <ai.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HdAiRenderPass : public HdRenderPass {
-public:
-    HDAI_API
-    HdAiRenderPass(
-        HdAiRenderDelegate* delegate, HdRenderIndex* index,
-        const HdRprimCollection& collection);
-    HDAI_API
-    ~HdAiRenderPass() override = default;
+bool HdAiRenderParam::Render() {
+    const auto status = AiRenderGetStatus();
+    if (status == AI_RENDER_STATUS_NOT_STARTED) {
+        AiRenderBegin();
+        return false;
+    }
+    if (status == AI_RENDER_STATUS_FINISHED) { return true; }
+    if (status == AI_RENDER_STATUS_RESTARTING) { return false; }
+    AiRenderBegin();
+    return false;
+}
 
-    bool IsConverged() const { return _isConverged; }
-
-protected:
-    HDAI_API
-    void _Execute(
-        const HdRenderPassStateSharedPtr& renderPassState,
-        const TfTokenVector& renderTags) override;
-
-private:
-    std::vector<AtRGBA8> _colorBuffer;
-    std::vector<float> _depthBuffer;
-    HdAiRenderDelegate* _delegate;
-    AtNode* _camera = nullptr;
-    AtNode* _beautyFilter = nullptr;
-    AtNode* _closestFilter = nullptr;
-    AtNode* _driver = nullptr;
-
-    HdxCompositor _compositor;
-
-    GfMatrix4d _viewMtx;
-    GfMatrix4d _viewInvMtx;
-    GfMatrix4d _projMtx;
-
-    int _width = 0;
-    int _height = 0;
-
-    bool _isConverged = false;
-};
+void HdAiRenderParam::End() {
+    const auto status = AiRenderGetStatus();
+    if (status != AI_RENDER_STATUS_NOT_STARTED) {
+        if (status == AI_RENDER_STATUS_RENDERING ||
+            status == AI_RENDER_STATUS_RESTARTING) {
+            AiRenderAbort(AI_BLOCKING);
+        }
+        AiRenderEnd();
+    }
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif // HDAI_RENDER_PASS_H
