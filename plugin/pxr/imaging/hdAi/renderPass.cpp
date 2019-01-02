@@ -42,10 +42,26 @@
 #include <cstring> // memset
 
 namespace {
-const AtString cameraName("HdAiRenderPass_camera");
-const AtString filterName("HdAiRenderPass_beautyFilter");
-const AtString closestName("HdAiRenderPass_closestFilter");
-const AtString driverName("HdAiRenderPass_driver");
+namespace Str {
+const AtString renderPassCamera("HdAiRenderPass_camera");
+const AtString renderPassFilter("HdAiRenderPass_beautyFilter");
+const AtString renderPassClosestFilter("HdAiRenderPass_closestFilter");
+const AtString renderPassDriver("HdAiRenderPass_driver");
+
+const AtString persp_camera("persp_camera");
+const AtString camera("camera");
+const AtString matrix("matrix");
+const AtString name("name");
+const AtString gaussian_filter("gaussian_filter");
+const AtString closest_filter("closest_filter");
+const AtString outputs("outputs");
+const AtString shutter_start("shutter_start");
+const AtString shutter_end("shutter_end");
+const AtString fov("fov");
+const AtString xres("xres");
+const AtString yres("yres");
+const AtString bucket_size("bucket_size");
+} // namespace Str
 } // namespace
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -55,17 +71,21 @@ HdAiRenderPass::HdAiRenderPass(
     const HdRprimCollection& collection)
     : HdRenderPass(index, collection), _delegate(delegate) {
     auto* universe = _delegate->GetUniverse();
-    _camera = AiNode(universe, HdAiNodeNames::camera);
-    AiNodeSetPtr(AiUniverseGetOptions(universe), "camera", _camera);
-    AiNodeSetStr(_camera, "name", _delegate->GetLocalNodeName(cameraName));
-    _beautyFilter = AiNode(universe, "gaussian_filter");
+    _camera = AiNode(universe, Str::persp_camera);
+    AiNodeSetPtr(AiUniverseGetOptions(universe), Str::camera, _camera);
     AiNodeSetStr(
-        _beautyFilter, "name", _delegate->GetLocalNodeName(filterName));
-    _closestFilter = AiNode(universe, "closest_filter");
+        _camera, Str::name, _delegate->GetLocalNodeName(Str::renderPassCamera));
+    _beautyFilter = AiNode(universe, Str::gaussian_filter);
     AiNodeSetStr(
-        _closestFilter, "name", _delegate->GetLocalNodeName(closestName));
+        _beautyFilter, Str::name,
+        _delegate->GetLocalNodeName(Str::renderPassFilter));
+    _closestFilter = AiNode(universe, Str::closest_filter);
+    AiNodeSetStr(
+        _closestFilter, Str::name,
+        _delegate->GetLocalNodeName(Str::renderPassClosestFilter));
     _driver = AiNode(universe, HdAiNodeNames::driver);
-    AiNodeSetStr(_driver, "name", _delegate->GetLocalNodeName(driverName));
+    AiNodeSetStr(
+        _driver, Str::name, _delegate->GetLocalNodeName(Str::renderPassDriver));
     auto* options = _delegate->GetOptions();
     auto* outputsArray = AiArrayAllocate(2, 1, AI_TYPE_STRING);
     const auto beautyString = TfStringPrintf(
@@ -77,10 +97,10 @@ HdAiRenderPass::HdAiRenderPass(
         AiNodeGetName(_driver));
     AiArraySetStr(outputsArray, 0, beautyString.c_str());
     AiArraySetStr(outputsArray, 1, positionString.c_str());
-    AiNodeSetArray(options, "outputs", outputsArray);
+    AiNodeSetArray(options, Str::outputs, outputsArray);
 
-    AiNodeSetFlt(_camera, "shutter_start", -0.25f);
-    AiNodeSetFlt(_camera, "shutter_end", 0.25f);
+    AiNodeSetFlt(_camera, Str::shutter_start, -0.25f);
+    AiNodeSetFlt(_camera, Str::shutter_end, 0.25f);
 }
 
 HdAiRenderPass::~HdAiRenderPass() {
@@ -103,16 +123,17 @@ void HdAiRenderPass::_Execute(
     if (projMtx != _projMtx || viewMtx != _viewMtx) {
         _projMtx = projMtx;
         _viewMtx = viewMtx;
-        _viewInvMtx = _viewMtx.GetInverse();
         renderParam->End();
         ended = true;
         AiNodeSetMatrix(
-            _camera, HdAiCamera::projMtx, HdAiConvertMatrix(_projMtx));
-        AiNodeSetMatrix(_camera, "matrix", HdAiConvertMatrix(_viewInvMtx));
+            _camera, Str::matrix, HdAiConvertMatrix(_viewMtx.GetInverse()));
         AiNodeSetMatrix(
             _driver, HdAiDriver::projMtx, HdAiConvertMatrix(_projMtx));
         AiNodeSetMatrix(
             _driver, HdAiDriver::viewMtx, HdAiConvertMatrix(_viewMtx));
+        const auto fov = static_cast<float>(
+            GfRadiansToDegrees(atan(1.0 / _projMtx[0][0]) * 2.0));
+        AiNodeSetFlt(_camera, Str::fov, fov);
     }
 
     const auto width = static_cast<int>(vp[2]);
@@ -124,13 +145,12 @@ void HdAiRenderPass::_Execute(
         const auto oldNumPixels = static_cast<size_t>(_width * _height);
         _width = width;
         _height = height;
-        AiNodeSetFlt(_camera, HdAiCamera::frameAspect, vp[2] / vp[3]);
 
         auto* options = _delegate->GetOptions();
-        AiNodeSetInt(options, "xres", _width);
-        AiNodeSetInt(options, "yres", _height);
+        AiNodeSetInt(options, Str::xres, _width);
+        AiNodeSetInt(options, Str::yres, _height);
 
-        AiNodeSetInt(options, "bucket_size", 24);
+        AiNodeSetInt(options, Str::bucket_size, 24);
 
         if (oldNumPixels < numPixels) {
             _colorBuffer.resize(numPixels, AtRGBA8());

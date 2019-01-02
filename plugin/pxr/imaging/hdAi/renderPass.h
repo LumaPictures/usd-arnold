@@ -73,7 +73,6 @@ private:
     HdxCompositor _compositor;
 
     GfMatrix4d _viewMtx;
-    GfMatrix4d _viewInvMtx;
     GfMatrix4d _projMtx;
 
     int _width = 0;

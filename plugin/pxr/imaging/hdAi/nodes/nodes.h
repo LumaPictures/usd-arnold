@@ -36,14 +36,8 @@
 #include <vector>
 
 namespace HdAiNodeNames {
-extern AtString camera;
 extern AtString driver;
 } // namespace HdAiNodeNames
-
-namespace HdAiCamera {
-extern AtString projMtx;
-extern AtString frameAspect;
-} // namespace HdAiCamera
 
 namespace HdAiDriver {
 extern AtString projMtx;

@@ -48,7 +48,6 @@ pxr_plugin(hdAi
         utils
 
     CPPFILES
-        nodes/camera.cpp
         nodes/driver.cpp
         nodes/nodes.cpp
 
