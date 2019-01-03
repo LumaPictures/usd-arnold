@@ -27,57 +27,8 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#ifndef HDAI_CONFIG_H
-#define HDAI_CONFIG_H
-
-#include <pxr/pxr.h>
-
-#include <pxr/base/tf/singleton.h>
-
-#include "pxr/imaging/hdAi/api.h"
+#include "pxr/imaging/hdAi/volume.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HdAiConfig {
-public:
-    HDAI_API
-    static const HdAiConfig& GetInstance();
-
-    /// HDAI_bucket_size
-    int bucket_size;
-
-    /// HDAI_abort_on_error
-    bool abort_on_error;
-
-    /// HDAI_AA_samples
-    int AA_samples;
-
-    /// HDAI_GI_diffuse_depth
-    int GI_diffuse_depth;
-
-    /// HDAI_GI_specular_depth
-    int GI_specular_depth;
-
-    /// HDAI_enable_progressive_render
-    bool enable_progressive_render;
-
-    /// HDAI_shutter_start
-    float shutter_start;
-
-    /// HDAI_shutter_end
-    float shutter_end;
-
-private:
-    HDAI_API
-    HdAiConfig();
-    ~HdAiConfig() = default;
-    HdAiConfig(const HdAiConfig&) = delete;
-    HdAiConfig(HdAiConfig&&) = delete;
-    HdAiConfig& operator=(const HdAiConfig&) = delete;
-
-    friend class TfSingleton<HdAiConfig>;
-};
-
 PXR_NAMESPACE_CLOSE_SCOPE
-
-#endif // HDAI_CONFIG_H

@@ -47,6 +47,7 @@ pxr_plugin(hdAi
         renderParam
         renderPass
         utils
+        volume
 
     CPPFILES
         nodes/driver.cpp
