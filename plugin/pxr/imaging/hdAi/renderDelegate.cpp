@@ -178,6 +178,12 @@ void HdAiRenderDelegate::SetRenderSetting(
         AiNodeSetFlt(_options, key.GetText(), value.UncheckedGet<float>());
     } else if (value.IsHolding<bool>()) {
         AiNodeSetBool(_options, key.GetText(), value.UncheckedGet<bool>());
+    } else if (value.IsHolding<std::string>()) {
+        AiNodeSetStr(
+            _options, key.GetText(), value.UncheckedGet<std::string>().c_str());
+    } else if (value.IsHolding<TfToken>()) {
+        AiNodeSetStr(
+            _options, key.GetText(), value.UncheckedGet<TfToken>().GetText());
     }
     _renderParam->End();
 }
@@ -194,6 +200,8 @@ VtValue HdAiRenderDelegate::GetRenderSetting(const TfToken& key) const {
         return VtValue(AiNodeGetFlt(_options, key.GetText()));
     } else if (ptype == AI_TYPE_BOOLEAN) {
         return VtValue(AiNodeGetBool(_options, key.GetText()));
+    } else if (ptype == AI_TYPE_STRING || ptype == AI_TYPE_ENUM) {
+        return VtValue(std::string(AiNodeGetStr(_options, key.GetText())));
     }
     return {};
 }
@@ -227,6 +235,17 @@ HdRenderSettingDescriptorList HdAiRenderDelegate::GetRenderSettingDescriptors()
             desc.defaultValue = VtValue(AiParamGetDefault(pentry)->FLT());
         } else if (ptype == AI_TYPE_BOOLEAN) {
             desc.defaultValue = VtValue(AiParamGetDefault(pentry)->BOOL());
+        } else if (ptype == AI_TYPE_STRING) {
+            desc.defaultValue =
+                VtValue(std::string(AiParamGetDefault(pentry)->STR()));
+        } else if (ptype == AI_TYPE_ENUM) {
+            const auto enums = AiParamGetEnum(pentry);
+            if (enums == nullptr || enums[0] == nullptr) {
+                desc.defaultValue = VtValue(std::string(""));
+            } else {
+                desc.defaultValue = VtValue(
+                    std::string(enums[AiParamGetDefault(pentry)->INT()]));
+            }
         } else {
             continue;
         }
