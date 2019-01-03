@@ -27,3 +27,28 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#ifndef HDAI_CONFIG_H
+#define HDAI_CONFIG_H
+
+#include <pxr/base/tf/singleton.h>
+#include <pxr/pxr.h>
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+class HdAiConfig {
+public:
+    static const HdAiConfig& GetInstance();
+
+private:
+    HdAiConfig();
+    ~HdAiConfig() = default;
+    HdAiConfig(const HdAiConfig&) = delete;
+    HdAiConfig(HdAiConfig&&) = delete;
+    HdAiConfig& operator=(const HdAiConfig&) = delete;
+
+    friend class TfSingleton<HdAiConfig>;
+};
+
+PXR_NAMESPACE_CLOSE_SCOPE
+
+#endif // HDAI_CONFIG_H

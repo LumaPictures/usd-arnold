@@ -1,4 +1,4 @@
-// Copyright (c) 2018 Luma Pictures . All rights reserved.
+// Copyright (c) 2019 Luma Pictures . All rights reserved.
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions are met:
 //
@@ -39,6 +39,7 @@
 #include <pxr/imaging/hd/rprim.h>
 #include <pxr/imaging/hd/tokens.h>
 
+#include "pxr/iamging/hdAi/config.h"
 #include "pxr/imaging/hdAi/light.h"
 #include "pxr/imaging/hdAi/material.h"
 #include "pxr/imaging/hdAi/mesh.h"
@@ -60,43 +61,45 @@ namespace {
 using AtStringHashSet = std::unordered_set<AtString, AtStringHash>;
 
 const AtStringHashSet& _IgnoredParameters() {
-    static const AtStringHashSet r{AtString("xres"),
-                                   AtString("yres"),
-                                   AtString("region_min_x"),
-                                   AtString("region_min_y"),
-                                   AtString("region_max_x"),
-                                   AtString("region_max_y"),
-                                   AtString("pixel_aspect_ratio"),
-                                   AtString("reference_time"),
-                                   AtString("frame"),
-                                   AtString("fps"),
-                                   AtString("enable_progressive_render"),
-                                   AtString("enable_progressive_pattern"),
-                                   AtString("AA_seed"),
-                                   AtString("AA_sample_clamp"),
-                                   AtString("indirect_sample_clamp"),
-                                   AtString("AA_sample_clamp_affects_aovs"),
-                                   AtString("AA_samples_max"),
-                                   AtString("thread_priority"),
-                                   AtString("pin_threads"),
-                                   AtString("abort_on_error"),
-                                   AtString("abort_on_license_fail"),
-                                   AtString("bucket_size"),
-                                   AtString("bucket_scanning"),
-                                   AtString("texture_per_file_stats"),
-                                   AtString("texture_max_open_files"),
-                                   AtString("texture_automip"),
-                                   AtString("texture_autotile"),
-                                   AtString("texture_accept_untiled"),
-                                   AtString("texture_accept_unmipped"),
-                                   AtString("texture_failure_retries"),
-                                   AtString("texture_conservative_lookups"),
-                                   AtString("enable_procedural_cache"),
-                                   AtString("parallel_node_init"),
-                                   AtString("enable_new_quad_light_sampler"),
-                                   AtString("enable_new_point_light_sampler"),
-                                   AtString("enable_dithered_sampling"),
-                                   AtString("enable_dependency_graph"),};
+    static const AtStringHashSet r{
+        AtString("xres"),
+        AtString("yres"),
+        AtString("region_min_x"),
+        AtString("region_min_y"),
+        AtString("region_max_x"),
+        AtString("region_max_y"),
+        AtString("pixel_aspect_ratio"),
+        AtString("reference_time"),
+        AtString("frame"),
+        AtString("fps"),
+        AtString("enable_progressive_render"),
+        AtString("enable_progressive_pattern"),
+        AtString("AA_seed"),
+        AtString("AA_sample_clamp"),
+        AtString("indirect_sample_clamp"),
+        AtString("AA_sample_clamp_affects_aovs"),
+        AtString("AA_samples_max"),
+        AtString("thread_priority"),
+        AtString("pin_threads"),
+        AtString("abort_on_error"),
+        AtString("abort_on_license_fail"),
+        AtString("bucket_size"),
+        AtString("bucket_scanning"),
+        AtString("texture_per_file_stats"),
+        AtString("texture_max_open_files"),
+        AtString("texture_automip"),
+        AtString("texture_autotile"),
+        AtString("texture_accept_untiled"),
+        AtString("texture_accept_unmipped"),
+        AtString("texture_failure_retries"),
+        AtString("texture_conservative_lookups"),
+        AtString("enable_procedural_cache"),
+        AtString("parallel_node_init"),
+        AtString("enable_new_quad_light_sampler"),
+        AtString("enable_new_point_light_sampler"),
+        AtString("enable_dithered_sampling"),
+        AtString("enable_dependency_graph"),
+    };
     return r;
 }
 

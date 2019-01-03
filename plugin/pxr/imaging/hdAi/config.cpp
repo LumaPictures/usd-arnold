@@ -27,3 +27,19 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#include "pxr/imaging/hdAi/config.h"
+
+#include <pxr/base/tf/envSetting.h>
+#include <pxr/base/tf/instantiateSingleton.h>
+
+PXR_NAMESPACE_OPEN_SCOPE
+
+TF_INSTANTIATE_SINGLETON(HdAiConfig);
+
+HdAiConfig::HdAiConfig() {}
+
+const HdAiConfig& HdAiConfig::GetInstance() {
+    return TfSingleton<HdAiConfig>::GetInstance();
+}
+
+PXR_NAMESPACE_CLOSE_SCOPE
