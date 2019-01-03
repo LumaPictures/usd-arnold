@@ -39,6 +39,30 @@ class HdAiConfig {
 public:
     static const HdAiConfig& GetInstance();
 
+    /// HDAI_bucket_size
+    int bucket_size;
+
+    /// HDAI_abort_on_error
+    bool abort_on_error;
+
+    /// HDAI_AA_samples
+    int AA_samples;
+
+    /// HDAI_GI_diffuse_depth
+    int GI_diffuse_depth;
+
+    /// HDAI_GI_specular_depth
+    int GI_specular_depth;
+
+    /// HDAI_enable_progressive_render
+    bool enable_progressive_render;
+
+    /// HDAI_shutter_start
+    float shutter_start;
+
+    /// HDAI_shutter_end
+    float shutter_end;
+
 private:
     HdAiConfig();
     ~HdAiConfig() = default;

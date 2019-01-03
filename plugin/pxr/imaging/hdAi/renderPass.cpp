@@ -35,6 +35,7 @@
 
 #include <pxr/imaging/hd/renderPassState.h>
 
+#include "pxr/imaging/hdAi/config.h"
 #include "pxr/imaging/hdAi/nodes/nodes.h"
 #include "pxr/imaging/hdAi/utils.h"
 
@@ -60,7 +61,6 @@ const AtString shutter_end("shutter_end");
 const AtString fov("fov");
 const AtString xres("xres");
 const AtString yres("yres");
-const AtString bucket_size("bucket_size");
 } // namespace Str
 } // namespace
 
@@ -99,8 +99,9 @@ HdAiRenderPass::HdAiRenderPass(
     AiArraySetStr(outputsArray, 1, positionString.c_str());
     AiNodeSetArray(options, Str::outputs, outputsArray);
 
-    AiNodeSetFlt(_camera, Str::shutter_start, -0.25f);
-    AiNodeSetFlt(_camera, Str::shutter_end, 0.25f);
+    const auto& config = HdAiConfig::GetInstance();
+    AiNodeSetFlt(_camera, Str::shutter_start, config.shutter_start);
+    AiNodeSetFlt(_camera, Str::shutter_end, config.shutter_end);
 }
 
 HdAiRenderPass::~HdAiRenderPass() {
@@ -149,8 +150,6 @@ void HdAiRenderPass::_Execute(
         auto* options = _delegate->GetOptions();
         AiNodeSetInt(options, Str::xres, _width);
         AiNodeSetInt(options, Str::yres, _height);
-
-        AiNodeSetInt(options, Str::bucket_size, 24);
 
         if (oldNumPixels < numPixels) {
             _colorBuffer.resize(numPixels, AtRGBA8());

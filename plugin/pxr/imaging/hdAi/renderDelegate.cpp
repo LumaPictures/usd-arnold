@@ -124,12 +124,15 @@ using TfTokenValueMap =
     std::unordered_map<TfToken, VtValue, TfToken::HashFunctor>;
 
 const TfTokenValueMap& _DefaultValueOverrides() {
+    static const auto& config = HdAiConfig::GetInstance();
     static const TfTokenValueMap r = {
-        {TfToken("enable_progressive_render"), VtValue(true)},
-        {TfToken("GI_diffuse_depth"), VtValue(1)},
-        {TfToken("GI_specular_depth"), VtValue(1)},
-        {TfToken("AA_samples"), VtValue(5)},
-        {TfToken("abort_on_error"), VtValue(false)},
+        {TfToken("enable_progressive_render"),
+         VtValue(config.enable_progressive_render)},
+        {TfToken("GI_diffuse_depth"), VtValue(config.GI_diffuse_depth)},
+        {TfToken("GI_specular_depth"), VtValue(config.GI_specular_depth)},
+        {TfToken("AA_samples"), VtValue(config.AA_samples)},
+        {TfToken("abort_on_error"), VtValue(config.abort_on_error)},
+        {TfToken("bucket_size"), VtValue(config.bucket_size)},
     };
     return r;
 }
