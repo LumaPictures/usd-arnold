@@ -52,60 +52,120 @@
 PXR_NAMESPACE_OPEN_SCOPE
 
 namespace {
-namespace Str {
-const AtString AA_samples("AA_samples");
-const AtString GI_diffuse_depth("GI_diffuse_depth");
-const AtString GI_specular_depth("GI_specular_depth");
-const AtString enable_progressive_render("enable_progressive_render");
-} // namespace Str
+// The following patters might look a bit weird at first glance, but
+// there are two main reasons for doing them.
+//  - Initializing variables when loading the plugin could throw exceptions
+//    which are hard to track.
 
-std::unordered_set<AtString, AtStringHash> _ignoredParameters{
-    AtString("xres"),
-    AtString("yres"),
-    AtString("region_min_x"),
-    AtString("region_min_y"),
-    AtString("region_max_x"),
-    AtString("region_max_y"),
-    AtString("pixel_aspect_ratio"),
-    AtString("reference_time"),
-    AtString("frame"),
-    AtString("fps"),
-    AtString("enable_progressive_render"),
-    AtString("enable_progressive_pattern")};
+using AtStringHashSet = std::unordered_set<AtString, AtStringHash>;
 
-std::unordered_map<AtString, TfToken, AtStringHash> _parameterNameMap{
-    {AtString("GI_diffuse_depth"), TfToken("Diffuse Depth")},
-    {AtString("GI_specular_depth"), TfToken("Specular Depth")},
-    {AtString("GI_transmission_depth"), TfToken("Transmission Depth")},
-    {AtString("GI_volume_depth"), TfToken("Volume Depth")},
-    {AtString("GI_total_depth"), TfToken("Total Depth")},
-    {AtString("GI_diffuse_samples"), TfToken("Diffuse Samples")},
-    {AtString("GI_specular_samples"), TfToken("Specular Samples")},
-    {AtString("GI_transmission_samples"), TfToken("Transmission Samples")},
-    {AtString("GI_sss_samples"), TfToken("SSS Samples")},
-    {AtString("GI_volume_samples"), TfToken("Volume Samples")},
-};
+const AtStringHashSet& _IgnoredParameters() {
+    static const AtStringHashSet r{AtString("xres"),
+                                   AtString("yres"),
+                                   AtString("region_min_x"),
+                                   AtString("region_min_y"),
+                                   AtString("region_max_x"),
+                                   AtString("region_max_y"),
+                                   AtString("pixel_aspect_ratio"),
+                                   AtString("reference_time"),
+                                   AtString("frame"),
+                                   AtString("fps"),
+                                   AtString("enable_progressive_render"),
+                                   AtString("enable_progressive_pattern"),
+                                   AtString("AA_seed"),
+                                   AtString("AA_sample_clamp"),
+                                   AtString("indirect_sample_clamp"),
+                                   AtString("AA_sample_clamp_affects_aovs"),
+                                   AtString("AA_samples_max"),
+                                   AtString("thread_priority"),
+                                   AtString("pin_threads"),
+                                   AtString("abort_on_error"),
+                                   AtString("abort_on_license_fail"),
+                                   AtString("bucket_size"),
+                                   AtString("bucket_scanning"),
+                                   AtString("texture_per_file_stats"),
+                                   AtString("texture_max_open_files"),
+                                   AtString("texture_automip"),
+                                   AtString("texture_autotile"),
+                                   AtString("texture_accept_untiled"),
+                                   AtString("texture_accept_unmipped"),
+                                   AtString("texture_failure_retries"),
+                                   AtString("texture_conservative_lookups")};
+    return r;
+}
 
 TfToken _GetParameterLabel(const AtString& name) {
-    const auto& it = _parameterNameMap.find(name);
-    return it == _parameterNameMap.end() ? TfToken(name.c_str()) : it->second;
+    static const std::unordered_map<AtString, TfToken, AtStringHash> pm{
+        {AtString("GI_diffuse_depth"), TfToken("Diffuse Depth")},
+        {AtString("GI_specular_depth"), TfToken("Specular Depth")},
+        {AtString("GI_transmission_depth"), TfToken("Transmission Depth")},
+        {AtString("GI_volume_depth"), TfToken("Volume Depth")},
+        {AtString("GI_total_depth"), TfToken("Total Depth")},
+        {AtString("GI_diffuse_samples"), TfToken("Diffuse Samples")},
+        {AtString("GI_specular_samples"), TfToken("Specular Samples")},
+        {AtString("GI_transmission_samples"), TfToken("Transmission Samples")},
+        {AtString("GI_sss_samples"), TfToken("SSS Samples")},
+        {AtString("GI_volume_samples"), TfToken("Volume Samples")},
+    };
+    const auto& it = pm.find(name);
+    return it == pm.end() ? TfToken(name.c_str()) : it->second;
+}
+
+using TfTokenValueMap =
+    std::unordered_map<TfToken, VtValue, TfToken::HashFunctor>;
+
+const TfTokenValueMap& _DefaultValueOverrides() {
+    static const TfTokenValueMap r = {
+        {TfToken("enable_progressive_render"), VtValue(true)},
+        {TfToken("GI_diffuse_depth"), VtValue(1)},
+        {TfToken("GI_specular_depth"), VtValue(1)},
+        {TfToken("AA_samples"), VtValue(5)},
+        {TfToken("abort_on_error"), VtValue(false)},
+    };
+    return r;
+}
+
+bool _SetNodeParam(AtNode* node, const TfToken& key, const VtValue& value) {
+    if (value.IsHolding<int>()) {
+        AiNodeSetInt(node, key.GetText(), value.UncheckedGet<int>());
+    } else if (value.IsHolding<float>()) {
+        AiNodeSetFlt(node, key.GetText(), value.UncheckedGet<float>());
+    } else if (value.IsHolding<bool>()) {
+        AiNodeSetBool(node, key.GetText(), value.UncheckedGet<bool>());
+    } else if (value.IsHolding<std::string>()) {
+        AiNodeSetStr(
+            node, key.GetText(), value.UncheckedGet<std::string>().c_str());
+    } else if (value.IsHolding<TfToken>()) {
+        AiNodeSetStr(
+            node, key.GetText(), value.UncheckedGet<TfToken>().GetText());
+    } else {
+        return false;
+    }
+    return true;
+}
+
+inline const TfTokenVector& _SupportedRprimTypes() {
+    static const TfTokenVector r{HdPrimTypeTokens->mesh};
+    return r;
+}
+
+inline const TfTokenVector& _SupportedSprimTypes() {
+    static const TfTokenVector r{
+        HdPrimTypeTokens->camera,        HdPrimTypeTokens->material,
+        HdPrimTypeTokens->distantLight,  HdPrimTypeTokens->sphereLight,
+        HdPrimTypeTokens->diskLight,     HdPrimTypeTokens->rectLight,
+        HdPrimTypeTokens->cylinderLight, HdPrimTypeTokens->domeLight};
+    return r;
+}
+
+inline const TfTokenVector& _SupportedBprimTypes() {
+    static const TfTokenVector r{
+        HdPrimTypeTokens->renderBuffer,
+    };
+    return r;
 }
 
 } // namespace
-
-const TfTokenVector HdAiRenderDelegate::SUPPORTED_RPRIM_TYPES = {
-    HdPrimTypeTokens->mesh,
-};
-
-const TfTokenVector HdAiRenderDelegate::SUPPORTED_SPRIM_TYPES = {
-    HdPrimTypeTokens->camera,        HdPrimTypeTokens->material,
-    HdPrimTypeTokens->distantLight,  HdPrimTypeTokens->sphereLight,
-    HdPrimTypeTokens->diskLight,     HdPrimTypeTokens->rectLight,
-    HdPrimTypeTokens->cylinderLight, HdPrimTypeTokens->domeLight};
-
-const TfTokenVector HdAiRenderDelegate::SUPPORTED_BPRIM_TYPES = {
-    HdPrimTypeTokens->renderBuffer,
-};
 
 std::mutex HdAiRenderDelegate::_mutexResourceRegistry;
 std::atomic_int HdAiRenderDelegate::_counterResourceRegistry;
@@ -129,13 +189,12 @@ HdAiRenderDelegate::HdAiRenderDelegate() {
     _universe = nullptr;
 
     _options = AiUniverseGetOptions(_universe);
-    AiNodeSetBool(_options, Str::enable_progressive_render, true);
-    AiNodeSetInt(_options, Str::GI_diffuse_depth, 1);
-    AiNodeSetInt(_options, Str::GI_specular_depth, 1);
-    AiNodeSetInt(_options, Str::AA_samples, 5);
+    for (const auto& o : _DefaultValueOverrides()) {
+        _SetNodeParam(_options, o.first, o.second);
+    }
 
     _fallbackShader = AiNode(_universe, "ambient_occlusion");
-    AiNodeSetInt(_fallbackShader, "samples", 1);
+    AiNodeSetUInt(_fallbackShader, "samples", 1);
     _renderParam.reset(new HdAiRenderParam());
 }
 
@@ -159,33 +218,20 @@ void HdAiRenderDelegate::CommitResources(HdChangeTracker* tracker) {
 }
 
 const TfTokenVector& HdAiRenderDelegate::GetSupportedRprimTypes() const {
-    return SUPPORTED_RPRIM_TYPES;
+    return _SupportedRprimTypes();
 }
 
 const TfTokenVector& HdAiRenderDelegate::GetSupportedSprimTypes() const {
-    return SUPPORTED_SPRIM_TYPES;
+    return _SupportedSprimTypes();
 }
 
 const TfTokenVector& HdAiRenderDelegate::GetSupportedBprimTypes() const {
-    return SUPPORTED_BPRIM_TYPES;
+    return _SupportedBprimTypes();
 }
 
 void HdAiRenderDelegate::SetRenderSetting(
     const TfToken& key, const VtValue& value) {
-    if (value.IsHolding<int>()) {
-        AiNodeSetInt(_options, key.GetText(), value.UncheckedGet<int>());
-    } else if (value.IsHolding<float>()) {
-        AiNodeSetFlt(_options, key.GetText(), value.UncheckedGet<float>());
-    } else if (value.IsHolding<bool>()) {
-        AiNodeSetBool(_options, key.GetText(), value.UncheckedGet<bool>());
-    } else if (value.IsHolding<std::string>()) {
-        AiNodeSetStr(
-            _options, key.GetText(), value.UncheckedGet<std::string>().c_str());
-    } else if (value.IsHolding<TfToken>()) {
-        AiNodeSetStr(
-            _options, key.GetText(), value.UncheckedGet<TfToken>().GetText());
-    }
-    _renderParam->End();
+    if (_SetNodeParam(_options, key, value)) { _renderParam->End(); }
 }
 
 VtValue HdAiRenderDelegate::GetRenderSetting(const TfToken& key) const {
@@ -213,24 +259,22 @@ HdRenderSettingDescriptorList HdAiRenderDelegate::GetRenderSettingDescriptors()
     HdRenderSettingDescriptorList ret;
     const auto* nentry = AiNodeGetNodeEntry(_options);
     auto* piter = AiNodeEntryGetParamIterator(nentry);
+    const auto& ignoredParameters = _IgnoredParameters();
+    const auto& defaultValueOverrides = _DefaultValueOverrides();
     while (!AiParamIteratorFinished(piter)) {
         const auto* pentry = AiParamIteratorGetNext(piter);
         const auto pname = AiParamGetName(pentry);
-        if (_ignoredParameters.find(pname) != _ignoredParameters.end()) {
+        if (ignoredParameters.find(pname) != ignoredParameters.end()) {
             continue;
         }
         const auto ptype = AiParamGetType(pentry);
         HdRenderSettingDescriptor desc;
-        if (ptype == AI_TYPE_INT) {
-            // We are changing the default values of these.
-            if (pname == Str::GI_diffuse_depth ||
-                pname == Str::GI_specular_depth) {
-                desc.defaultValue = VtValue(1);
-            } else if (pname == Str::AA_samples) {
-                desc.defaultValue = VtValue(5);
-            } else {
-                desc.defaultValue = VtValue(AiParamGetDefault(pentry)->INT());
-            }
+        const auto defaultIter =
+            defaultValueOverrides.find(TfToken(pname.c_str()));
+        if (defaultIter != defaultValueOverrides.end()) {
+            desc.defaultValue = defaultIter->second;
+        } else if (ptype == AI_TYPE_INT) {
+            desc.defaultValue = VtValue(AiParamGetDefault(pentry)->INT());
         } else if (ptype == AI_TYPE_FLOAT) {
             desc.defaultValue = VtValue(AiParamGetDefault(pentry)->FLT());
         } else if (ptype == AI_TYPE_BOOLEAN) {

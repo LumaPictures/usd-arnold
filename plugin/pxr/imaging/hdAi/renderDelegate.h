@@ -112,10 +112,6 @@ public:
     AtNode* GetFallbackShader() const;
 
 private:
-    static const TfTokenVector SUPPORTED_RPRIM_TYPES;
-    static const TfTokenVector SUPPORTED_SPRIM_TYPES;
-    static const TfTokenVector SUPPORTED_BPRIM_TYPES;
-
     static std::mutex _mutexResourceRegistry;
     static std::atomic_int _counterResourceRegistry;
     static HdResourceRegistrySharedPtr _resourceRegistry;
