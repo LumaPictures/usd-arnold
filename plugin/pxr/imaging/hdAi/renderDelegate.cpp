@@ -39,7 +39,7 @@
 #include <pxr/imaging/hd/rprim.h>
 #include <pxr/imaging/hd/tokens.h>
 
-#include "pxr/iamging/hdAi/config.h"
+#include "pxr/imaging/hdAi/config.h"
 #include "pxr/imaging/hdAi/light.h"
 #include "pxr/imaging/hdAi/material.h"
 #include "pxr/imaging/hdAi/mesh.h"
