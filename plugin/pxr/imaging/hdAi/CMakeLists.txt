@@ -37,6 +37,7 @@ pxr_plugin(hdAi
         ${PYTHON_INCLUDE_DIRS}
 
     PUBLIC_CLASSES
+        config
         light
         material
         mesh
