@@ -54,6 +54,8 @@ void HdAiRenderParam::Restart() {
     if (status != AI_RENDER_STATUS_NOT_STARTED) {
         if (status == AI_RENDER_STATUS_RENDERING) {
             AiRenderInterrupt(AI_BLOCKING);
+        } else if (status == AI_RENDER_STATUS_FINISHED) {
+            AiRenderRestart();
         }
     }
 }
