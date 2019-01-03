@@ -117,14 +117,14 @@ void HdAiRenderPass::_Execute(
         reinterpret_cast<HdAiRenderParam*>(_delegate->GetRenderParam());
     const auto vp = renderPassState->GetViewport();
 
-    auto ended = false;
     const auto projMtx = renderPassState->GetProjectionMatrix();
     const auto viewMtx = renderPassState->GetWorldToViewMatrix();
+    auto restarted = false;
     if (projMtx != _projMtx || viewMtx != _viewMtx) {
         _projMtx = projMtx;
         _viewMtx = viewMtx;
-        renderParam->End();
-        ended = true;
+        renderParam->Restart();
+        restarted = true;
         AiNodeSetMatrix(
             _camera, Str::matrix, HdAiConvertMatrix(_viewMtx.GetInverse()));
         AiNodeSetMatrix(
@@ -140,7 +140,7 @@ void HdAiRenderPass::_Execute(
     const auto height = static_cast<int>(vp[3]);
     const auto numPixels = static_cast<size_t>(width * height);
     if (width != _width || height != _height) {
-        if (!ended) { renderParam->End(); }
+        if (!restarted) { renderParam->Restart(); }
         hdAiEmptyBucketQueue([](const HdAiBucketData*) {});
         const auto oldNumPixels = static_cast<size_t>(_width * _height);
         _width = width;
@@ -170,7 +170,6 @@ void HdAiRenderPass::_Execute(
     }
 
     _isConverged = renderParam->Render();
-
     bool needsUpdate = false;
     hdAiEmptyBucketQueue([this, &needsUpdate](const HdAiBucketData* data) {
         const auto xo = AiClamp(data->xo, 0, _width - 1);

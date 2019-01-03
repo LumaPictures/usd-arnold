@@ -41,6 +41,7 @@ public:
     ~HdAiRenderParam() override = default;
 
     bool Render();
+    void Restart();
     void End();
 };
 
