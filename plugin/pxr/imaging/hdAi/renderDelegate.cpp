@@ -90,7 +90,13 @@ const AtStringHashSet& _IgnoredParameters() {
                                    AtString("texture_accept_untiled"),
                                    AtString("texture_accept_unmipped"),
                                    AtString("texture_failure_retries"),
-                                   AtString("texture_conservative_lookups")};
+                                   AtString("texture_conservative_lookups"),
+                                   AtString("enable_procedural_cache"),
+                                   AtString("parallel_node_init"),
+                                   AtString("enable_new_quad_light_sampler"),
+                                   AtString("enable_new_point_light_sampler"),
+                                   AtString("enable_dithered_sampling"),
+                                   AtString("enable_dependency_graph"),};
     return r;
 }
 
