@@ -199,8 +199,9 @@ HdAiRenderDelegate::HdAiRenderDelegate() {
         _SetNodeParam(_options, o.first, o.second);
     }
 
-    _fallbackShader = AiNode(_universe, "ambient_occlusion");
-    AiNodeSetUInt(_fallbackShader, "samples", 1);
+    _fallbackShader = AiNode(_universe, "utility");
+    AiNodeSetStr(_fallbackShader, "shade_mode", "ambocc");
+    AiNodeSetStr(_fallbackShader, "color_mode", "obj");
     _renderParam.reset(new HdAiRenderParam());
 }
 
