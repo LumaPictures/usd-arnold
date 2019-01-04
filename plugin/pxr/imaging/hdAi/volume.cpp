@@ -30,16 +30,21 @@
 #include "pxr/imaging/hdAi/volume.h"
 #include <pxr/imaging/hd/changeTracker.h>
 
-#include "pxr/imaging/hdAi/openvdbAsset.h"
+#include <pxr/usd/sdf/assetPath.h>
+
+#include "pxr/imaging/hdAi/material.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
-TF_DEFINE_PRIVATE_TOKENS(_tokens, (openvdbAsset));
+TF_DEFINE_PRIVATE_TOKENS(_tokens, (openvdbAsset)(filePath));
 
 namespace {
 namespace Str {
 const AtString name("name");
 const AtString volume("volume");
+const AtString filename("filename");
+const AtString grids("grids");
+const AtString shader("shader");
 } // namespace Str
 } // namespace
 
@@ -61,14 +66,39 @@ void HdAiVolume::Sync(
     param->End();
     const auto& id = GetId();
 
+    std::unordered_map<SdfAssetPath, std::vector<TfToken>, SdfAssetPath::Hash>
+        openvdbs;
     const auto fieldDescriptors = delegate->GetVolumeFieldDescriptors(id);
-    if (!fieldDescriptors.empty()) {
-        for (const auto& field : fieldDescriptors) {
-            auto* openvdbAsset = reinterpret_cast<HdAiOpenvdbAsset*>(
-                delegate->GetRenderIndex().GetBprim(
-                    _tokens->openvdbAsset, field.fieldId));
-            if (openvdbAsset == nullptr) { continue; }
+    for (const auto& field : fieldDescriptors) {
+        const auto vv = delegate->Get(field.fieldId, _tokens->filePath);
+        if (vv.IsHolding<SdfAssetPath>()) {
+            auto& fields = openvdbs[vv.UncheckedGet<SdfAssetPath>()];
+            if (std::find(fields.begin(), fields.end(), field.fieldName) ==
+                fields.end()) {
+                fields.push_back(field.fieldName);
+            }
         }
+    }
+
+    // TODO: support multiple filepaths.
+    if (!openvdbs.empty()) {
+        const auto& it = openvdbs.cbegin();
+        auto path = it->first.GetResolvedPath();
+        if (path.empty()) { path = it->first.GetAssetPath(); }
+        AiNodeSetStr(_volume, Str::filename, path.c_str());
+        const auto numFields = it->second.size();
+        auto* fields = AiArrayAllocate(numFields, 1, AI_TYPE_STRING);
+        for (auto i = decltype(numFields){0}; i < numFields; ++i) {
+            AiArraySetStr(fields, i, AtString(it->second[i].GetText()));
+        }
+        AiNodeSetArray(_volume, Str::grids, fields);
+    }
+
+    const auto* material = reinterpret_cast<const HdAiMaterial*>(
+        delegate->GetRenderIndex().GetSprim(
+            HdPrimTypeTokens->material, delegate->GetMaterialId(id)));
+    if (material != nullptr) {
+        AiNodeSetPtr(_volume, Str::shader, material->GetSurfaceShader());
     }
 
     *dirtyBits = ~HdChangeTracker::AllSceneDirtyBits;
