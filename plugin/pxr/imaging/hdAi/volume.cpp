@@ -62,7 +62,7 @@ void HdAiVolume::Sync(
     const auto& id = GetId();
 
     const auto fieldDescriptors = delegate->GetVolumeFieldDescriptors(id);
-    if (fieldDescriptors.size()) {
+    if (!fieldDescriptors.empty()) {
         for (const auto& field : fieldDescriptors) {
             auto* openvdbAsset = reinterpret_cast<HdAiOpenvdbAsset*>(
                 delegate->GetRenderIndex().GetBprim(
