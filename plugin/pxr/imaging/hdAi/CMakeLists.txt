@@ -41,6 +41,7 @@ pxr_plugin(hdAi
         light
         material
         mesh
+        openvdbAsset
         rendererPlugin
         renderBuffer
         renderDelegate

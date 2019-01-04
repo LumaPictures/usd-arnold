@@ -27,49 +27,32 @@
 // WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#ifndef HDAI_MESH_H
-#define HDAI_MESH_H
+#ifndef HDAI_OPENVDB_ASSET_H
+#define HDAI_OPENVDB_ASSET_H
 
 #include <pxr/pxr.h>
 #include "pxr/imaging/hdAi/api.h"
 
-#include <pxr/imaging/hd/mesh.h>
+#include <pxr/imaging/hd/bprim.h>
 
 #include "pxr/imaging/hdAi/renderDelegate.h"
 
-#include <ai.h>
-
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HdAiMesh : public HdMesh {
+class HdAiOpenvdbAsset : public HdBprim {
 public:
     HDAI_API
-    HdAiMesh(
-        HdAiRenderDelegate* delegate, const SdfPath& id,
-        const SdfPath& instancerId = SdfPath());
-
-    HDAI_API
-    ~HdAiMesh() override;
+    HdAiOpenvdbAsset(HdAiRenderDelegate* delegate, const SdfPath& id);
 
     HDAI_API
     void Sync(
-        HdSceneDelegate* delegate, HdRenderParam* renderParam,
-        HdDirtyBits* dirtyBits, const TfToken& reprToken) override;
+        HdSceneDelegate* sceneDelegate, HdRenderParam* renderParam,
+        HdDirtyBits* dirtyBits) override;
 
     HDAI_API
     HdDirtyBits GetInitialDirtyBitsMask() const override;
-
-protected:
-    HDAI_API
-    HdDirtyBits _PropagateDirtyBits(HdDirtyBits bits) const override;
-
-    HDAI_API
-    void _InitRepr(const TfToken& reprToken, HdDirtyBits* dirtyBits) override;
-
-    HdAiRenderDelegate* _delegate;
-    AtNode* _mesh;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
-#endif // HDAI_MESH_H
+#endif // HDAI_OPENVDB_ASSET_H

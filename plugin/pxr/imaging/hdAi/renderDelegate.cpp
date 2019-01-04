@@ -44,13 +44,17 @@
 #include "pxr/imaging/hdAi/material.h"
 #include "pxr/imaging/hdAi/mesh.h"
 #include "pxr/imaging/hdAi/nodes/nodes.h"
+#include "pxr/imaging/hdAi/openvdbAsset.h"
 #include "pxr/imaging/hdAi/renderBuffer.h"
 #include "pxr/imaging/hdAi/renderPass.h"
+#include "pxr/imaging/hdAi/volume.h"
 
 #include <unordered_map>
 #include <unordered_set>
 
 PXR_NAMESPACE_OPEN_SCOPE
+
+TF_DEFINE_PRIVATE_TOKENS(_tokens, (openvdbAsset));
 
 namespace {
 // The following patters might look a bit weird at first glance, but
@@ -157,7 +161,8 @@ bool _SetNodeParam(AtNode* node, const TfToken& key, const VtValue& value) {
 }
 
 inline const TfTokenVector& _SupportedRprimTypes() {
-    static const TfTokenVector r{HdPrimTypeTokens->mesh};
+    static const TfTokenVector r{HdPrimTypeTokens->mesh,
+                                 HdPrimTypeTokens->volume};
     return r;
 }
 
@@ -171,9 +176,8 @@ inline const TfTokenVector& _SupportedSprimTypes() {
 }
 
 inline const TfTokenVector& _SupportedBprimTypes() {
-    static const TfTokenVector r{
-        HdPrimTypeTokens->renderBuffer,
-    };
+    static const TfTokenVector r{HdPrimTypeTokens->renderBuffer,
+                                 _tokens->openvdbAsset};
     return r;
 }
 
@@ -341,6 +345,9 @@ HdRprim* HdAiRenderDelegate::CreateRprim(
     if (typeId == HdPrimTypeTokens->mesh) {
         return new HdAiMesh(this, rprimId, instancerId);
     }
+    if (typeId == HdPrimTypeTokens->volume) {
+        return new HdAiVolume(this, rprimId, instancerId);
+    }
     TF_CODING_ERROR("Unknown Rprim Type %s", typeId.GetText());
     return nullptr;
 }
@@ -418,6 +425,9 @@ HdBprim* HdAiRenderDelegate::CreateBprim(
     if (typeId == HdPrimTypeTokens->renderBuffer) {
         return new HdAiRenderBuffer(bprimId);
     }
+    if (typeId == _tokens->openvdbAsset) {
+        return new HdAiOpenvdbAsset(this, bprimId);
+    }
     TF_CODING_ERROR("Unknown Bprim Type %s", typeId.GetText());
     return nullptr;
 }
@@ -425,6 +435,9 @@ HdBprim* HdAiRenderDelegate::CreateBprim(
 HdBprim* HdAiRenderDelegate::CreateFallbackBprim(const TfToken& typeId) {
     if (typeId == HdPrimTypeTokens->renderBuffer) {
         return new HdAiRenderBuffer(SdfPath());
+    }
+    if (typeId == _tokens->openvdbAsset) {
+        return new HdAiOpenvdbAsset(this, SdfPath());
     }
     TF_CODING_ERROR("Unknown Bprim Type %s", typeId.GetText());
     return nullptr;

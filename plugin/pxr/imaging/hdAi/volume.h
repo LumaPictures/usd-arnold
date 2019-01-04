@@ -31,10 +31,43 @@
 #define HDAI_VOLUME_H
 
 #include <pxr/pxr.h>
-
 #include "pxr/imaging/hdAi/api.h"
 
+#include <pxr/imaging/hd/volume.h>
+
+#include "pxr/imaging/hdAi/renderDelegate.h"
+
+#include <ai.h>
+
 PXR_NAMESPACE_OPEN_SCOPE
+
+class HdAiVolume : public HdVolume {
+public:
+    HDAI_API
+    HdAiVolume(
+        HdAiRenderDelegate* delegate, const SdfPath& id,
+        const SdfPath& instancerId = SdfPath());
+
+    HDAI_API
+    ~HdAiVolume() override;
+
+    void Sync(
+        HdSceneDelegate* delegate, HdRenderParam* renderParam,
+        HdDirtyBits* dirtyBits, const TfToken& reprToken) override;
+
+    HDAI_API
+    HdDirtyBits GetInitialDirtyBitsMask() const override;
+
+protected:
+    HDAI_API
+    HdDirtyBits _PropagateDirtyBits(HdDirtyBits bits) const override;
+
+    HDAI_API
+    void _InitRepr(const TfToken& reprToken, HdDirtyBits* dirtyBits) override;
+
+    HdAiRenderDelegate* _delegate;
+    AtNode* _volume;
+};
 
 PXR_NAMESPACE_CLOSE_SCOPE
 
