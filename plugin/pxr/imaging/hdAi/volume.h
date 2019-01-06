@@ -39,6 +39,8 @@
 
 #include <ai.h>
 
+#include <vector>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 class HdAiVolume : public HdVolume {
@@ -66,7 +68,7 @@ protected:
     void _InitRepr(const TfToken& reprToken, HdDirtyBits* dirtyBits) override;
 
     HdAiRenderDelegate* _delegate;
-    AtNode* _volume;
+    std::vector<AtNode*> _volumes;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

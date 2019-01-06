@@ -51,12 +51,11 @@ const AtString shader("shader");
 
 HdAiVolume::HdAiVolume(
     HdAiRenderDelegate* delegate, const SdfPath& id, const SdfPath& instancerId)
-    : HdVolume(id, instancerId), _delegate(delegate) {
-    _volume = AiNode(delegate->GetUniverse(), Str::volume);
-    AiNodeSetStr(_volume, Str::name, id.GetText());
-}
+    : HdVolume(id, instancerId), _delegate(delegate) {}
 
-HdAiVolume::~HdAiVolume() { AiNodeDestroy(_volume); }
+HdAiVolume::~HdAiVolume() {
+    for (auto& volume : _volumes) { AiNodeDestroy(volume); }
+}
 
 void HdAiVolume::Sync(
     HdSceneDelegate* delegate, HdRenderParam* renderParam,
@@ -66,8 +65,7 @@ void HdAiVolume::Sync(
     param->End();
     const auto& id = GetId();
 
-    std::unordered_map<SdfAssetPath, std::vector<TfToken>, SdfAssetPath::Hash>
-        openvdbs;
+    std::unordered_map<std::string, std::vector<TfToken>> openvdbs;
     const auto fieldDescriptors = delegate->GetVolumeFieldDescriptors(id);
     for (const auto& field : fieldDescriptors) {
         auto* openvdbAsset =
@@ -77,7 +75,10 @@ void HdAiVolume::Sync(
         openvdbAsset->TrackVolumePrimitive(id);
         const auto vv = delegate->Get(field.fieldId, _tokens->filePath);
         if (vv.IsHolding<SdfAssetPath>()) {
-            auto& fields = openvdbs[vv.UncheckedGet<SdfAssetPath>()];
+            const auto& assetPath = vv.UncheckedGet<SdfAssetPath>();
+            auto path = assetPath.GetResolvedPath();
+            if (path.empty()) { path = assetPath.GetAssetPath(); }
+            auto& fields = openvdbs[path];
             if (std::find(fields.begin(), fields.end(), field.fieldName) ==
                 fields.end()) {
                 fields.push_back(field.fieldName);
@@ -85,25 +86,53 @@ void HdAiVolume::Sync(
         }
     }
 
-    // TODO: support multiple filepaths.
-    if (!openvdbs.empty()) {
-        const auto& it = openvdbs.cbegin();
-        auto path = it->first.GetResolvedPath();
-        if (path.empty()) { path = it->first.GetAssetPath(); }
-        AiNodeSetStr(_volume, Str::filename, path.c_str());
-        const auto numFields = it->second.size();
+    _volumes.erase(
+        std::remove_if(
+            _volumes.begin(), _volumes.end(),
+            [&openvdbs](AtNode* node) -> bool {
+                if (openvdbs.find(std::string(
+                        AiNodeGetStr(node, Str::filename).c_str())) ==
+                    openvdbs.end()) {
+                    AiNodeDestroy(node);
+                    return true;
+                }
+                return false;
+            }),
+        _volumes.end());
+
+    for (const auto& openvdb : openvdbs) {
+        AtNode* volume = nullptr;
+        for (auto& v : _volumes) {
+            if (openvdb.first == AiNodeGetStr(v, Str::filename).c_str()) {
+                volume = v;
+                break;
+            }
+        }
+        if (volume == nullptr) {
+            volume = AiNode(_delegate->GetUniverse(), Str::volume);
+            AiNodeSetStr(volume, Str::filename, openvdb.first.c_str());
+            AiNodeSetStr(
+                volume, Str::name,
+                id.AppendChild(TfToken(TfStringPrintf("p_%p", volume)))
+                    .GetText());
+            _volumes.push_back(volume);
+        }
+        const auto numFields = openvdb.second.size();
         auto* fields = AiArrayAllocate(numFields, 1, AI_TYPE_STRING);
         for (auto i = decltype(numFields){0}; i < numFields; ++i) {
-            AiArraySetStr(fields, i, AtString(it->second[i].GetText()));
+            AiArraySetStr(fields, i, AtString(openvdb.second[i].GetText()));
         }
-        AiNodeSetArray(_volume, Str::grids, fields);
+        AiNodeSetArray(volume, Str::grids, fields);
     }
 
     const auto* material = reinterpret_cast<const HdAiMaterial*>(
         delegate->GetRenderIndex().GetSprim(
             HdPrimTypeTokens->material, delegate->GetMaterialId(id)));
     if (material != nullptr) {
-        AiNodeSetPtr(_volume, Str::shader, material->GetSurfaceShader());
+        auto* surfaceShader = material->GetSurfaceShader();
+        for (auto& volume : _volumes) {
+            AiNodeSetPtr(volume, Str::shader, surfaceShader);
+        }
     }
 
     *dirtyBits = HdChangeTracker::Clean;
