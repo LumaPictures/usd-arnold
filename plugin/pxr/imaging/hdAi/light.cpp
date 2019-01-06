@@ -273,9 +273,7 @@ HdAiLight::HdAiLight(
 
 HdAiLight::~HdAiLight() {
     AiNodeDestroy(_light);
-    if (_texture != nullptr) {
-        AiNodeDestroy(_texture);
-    }
+    if (_texture != nullptr) { AiNodeDestroy(_texture); }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

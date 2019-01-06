@@ -62,9 +62,7 @@ HdAiMesh::HdAiMesh(
     AiNodeSetStr(_mesh, Str::name, id.GetText());
 }
 
-HdAiMesh::~HdAiMesh() {
-    AiNodeDestroy(_mesh);
-}
+HdAiMesh::~HdAiMesh() { AiNodeDestroy(_mesh); }
 
 void HdAiMesh::Sync(
     HdSceneDelegate* delegate, HdRenderParam* renderParam,

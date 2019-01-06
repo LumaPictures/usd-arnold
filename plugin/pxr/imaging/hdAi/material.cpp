@@ -46,9 +46,7 @@ HdAiMaterial::HdAiMaterial(HdAiRenderDelegate* delegate, const SdfPath& id)
 }
 
 HdAiMaterial::~HdAiMaterial() {
-    for (auto& node : _nodes) {
-        AiNodeDestroy(node.second);
-    }
+    for (auto& node : _nodes) { AiNodeDestroy(node.second); }
 }
 
 void HdAiMaterial::Sync(
