@@ -29,24 +29,41 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pxr/imaging/hdAi/openvdbAsset.h"
 
+#include <pxr/imaging/hd/renderIndex.h>
+#include <pxr/imaging/hd/sceneDelegate.h>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 HdAiOpenvdbAsset::HdAiOpenvdbAsset(
     HdAiRenderDelegate* delegate, const SdfPath& id)
-    : HdBprim(id) {
+    : HdField(id) {
     TF_UNUSED(delegate);
 }
 
 void HdAiOpenvdbAsset::Sync(
     HdSceneDelegate* sceneDelegate, HdRenderParam* renderParam,
     HdDirtyBits* dirtyBits) {
-    TF_UNUSED(sceneDelegate);
     TF_UNUSED(renderParam);
-    TF_UNUSED(dirtyBits);
+    if (*dirtyBits & HdField::DirtyParams) {
+        auto& changeTracker =
+            sceneDelegate->GetRenderIndex().GetChangeTracker();
+        // But accessing this list happens on a single thread,
+        // as bprims are synced before rprims.
+        for (const auto& volume : _volumeList) {
+            changeTracker.MarkRprimDirty(volume, HdChangeTracker::AllDirty);
+        }
+    }
+    *dirtyBits = HdField::Clean;
 }
 
 HdDirtyBits HdAiOpenvdbAsset::GetInitialDirtyBitsMask() const {
-    return HdChangeTracker::AllSceneDirtyBits;
+    return HdField::AllDirty;
+}
+
+// This will be called from multiple threads.
+void HdAiOpenvdbAsset::TrackVolumePrimitive(const SdfPath& id) {
+    std::lock_guard<std::mutex> lock(_volumeListMutex);
+    _volumeList.insert(id);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE

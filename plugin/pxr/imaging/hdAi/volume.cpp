@@ -33,6 +33,7 @@
 #include <pxr/usd/sdf/assetPath.h>
 
 #include "pxr/imaging/hdAi/material.h"
+#include "pxr/imaging/hdAi/openvdbAsset.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -60,7 +61,6 @@ HdAiVolume::~HdAiVolume() { AiNodeDestroy(_volume); }
 void HdAiVolume::Sync(
     HdSceneDelegate* delegate, HdRenderParam* renderParam,
     HdDirtyBits* dirtyBits, const TfToken& reprToken) {
-    TF_UNUSED(dirtyBits);
     TF_UNUSED(reprToken);
     auto* param = reinterpret_cast<HdAiRenderParam*>(renderParam);
     param->End();
@@ -70,6 +70,11 @@ void HdAiVolume::Sync(
         openvdbs;
     const auto fieldDescriptors = delegate->GetVolumeFieldDescriptors(id);
     for (const auto& field : fieldDescriptors) {
+        auto* openvdbAsset =
+            dynamic_cast<HdAiOpenvdbAsset*>(delegate->GetRenderIndex().GetBprim(
+                _tokens->openvdbAsset, field.fieldId));
+        if (openvdbAsset == nullptr) { continue; }
+        openvdbAsset->TrackVolumePrimitive(id);
         const auto vv = delegate->Get(field.fieldId, _tokens->filePath);
         if (vv.IsHolding<SdfAssetPath>()) {
             auto& fields = openvdbs[vv.UncheckedGet<SdfAssetPath>()];
@@ -101,11 +106,11 @@ void HdAiVolume::Sync(
         AiNodeSetPtr(_volume, Str::shader, material->GetSurfaceShader());
     }
 
-    *dirtyBits = ~HdChangeTracker::AllSceneDirtyBits;
+    *dirtyBits = HdChangeTracker::Clean;
 }
 
 HdDirtyBits HdAiVolume::GetInitialDirtyBitsMask() const {
-    return HdChangeTracker::AllSceneDirtyBits;
+    return HdChangeTracker::AllDirty;
 }
 
 HdDirtyBits HdAiVolume::_PropagateDirtyBits(HdDirtyBits bits) const {

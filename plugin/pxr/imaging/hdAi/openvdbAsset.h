@@ -33,13 +33,16 @@
 #include <pxr/pxr.h>
 #include "pxr/imaging/hdAi/api.h"
 
-#include <pxr/imaging/hd/bprim.h>
+#include <pxr/imaging/hd/field.h>
 
 #include "pxr/imaging/hdAi/renderDelegate.h"
 
+#include <mutex>
+#include <unordered_set>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
-class HdAiOpenvdbAsset : public HdBprim {
+class HdAiOpenvdbAsset : public HdField {
 public:
     HDAI_API
     HdAiOpenvdbAsset(HdAiRenderDelegate* delegate, const SdfPath& id);
@@ -51,6 +54,18 @@ public:
 
     HDAI_API
     HdDirtyBits GetInitialDirtyBitsMask() const override;
+
+    HDAI_API
+    void TrackVolumePrimitive(const SdfPath& id);
+
+private:
+    // We are creating the arnold prims via HdAiVolume primitive, not
+    // the HdField class. So when the file path has changed,
+    // we need to trigger the update of the volume primitive.
+    // Rprims can be synced on multiple threads, so we need a simple mutex
+    // to store the affected volume prims.
+    std::mutex _volumeListMutex;
+    std::unordered_set<SdfPath, SdfPath::Hash> _volumeList;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
