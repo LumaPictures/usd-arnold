@@ -67,6 +67,9 @@ protected:
     HDAI_API
     void _InitRepr(const TfToken& reprToken, HdDirtyBits* dirtyBits) override;
 
+    HDAI_API
+    void _CreateVolumes(const SdfPath& id, HdSceneDelegate* delegate);
+
     HdAiRenderDelegate* _delegate;
     std::vector<AtNode*> _volumes;
 };

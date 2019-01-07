@@ -42,6 +42,8 @@
 
 #include <ai.h>
 
+#include <vector>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 HDAI_API
@@ -53,6 +55,9 @@ GfMatrix4f HdAiConvertMatrix(const AtMatrix& in);
 HDAI_API
 void HdAiSetTransform(
     AtNode* node, HdSceneDelegate* delegate, const SdfPath& id);
+HDAI_API
+void HdAiSetTransform(
+    std::vector<AtNode*>& nodes, HdSceneDelegate* delegate, const SdfPath& id);
 HDAI_API
 void HdAiSetParameter(
     AtNode* node, const AtParamEntry* pentry, const VtValue& value);

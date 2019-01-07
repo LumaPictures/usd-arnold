@@ -108,6 +108,27 @@ void HdAiSetTransform(
     AiNodeSetArray(node, "matrix", matrices);
 }
 
+void HdAiSetTransform(
+    std::vector<AtNode*>& nodes, HdSceneDelegate* delegate, const SdfPath& id) {
+    constexpr size_t maxSamples = 3;
+    HdTimeSampleArray<GfMatrix4d, maxSamples> xf;
+    delegate->SampleTransform(id, &xf);
+    AtArray* matrices = AiArrayAllocate(1, xf.count, AI_TYPE_MATRIX);
+    for (auto i = decltype(xf.count){0}; i < xf.count; ++i) {
+        AiArraySetMtx(matrices, i, HdAiConvertMatrix(xf.values[i]));
+    }
+    const auto nodeCount = nodes.size();
+    if (nodeCount > 0) {
+        // IIRC you can't set the same array on two different nodes,
+        // because it causes a double-free.
+        // TODO: we need to check if it's still the case with Arnold 5.
+        for (auto i = decltype(nodeCount){1}; i < nodeCount; ++i) {
+            AiNodeSetArray(nodes[i], "matrix", AiArrayCopy(matrices));
+        }
+        AiNodeSetArray(nodes[0], "matrix", matrices);
+    }
+}
+
 void HdAiSetParameter(
     AtNode* node, const AtParamEntry* pentry, const VtValue& value) {
     const auto paramName = AiParamGetName(pentry);

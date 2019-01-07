@@ -34,6 +34,7 @@
 
 #include "pxr/imaging/hdAi/material.h"
 #include "pxr/imaging/hdAi/openvdbAsset.h"
+#include "pxr/imaging/hdAi/utils.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -62,9 +63,37 @@ void HdAiVolume::Sync(
     HdDirtyBits* dirtyBits, const TfToken& reprToken) {
     TF_UNUSED(reprToken);
     auto* param = reinterpret_cast<HdAiRenderParam*>(renderParam);
-    param->End();
-    const auto& id = GetId();
 
+    const auto& id = GetId();
+    auto volumesChanged = false;
+    if (HdChangeTracker::IsTopologyDirty(*dirtyBits, id)) {
+        param->End();
+        _CreateVolumes(id, delegate);
+        volumesChanged = true;
+    }
+
+    if (volumesChanged || (*dirtyBits & HdChangeTracker::DirtyMaterialId)) {
+        param->End();
+        const auto* material = reinterpret_cast<const HdAiMaterial*>(
+            delegate->GetRenderIndex().GetSprim(
+                HdPrimTypeTokens->material, delegate->GetMaterialId(id)));
+        if (material != nullptr) {
+            auto* surfaceShader = material->GetSurfaceShader();
+            for (auto& volume : _volumes) {
+                AiNodeSetPtr(volume, Str::shader, surfaceShader);
+            }
+        }
+    }
+
+    if (HdChangeTracker::IsTransformDirty(*dirtyBits, id)) {
+        param->End();
+        HdAiSetTransform(_volumes, delegate, GetId());
+    }
+
+    *dirtyBits = HdChangeTracker::Clean;
+}
+
+void HdAiVolume::_CreateVolumes(const SdfPath& id, HdSceneDelegate* delegate) {
     std::unordered_map<std::string, std::vector<TfToken>> openvdbs;
     const auto fieldDescriptors = delegate->GetVolumeFieldDescriptors(id);
     for (const auto& field : fieldDescriptors) {
@@ -91,7 +120,7 @@ void HdAiVolume::Sync(
             _volumes.begin(), _volumes.end(),
             [&openvdbs](AtNode* node) -> bool {
                 if (openvdbs.find(std::string(
-                        AiNodeGetStr(node, Str::filename).c_str())) ==
+                    AiNodeGetStr(node, Str::filename).c_str())) ==
                     openvdbs.end()) {
                     AiNodeDestroy(node);
                     return true;
@@ -124,18 +153,6 @@ void HdAiVolume::Sync(
         }
         AiNodeSetArray(volume, Str::grids, fields);
     }
-
-    const auto* material = reinterpret_cast<const HdAiMaterial*>(
-        delegate->GetRenderIndex().GetSprim(
-            HdPrimTypeTokens->material, delegate->GetMaterialId(id)));
-    if (material != nullptr) {
-        auto* surfaceShader = material->GetSurfaceShader();
-        for (auto& volume : _volumes) {
-            AiNodeSetPtr(volume, Str::shader, surfaceShader);
-        }
-    }
-
-    *dirtyBits = HdChangeTracker::Clean;
 }
 
 HdDirtyBits HdAiVolume::GetInitialDirtyBitsMask() const {

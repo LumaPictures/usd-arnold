@@ -50,7 +50,7 @@ void HdAiOpenvdbAsset::Sync(
         // But accessing this list happens on a single thread,
         // as bprims are synced before rprims.
         for (const auto& volume : _volumeList) {
-            changeTracker.MarkRprimDirty(volume, HdChangeTracker::AllDirty);
+            changeTracker.MarkRprimDirty(volume, HdChangeTracker::DirtyTopology);
         }
     }
     *dirtyBits = HdField::Clean;
