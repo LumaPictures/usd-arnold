@@ -39,6 +39,8 @@
 #include <pxr/imaging/hd/rprim.h>
 #include <pxr/imaging/hd/tokens.h>
 
+#include <pxr/usdImaging/usdVolImaging/tokens.h>
+
 #include "pxr/imaging/hdAi/config.h"
 #include "pxr/imaging/hdAi/light.h"
 #include "pxr/imaging/hdAi/material.h"
@@ -53,8 +55,6 @@
 #include <unordered_set>
 
 PXR_NAMESPACE_OPEN_SCOPE
-
-TF_DEFINE_PRIVATE_TOKENS(_tokens, (openvdbAsset));
 
 namespace {
 // The following patters might look a bit weird at first glance, but
@@ -177,7 +177,7 @@ inline const TfTokenVector& _SupportedSprimTypes() {
 
 inline const TfTokenVector& _SupportedBprimTypes() {
     static const TfTokenVector r{HdPrimTypeTokens->renderBuffer,
-                                 _tokens->openvdbAsset};
+                                 UsdVolImagingTokens->openvdbAsset};
     return r;
 }
 
@@ -425,7 +425,7 @@ HdBprim* HdAiRenderDelegate::CreateBprim(
     if (typeId == HdPrimTypeTokens->renderBuffer) {
         return new HdAiRenderBuffer(bprimId);
     }
-    if (typeId == _tokens->openvdbAsset) {
+    if (typeId == UsdVolImagingTokens->openvdbAsset) {
         return new HdAiOpenvdbAsset(this, bprimId);
     }
     TF_CODING_ERROR("Unknown Bprim Type %s", typeId.GetText());
@@ -436,7 +436,7 @@ HdBprim* HdAiRenderDelegate::CreateFallbackBprim(const TfToken& typeId) {
     if (typeId == HdPrimTypeTokens->renderBuffer) {
         return new HdAiRenderBuffer(SdfPath());
     }
-    if (typeId == _tokens->openvdbAsset) {
+    if (typeId == UsdVolImagingTokens->openvdbAsset) {
         return new HdAiOpenvdbAsset(this, SdfPath());
     }
     TF_CODING_ERROR("Unknown Bprim Type %s", typeId.GetText());

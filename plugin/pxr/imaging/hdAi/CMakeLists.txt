@@ -26,6 +26,7 @@ pxr_plugin(hdAi
         hdx
         sdf
         usdImaging
+        usdVolImaging
         ${TBB_LIBRARIES}
 
     INCLUDE_DIRS
