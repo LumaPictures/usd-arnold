@@ -31,6 +31,8 @@
 
 #include <pxr/base/gf/vec2f.h>
 
+#include <pxr/usd/sdf/assetPath.h>
+
 PXR_NAMESPACE_OPEN_SCOPE
 
 AtMatrix HdAiConvertMatrix(const GfMatrix4d& in) {
@@ -190,7 +192,14 @@ void HdAiSetParameter(
         case AI_TYPE_STRING:
             if (value.IsHolding<TfToken>()) {
                 AiNodeSetStr(
-                    node, paramName, value.UncheckedGet<TfToken>().GetText());
+                    node, paramName, value.UncheckedGet<TfToken>().GetText()); 
+            } else if (value.IsHolding<SdfAssetPath>()) {
+                const auto& assetPath = value.UncheckedGet<SdfAssetPath>();
+                AiNodeSetStr(
+                    node, paramName,
+                    assetPath.GetResolvedPath().empty() ?
+                        assetPath.GetAssetPath().c_str() :
+                        assetPath.GetResolvedPath().c_str());
             }
             break;
         case AI_TYPE_POINTER:
