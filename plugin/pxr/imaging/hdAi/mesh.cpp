@@ -116,12 +116,12 @@ void HdAiMesh::Sync(
             AiNodeSetPtr(_mesh, Str::shader, material->GetSurfaceShader());
             AiNodeSetPtr(
                 _mesh, Str::disp_map, material->GetDisplacementShader());
+            // TODO: We need a way to detect this.
+            AiNodeSetBool(_mesh, Str::opaque, false);
         } else {
             AiNodeSetPtr(_mesh, Str::shader, _delegate->GetFallbackShader());
             AiNodeSetPtr(_mesh, Str::disp_map, nullptr);
         }
-        // TODO: We need a way to detect this.
-        AiNodeSetBool(_mesh, Str::opaque, false);
     }
 
     // TODO: Implement all the primvars.
