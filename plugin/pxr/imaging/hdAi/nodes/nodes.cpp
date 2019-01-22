@@ -47,7 +47,7 @@ struct NodeDefinition {
 using BuiltInNodes = std::vector<NodeDefinition>;
 
 const auto builtInNodes = []() -> const BuiltInNodes& {
-    static const BuiltInNodes ret {
+    static const BuiltInNodes ret{
         {AI_NODE_DRIVER, AI_TYPE_UNDEFINED, HdAiNodeNames::driver,
          HdAiDriverMtd},
     };

@@ -29,10 +29,12 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "pxr/imaging/hdAi/mesh.h"
 
-#include "pxr/base/gf/vec2f.h"
+#include <pxr/base/gf/vec2f.h>
 
-#include "pxr/imaging/hdAi/material.h"
-#include "pxr/imaging/hdAi/utils.h"
+#include <pxr/imaging/hdAi/material.h>
+#include <pxr/imaging/hdAi/utils.h>
+
+#include <pxr/imaging/pxOsd/tokens.h>
 
 PXR_NAMESPACE_OPEN_SCOPE
 
@@ -50,6 +52,10 @@ const AtString uvidxs("uvidxs");
 const AtString shader("shader");
 const AtString disp_map("disp_map");
 const AtString opaque("opaque");
+const AtString subdiv_type("subdiv_type");
+const AtString catclark("catclark");
+const AtString none("none");
+const AtString subdiv_iterations("subdiv_iterations");
 
 } // namespace Str
 
@@ -100,6 +106,20 @@ void HdAiMesh::Sync(
         }
         AiNodeSetArray(_mesh, Str::nsides, nsides);
         AiNodeSetArray(_mesh, Str::vidxs, vidxs);
+        const auto scheme = topology.GetScheme();
+        if (scheme == PxOsdOpenSubdivTokens->catmullClark ||
+            scheme == PxOsdOpenSubdivTokens->catmark) {
+            AiNodeSetStr(_mesh, Str::subdiv_type, Str::catclark);
+        } else {
+            AiNodeSetStr(_mesh, Str::subdiv_type, Str::none);
+        }
+    }
+
+    if (HdChangeTracker::IsDisplayStyleDirty(*dirtyBits, id)) {
+        const auto displayStyle = GetDisplayStyle(delegate);
+        AiNodeSetByte(
+            _mesh, Str::subdiv_iterations,
+            std::max(0, displayStyle.refineLevel));
     }
 
     if (HdChangeTracker::IsTransformDirty(*dirtyBits, id)) {

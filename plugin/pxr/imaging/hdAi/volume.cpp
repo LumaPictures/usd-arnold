@@ -120,7 +120,7 @@ void HdAiVolume::_CreateVolumes(const SdfPath& id, HdSceneDelegate* delegate) {
             _volumes.begin(), _volumes.end(),
             [&openvdbs](AtNode* node) -> bool {
                 if (openvdbs.find(std::string(
-                    AiNodeGetStr(node, Str::filename).c_str())) ==
+                        AiNodeGetStr(node, Str::filename).c_str())) ==
                     openvdbs.end()) {
                     AiNodeDestroy(node);
                     return true;

@@ -84,12 +84,11 @@ AtNode* HdAiMaterial::GetDisplacementShader() const { return _displacement; }
 AtNode* HdAiMaterial::ReadMaterialNetwork(const HdMaterialNetwork& network) {
     if (network.nodes.empty()) { return nullptr; }
 
-    std::vector<AtNode*> nodes; nodes.reserve(network.nodes.size());
+    std::vector<AtNode*> nodes;
+    nodes.reserve(network.nodes.size());
     for (const auto& node : network.nodes) {
         auto* n = ReadMaterial(node);
-        if (n != nullptr) {
-            nodes.push_back(n);
-        }
+        if (n != nullptr) { nodes.push_back(n); }
     }
 
     // Currently USD can't describe partial connections, so we just do a full
