@@ -56,6 +56,8 @@ const AtString subdiv_type("subdiv_type");
 const AtString catclark("catclark");
 const AtString none("none");
 const AtString subdiv_iterations("subdiv_iterations");
+const AtString crease_idxs("crease_idxs");
+const AtString crease_sharpness("crease_sharpness");
 
 } // namespace Str
 
@@ -119,12 +121,60 @@ void HdAiMesh::Sync(
         const auto displayStyle = GetDisplayStyle(delegate);
         AiNodeSetByte(
             _mesh, Str::subdiv_iterations,
-            std::max(0, displayStyle.refineLevel));
+            static_cast<uint8_t>(std::max(0, displayStyle.refineLevel)));
     }
 
     if (HdChangeTracker::IsTransformDirty(*dirtyBits, id)) {
         param->End();
         HdAiSetTransform(_mesh, delegate, GetId());
+    }
+
+    if (HdChangeTracker::IsSubdivTagsDirty(*dirtyBits, id)) {
+        const auto subdivTags = GetSubdivTags(delegate);
+        const auto& cornerIndices = subdivTags.GetCornerIndices();
+        const auto& cornerWeights = subdivTags.GetCornerWeights();
+        const auto& creaseIndices = subdivTags.GetCreaseIndices();
+        const auto& creaseLengths = subdivTags.GetCreaseLengths();
+        const auto& creaseWeights = subdivTags.GetCreaseWeights();
+
+        const auto cornerIndicesCount =
+            static_cast<uint32_t>(cornerIndices.size());
+        uint32_t cornerWeightCounts = 0;
+        for (auto creaseLength : creaseLengths) {
+            cornerWeightCounts += std::max(0, creaseLength - 1);
+        }
+
+        const auto creaseIdxsCount =
+            cornerIndicesCount * 2 + cornerWeightCounts * 2;
+        const auto craseSharpnessCount =
+            cornerIndicesCount + cornerWeightCounts;
+
+        auto* creaseIdxs = AiArrayAllocate(creaseIdxsCount, 1, AI_TYPE_UINT);
+        auto* creaseSharpness =
+            AiArrayAllocate(craseSharpnessCount, 1, AI_TYPE_FLOAT);
+
+        uint32_t ii = 0;
+        for (auto cornerIndex : cornerIndices) {
+            AiArraySetUInt(creaseIdxs, ii * 2, cornerIndex);
+            AiArraySetUInt(creaseIdxs, ii * 2 + 1, cornerIndex);
+            AiArraySetFlt(creaseSharpness, ii, cornerWeights[ii]);
+            ++ii;
+        }
+
+        uint32_t jj = 0;
+        for (auto creaseLength : creaseLengths) {
+            for (auto k = decltype(creaseLength){0}; k < creaseLength;
+                 ++k, ++ii) {
+                AiArraySetUInt(creaseIdxs, ii * 2, creaseIndices[jj + k]);
+                AiArraySetUInt(
+                    creaseIdxs, ii * 2 + 1, creaseIndices[jj + k + 1]);
+                AiArraySetFlt(creaseSharpness, ii, creaseWeights[jj]);
+            }
+            jj += creaseLength;
+        }
+
+        AiNodeSetArray(_mesh, Str::crease_idxs, creaseIdxs);
+        AiNodeSetArray(_mesh, Str::crease_sharpness, creaseSharpness);
     }
 
     if (*dirtyBits & HdChangeTracker::DirtyMaterialId) {
