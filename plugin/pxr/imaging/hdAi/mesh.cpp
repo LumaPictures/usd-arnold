@@ -163,11 +163,11 @@ void HdAiMesh::Sync(
 
         uint32_t jj = 0;
         for (auto creaseLength : creaseLengths) {
-            for (auto k = decltype(creaseLength){0}; k < creaseLength;
+            for (auto k = decltype(creaseLength){1}; k < creaseLength;
                  ++k, ++ii) {
-                AiArraySetUInt(creaseIdxs, ii * 2, creaseIndices[jj + k]);
+                AiArraySetUInt(creaseIdxs, ii * 2, creaseIndices[jj + k - 1]);
                 AiArraySetUInt(
-                    creaseIdxs, ii * 2 + 1, creaseIndices[jj + k + 1]);
+                    creaseIdxs, ii * 2 + 1, creaseIndices[jj + k]);
                 AiArraySetFlt(creaseSharpness, ii, creaseWeights[jj]);
             }
             jj += creaseLength;
