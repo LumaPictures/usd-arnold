@@ -69,7 +69,7 @@ HdAiMesh::HdAiMesh(
     _mesh = AiNode(delegate->GetUniverse(), Str::polymesh);
     AiNodeSetStr(_mesh, Str::name, id.GetText());
     // The default value is 1, which won't work well in a Hydra context.
-    AiNodeSetInt(_mesh, Str::subdiv_iterations, 0);
+    AiNodeSetByte(_mesh, Str::subdiv_iterations, 0);
 }
 
 HdAiMesh::~HdAiMesh() { AiNodeDestroy(_mesh); }
