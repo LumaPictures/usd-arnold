@@ -61,6 +61,22 @@ void HdAiSetTransform(
 HDAI_API
 void HdAiSetParameter(
     AtNode* node, const AtParamEntry* pentry, const VtValue& value);
+HDAI_API
+void HdAiSetConstantPrimvar(
+    AtNode* node, const SdfPath& id, HdSceneDelegate* delegate,
+    const HdPrimvarDescriptor& primvarDesc);
+HDAI_API
+void HdAiSetUniformPrimvar(
+    AtNode* node, const SdfPath& id, HdSceneDelegate* delegate,
+    const HdPrimvarDescriptor& primvarDesc);
+HDAI_API
+void HdAiSetVertexPrimvar(
+    AtNode* node, const SdfPath& id, HdSceneDelegate* delegate,
+    const HdPrimvarDescriptor& primvarDesc);
+HDAI_API
+void HdAiSetFaceVaryingPrimvar(
+    AtNode* node, const SdfPath& id, HdSceneDelegate* delegate,
+    const HdPrimvarDescriptor& primvarDesc);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

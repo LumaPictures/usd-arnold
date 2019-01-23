@@ -168,8 +168,7 @@ void HdAiMesh::Sync(
             for (auto k = decltype(creaseLength){1}; k < creaseLength;
                  ++k, ++ii) {
                 AiArraySetUInt(creaseIdxs, ii * 2, creaseIndices[jj + k - 1]);
-                AiArraySetUInt(
-                    creaseIdxs, ii * 2 + 1, creaseIndices[jj + k]);
+                AiArraySetUInt(creaseIdxs, ii * 2 + 1, creaseIndices[jj + k]);
                 AiArraySetFlt(creaseSharpness, ii, creaseWeights[jj]);
             }
             jj += creaseLength;
@@ -200,6 +199,18 @@ void HdAiMesh::Sync(
     if (*dirtyBits & HdChangeTracker::DirtyPrimvar) {
         param->End();
         for (const auto& primvar : delegate->GetPrimvarDescriptors(
+            id, HdInterpolation::HdInterpolationConstant)) {
+            HdAiSetConstantPrimvar(_mesh, id, delegate, primvar);
+        }
+        for (const auto& primvar : delegate->GetPrimvarDescriptors(
+            id, HdInterpolation::HdInterpolationUniform)) {
+            HdAiSetUniformPrimvar(_mesh, id, delegate, primvar);
+        }
+        for (const auto& primvar : delegate->GetPrimvarDescriptors(
+            id, HdInterpolation::HdInterpolationVertex)) {
+            HdAiSetVertexPrimvar(_mesh, id, delegate, primvar);
+        }
+        for (const auto& primvar : delegate->GetPrimvarDescriptors(
                  id, HdInterpolation::HdInterpolationFaceVarying)) {
             if (primvar.name == _tokens->st || primvar.name == _tokens->uv) {
                 const auto v = delegate->Get(id, primvar.name);
@@ -216,6 +227,8 @@ void HdAiMesh::Sync(
                     AiNodeSetArray(_mesh, Str::uvlist, uvlist);
                     AiNodeSetArray(_mesh, Str::uvidxs, uvidxs);
                 }
+            } else {
+                HdAiSetFaceVaryingPrimvar(_mesh, id, delegate, primvar);
             }
         }
     }

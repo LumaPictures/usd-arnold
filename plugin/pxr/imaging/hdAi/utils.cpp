@@ -218,4 +218,40 @@ void HdAiSetParameter(
     }
 }
 
+void HdAiSetConstantPrimvar(
+    AtNode* node, const SdfPath& id, HdSceneDelegate* delegate,
+    const HdPrimvarDescriptor& primvarDesc) {
+    TF_UNUSED(node);
+    TF_UNUSED(id);
+    TF_UNUSED(delegate);
+    TF_UNUSED(primvarDesc);
+}
+
+void HdAiSetUniformPrimvar(
+    AtNode* node, const SdfPath& id, HdSceneDelegate* delegate,
+    const HdPrimvarDescriptor& primvarDesc) {
+    TF_UNUSED(node);
+    TF_UNUSED(id);
+    TF_UNUSED(delegate);
+    TF_UNUSED(primvarDesc);
+}
+
+void HdAiSetVertexPrimvar(
+    AtNode* node, const SdfPath& id, HdSceneDelegate* delegate,
+    const HdPrimvarDescriptor& primvarDesc) {
+    TF_UNUSED(node);
+    TF_UNUSED(id);
+    TF_UNUSED(delegate);
+    TF_UNUSED(primvarDesc);
+}
+
+void HdAiSetFaceVaryingPrimvar(
+    AtNode* node, const SdfPath& id, HdSceneDelegate* delegate,
+    const HdPrimvarDescriptor& primvarDesc) {
+    TF_UNUSED(node);
+    TF_UNUSED(id);
+    TF_UNUSED(delegate);
+    TF_UNUSED(primvarDesc);
+}
+
 PXR_NAMESPACE_CLOSE_SCOPE
