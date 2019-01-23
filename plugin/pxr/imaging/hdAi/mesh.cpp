@@ -199,15 +199,16 @@ void HdAiMesh::Sync(
     if (*dirtyBits & HdChangeTracker::DirtyPrimvar) {
         param->End();
         for (const auto& primvar : delegate->GetPrimvarDescriptors(
-            id, HdInterpolation::HdInterpolationConstant)) {
+                 id, HdInterpolation::HdInterpolationConstant)) {
             HdAiSetConstantPrimvar(_mesh, id, delegate, primvar);
         }
         for (const auto& primvar : delegate->GetPrimvarDescriptors(
-            id, HdInterpolation::HdInterpolationUniform)) {
+                 id, HdInterpolation::HdInterpolationUniform)) {
             HdAiSetUniformPrimvar(_mesh, id, delegate, primvar);
         }
         for (const auto& primvar : delegate->GetPrimvarDescriptors(
-            id, HdInterpolation::HdInterpolationVertex)) {
+                 id, HdInterpolation::HdInterpolationVertex)) {
+            if (primvar.name == HdTokens->points) { continue; }
             HdAiSetVertexPrimvar(_mesh, id, delegate, primvar);
         }
         for (const auto& primvar : delegate->GetPrimvarDescriptors(

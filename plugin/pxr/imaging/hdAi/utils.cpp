@@ -35,6 +35,69 @@
 
 PXR_NAMESPACE_OPEN_SCOPE
 
+TF_DEFINE_PRIVATE_TOKENS(
+    _tokens, (BOOL)(BYTE)(INT)(UINT)(FLOAT)(VECTOR2)(VECTOR)(RGB)(RGBA)(STRING)(
+                 constant)(uniform)(varying)(indexed));
+
+namespace {
+
+template <typename T>
+uint32_t _DeclareAndConvertArray(
+    AtNode* node, const TfToken& name, const TfToken& scope,
+    const TfToken& type, uint8_t arnoldType, const VtValue& value) {
+    if (!AiNodeDeclare(
+            node, name.GetText(),
+            TfStringPrintf("%s %s", scope.GetText(), type.GetText()).c_str())) {
+        return 0;
+    }
+    const auto& v = value.UncheckedGet<T>();
+    auto a = AiArrayConvert(v.size(), 1, arnoldType, v.data());
+    AiNodeSetArray(node, name.GetText(), a);
+    return AiArrayGetNumElements(a);
+}
+
+// This is useful for uniform, vertex and face-varying. We need to know the size
+// to generate the indices for faceVarying data.
+uint32_t _DeclareAndAssignFromArray(
+    AtNode* node, const TfToken& name, const TfToken& scope,
+    const VtValue& value, bool isColor = false) {
+    if (value.IsHolding<VtBoolArray>()) {
+        return _DeclareAndConvertArray<VtBoolArray>(
+            node, name, scope, _tokens->BOOL, AI_TYPE_BOOLEAN, value);
+    } else if (value.IsHolding<VtCharArray>()) {
+        return _DeclareAndConvertArray<VtCharArray>(
+            node, name, scope, _tokens->BYTE, AI_TYPE_BYTE, value);
+    } else if (value.IsHolding<VtUIntArray>()) {
+        return _DeclareAndConvertArray<VtUIntArray>(
+            node, name, scope, _tokens->UINT, AI_TYPE_UINT, value);
+    } else if (value.IsHolding<VtIntArray>()) {
+        return _DeclareAndConvertArray<VtIntArray>(
+            node, name, scope, _tokens->INT, AI_TYPE_INT, value);
+    } else if (value.IsHolding<VtFloatArray>()) {
+        return _DeclareAndConvertArray<VtFloatArray>(
+            node, name, scope, _tokens->FLOAT, AI_TYPE_FLOAT, value);
+    } else if (value.IsHolding<VtDoubleArray>()) {
+        // TODO
+    } else if (value.IsHolding<VtVec2fArray>()) {
+        return _DeclareAndConvertArray<VtVec2fArray>(
+            node, name, scope, _tokens->VECTOR2, AI_TYPE_VECTOR2, value);
+    } else if (value.IsHolding<VtVec3fArray>()) {
+        if (isColor) {
+            return _DeclareAndConvertArray<VtVec3fArray>(
+                node, name, scope, _tokens->RGB, AI_TYPE_RGB, value);
+        } else {
+            return _DeclareAndConvertArray<VtVec3fArray>(
+                node, name, scope, _tokens->VECTOR, AI_TYPE_VECTOR, value);
+        }
+    } else if (value.IsHolding<VtVec4fArray>()) {
+        return _DeclareAndConvertArray<VtVec4fArray>(
+            node, name, scope, _tokens->RGBA, AI_TYPE_RGBA, value);
+    }
+    return 0;
+}
+
+} // namespace
+
 AtMatrix HdAiConvertMatrix(const GfMatrix4d& in) {
     AtMatrix out = AI_M4_IDENTITY;
     out.data[0][0] = static_cast<float>(in[0][0]);
@@ -230,28 +293,37 @@ void HdAiSetConstantPrimvar(
 void HdAiSetUniformPrimvar(
     AtNode* node, const SdfPath& id, HdSceneDelegate* delegate,
     const HdPrimvarDescriptor& primvarDesc) {
-    TF_UNUSED(node);
-    TF_UNUSED(id);
-    TF_UNUSED(delegate);
-    TF_UNUSED(primvarDesc);
+    _DeclareAndAssignFromArray(
+        node, primvarDesc.name, _tokens->varying,
+        delegate->Get(id, primvarDesc.name),
+        primvarDesc.role == HdPrimvarRoleTokens->color);
 }
 
 void HdAiSetVertexPrimvar(
     AtNode* node, const SdfPath& id, HdSceneDelegate* delegate,
     const HdPrimvarDescriptor& primvarDesc) {
-    TF_UNUSED(node);
-    TF_UNUSED(id);
-    TF_UNUSED(delegate);
-    TF_UNUSED(primvarDesc);
+    _DeclareAndAssignFromArray(
+        node, primvarDesc.name, _tokens->varying,
+        delegate->Get(id, primvarDesc.name),
+        primvarDesc.role == HdPrimvarRoleTokens->color);
 }
 
 void HdAiSetFaceVaryingPrimvar(
     AtNode* node, const SdfPath& id, HdSceneDelegate* delegate,
     const HdPrimvarDescriptor& primvarDesc) {
-    TF_UNUSED(node);
-    TF_UNUSED(id);
-    TF_UNUSED(delegate);
-    TF_UNUSED(primvarDesc);
+    const auto numElements = _DeclareAndAssignFromArray(
+        node, primvarDesc.name, _tokens->varying,
+        delegate->Get(id, primvarDesc.name),
+        primvarDesc.role == HdPrimvarRoleTokens->color);
+    if (numElements != 0) {
+        auto* a = AiArrayAllocate(numElements, 1, AI_TYPE_UINT);
+        for (auto i = decltype(numElements){0}; i < numElements; ++i) {
+            AiArraySetUInt(a, i, i);
+        }
+        AiNodeSetArray(
+            node, TfStringPrintf("%sidsx", primvarDesc.name.GetText()).c_str(),
+            a);
+    }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
