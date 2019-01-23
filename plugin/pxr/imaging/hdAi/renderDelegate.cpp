@@ -211,7 +211,12 @@ HdAiRenderDelegate::HdAiRenderDelegate() {
 
     _fallbackShader = AiNode(_universe, "utility");
     AiNodeSetStr(_fallbackShader, "shade_mode", "ambocc");
-    AiNodeSetStr(_fallbackShader, "color_mode", "obj");
+    AiNodeSetStr(_fallbackShader, "color_mode", "color");
+    auto* userDataReader = AiNode(_universe, "user_data_rgb");
+    AiNodeSetStr(userDataReader, "name", "displayColor");
+    AiNodeSetRGB(userDataReader, "default", 1.0f, 1.0f, 1.0f);
+    AiNodeLink(userDataReader, "color", _fallbackShader);
+
     _renderParam.reset(new HdAiRenderParam());
 }
 
