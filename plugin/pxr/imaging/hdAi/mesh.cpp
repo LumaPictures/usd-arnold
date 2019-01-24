@@ -234,7 +234,7 @@ void HdAiMesh::Sync(
         }
     }
 
-    *dirtyBits = ~HdChangeTracker::AllSceneDirtyBits;
+    *dirtyBits = HdChangeTracker::Clean;
 }
 
 HdDirtyBits HdAiMesh::GetInitialDirtyBitsMask() const {
