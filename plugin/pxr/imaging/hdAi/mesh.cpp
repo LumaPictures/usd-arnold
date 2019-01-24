@@ -82,12 +82,28 @@ void HdAiMesh::Sync(
 
     if (HdChangeTracker::IsPrimvarDirty(*dirtyBits, id, HdTokens->points)) {
         param->End();
-        auto value = delegate->Get(id, HdTokens->points);
-        const auto& vecArray = value.Get<VtVec3fArray>();
-        AiNodeSetArray(
-            _mesh, Str::vlist,
-            AiArrayConvert(
-                vecArray.size(), 1, AI_TYPE_VECTOR, vecArray.data()));
+        constexpr size_t maxSamples = 2;
+        HdTimeSampleArray<VtValue, maxSamples> xf;
+        delegate->SamplePrimvar(id, HdTokens->points, &xf);
+        if (xf.count > 0 &&
+            ARCH_LIKELY(xf.values[0].IsHolding<VtVec3fArray>())) {
+            const auto& v0 = xf.values[0].Get<VtVec3fArray>();
+            if (xf.count > 1 &&
+                ARCH_UNLIKELY(!xf.values[1].IsHolding<VtVec3fArray>())) {
+                xf.count = 1;
+            }
+            auto* arr = AiArrayAllocate(v0.size(), xf.count, AI_TYPE_VECTOR);
+            AiArraySetKey(arr, 0, v0.data());
+            if (xf.count > 1) {
+                const auto& v1 = xf.values[1].Get<VtVec3fArray>();
+                if (ARCH_LIKELY(v1.size() == v0.size())) {
+                    AiArraySetKey(arr, 1, v1.data());
+                } else {
+                    AiArraySetKey(arr, 1, v0.data());
+                }
+            }
+            AiNodeSetArray(_mesh, Str::vlist, arr);
+        }
     }
 
     if (HdChangeTracker::IsTopologyDirty(*dirtyBits, id)) {

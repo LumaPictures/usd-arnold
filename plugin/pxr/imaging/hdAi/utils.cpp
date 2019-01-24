@@ -101,11 +101,10 @@ inline uint32_t _DeclareAndAssignFromArray(
     return 0;
 }
 
-inline
-void _DeclareAndAssignConstant(
+inline void _DeclareAndAssignConstant(
     AtNode* node, const TfToken& name, const VtValue& value,
     bool isColor = false) {
-    auto declareConstant = [&node, &name] (const TfToken& type) -> bool {
+    auto declareConstant = [&node, &name](const TfToken& type) -> bool {
         return _Declare(node, name, _tokens->constant, type);
     };
     if (value.IsHolding<bool>()) {
@@ -125,7 +124,8 @@ void _DeclareAndAssignConstant(
         AiNodeSetFlt(node, name.GetText(), value.UncheckedGet<float>());
     } else if (value.IsHolding<double>()) {
         if (!declareConstant(_tokens->FLOAT)) { return; }
-        AiNodeSetFlt(node, name.GetText(),
+        AiNodeSetFlt(
+            node, name.GetText(),
             static_cast<float>(value.UncheckedGet<double>()));
     } else if (value.IsHolding<GfVec2f>()) {
         if (!declareConstant(_tokens->VECTOR2)) { return; }
@@ -218,7 +218,8 @@ GfMatrix4f HdAiConvertMatrix(const AtMatrix& in) {
 
 void HdAiSetTransform(
     AtNode* node, HdSceneDelegate* delegate, const SdfPath& id) {
-    constexpr size_t maxSamples = 3;
+    // For now this is hardcoded to two samples and 0.0 / 1.0 sample times.
+    constexpr size_t maxSamples = 2;
     HdTimeSampleArray<GfMatrix4d, maxSamples> xf;
     delegate->SampleTransform(id, &xf);
     AtArray* matrices = AiArrayAllocate(1, xf.count, AI_TYPE_MATRIX);
