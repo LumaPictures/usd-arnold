@@ -366,7 +366,7 @@ void HdAiSetUniformPrimvar(
     AtNode* node, const SdfPath& id, HdSceneDelegate* delegate,
     const HdPrimvarDescriptor& primvarDesc) {
     _DeclareAndAssignFromArray(
-        node, primvarDesc.name, _tokens->varying,
+        node, primvarDesc.name, _tokens->uniform,
         delegate->Get(id, primvarDesc.name),
         primvarDesc.role == HdPrimvarRoleTokens->color);
 }
@@ -384,7 +384,7 @@ void HdAiSetFaceVaryingPrimvar(
     AtNode* node, const SdfPath& id, HdSceneDelegate* delegate,
     const HdPrimvarDescriptor& primvarDesc) {
     const auto numElements = _DeclareAndAssignFromArray(
-        node, primvarDesc.name, _tokens->varying,
+        node, primvarDesc.name, _tokens->indexed,
         delegate->Get(id, primvarDesc.name),
         primvarDesc.role == HdPrimvarRoleTokens->color);
     if (numElements != 0) {
@@ -393,7 +393,7 @@ void HdAiSetFaceVaryingPrimvar(
             AiArraySetUInt(a, i, i);
         }
         AiNodeSetArray(
-            node, TfStringPrintf("%sidsx", primvarDesc.name.GetText()).c_str(),
+            node, TfStringPrintf("%sidxs", primvarDesc.name.GetText()).c_str(),
             a);
     }
 }
