@@ -37,19 +37,24 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 TF_DEFINE_PRIVATE_TOKENS(
     _tokens, (BOOL)(BYTE)(INT)(UINT)(FLOAT)(VECTOR2)(VECTOR)(RGB)(RGBA)(STRING)(
-                 constant)(uniform)(varying)(indexed));
+                 constant)(uniform)(varying)(indexed)(
+                 (constantArray, "constant ARRAY")));
 
 namespace {
 
+inline bool _Declare(
+    AtNode* node, const TfToken& name, const TfToken& scope,
+    const TfToken& type) {
+    return AiNodeDeclare(
+        node, name.GetText(),
+        TfStringPrintf("%s %s", scope.GetText(), type.GetText()).c_str());
+}
+
 template <typename T>
-uint32_t _DeclareAndConvertArray(
+inline uint32_t _DeclareAndConvertArray(
     AtNode* node, const TfToken& name, const TfToken& scope,
     const TfToken& type, uint8_t arnoldType, const VtValue& value) {
-    if (!AiNodeDeclare(
-            node, name.GetText(),
-            TfStringPrintf("%s %s", scope.GetText(), type.GetText()).c_str())) {
-        return 0;
-    }
+    if (!_Declare(node, name, scope, type)) { return 0; }
     const auto& v = value.UncheckedGet<T>();
     auto a = AiArrayConvert(v.size(), 1, arnoldType, v.data());
     AiNodeSetArray(node, name.GetText(), a);
@@ -58,14 +63,14 @@ uint32_t _DeclareAndConvertArray(
 
 // This is useful for uniform, vertex and face-varying. We need to know the size
 // to generate the indices for faceVarying data.
-uint32_t _DeclareAndAssignFromArray(
+inline uint32_t _DeclareAndAssignFromArray(
     AtNode* node, const TfToken& name, const TfToken& scope,
     const VtValue& value, bool isColor = false) {
     if (value.IsHolding<VtBoolArray>()) {
         return _DeclareAndConvertArray<VtBoolArray>(
             node, name, scope, _tokens->BOOL, AI_TYPE_BOOLEAN, value);
-    } else if (value.IsHolding<VtCharArray>()) {
-        return _DeclareAndConvertArray<VtCharArray>(
+    } else if (value.IsHolding<VtUCharArray>()) {
+        return _DeclareAndConvertArray<VtUCharArray>(
             node, name, scope, _tokens->BYTE, AI_TYPE_BYTE, value);
     } else if (value.IsHolding<VtUIntArray>()) {
         return _DeclareAndConvertArray<VtUIntArray>(
@@ -94,6 +99,56 @@ uint32_t _DeclareAndAssignFromArray(
             node, name, scope, _tokens->RGBA, AI_TYPE_RGBA, value);
     }
     return 0;
+}
+
+inline
+void _DeclareAndAssignConstant(
+    AtNode* node, const TfToken& name, const VtValue& value,
+    bool isColor = false) {
+    auto declareConstant = [&node, &name] (const TfToken& type) -> bool {
+        return _Declare(node, name, _tokens->constant, type);
+    };
+    if (value.IsHolding<bool>()) {
+        if (!declareConstant(_tokens->BOOL)) { return; }
+        AiNodeSetBool(node, name.GetText(), value.UncheckedGet<bool>());
+    } else if (value.IsHolding<uint8_t>()) {
+        if (!declareConstant(_tokens->BYTE)) { return; }
+        AiNodeSetByte(node, name.GetText(), value.UncheckedGet<uint8_t>());
+    } else if (value.IsHolding<unsigned int>()) {
+        if (!declareConstant(_tokens->UINT)) { return; }
+        AiNodeSetUInt(node, name.GetText(), value.UncheckedGet<unsigned int>());
+    } else if (value.IsHolding<int>()) {
+        if (!declareConstant(_tokens->INT)) { return; }
+        AiNodeSetInt(node, name.GetText(), value.UncheckedGet<int>());
+    } else if (value.IsHolding<float>()) {
+        if (!declareConstant(_tokens->FLOAT)) { return; }
+        AiNodeSetFlt(node, name.GetText(), value.UncheckedGet<float>());
+    } else if (value.IsHolding<double>()) {
+        if (!declareConstant(_tokens->FLOAT)) { return; }
+        AiNodeSetFlt(node, name.GetText(),
+            static_cast<float>(value.UncheckedGet<double>()));
+    } else if (value.IsHolding<GfVec2f>()) {
+        if (!declareConstant(_tokens->VECTOR2)) { return; }
+        const auto& v = value.UncheckedGet<GfVec2f>();
+        AiNodeSetVec2(node, name.GetText(), v[0], v[1]);
+    } else if (value.IsHolding<GfVec3f>()) {
+        if (isColor) {
+            if (!declareConstant(_tokens->RGB)) { return; }
+            const auto& v = value.UncheckedGet<GfVec3f>();
+            AiNodeSetRGB(node, name.GetText(), v[0], v[1], v[2]);
+        } else {
+            if (!declareConstant(_tokens->VECTOR)) { return; }
+            const auto& v = value.UncheckedGet<GfVec3f>();
+            AiNodeSetVec(node, name.GetText(), v[0], v[1], v[2]);
+        }
+    } else if (value.IsHolding<GfVec4f>()) {
+        if (!declareConstant(_tokens->RGBA)) { return; }
+        const auto& v = value.UncheckedGet<GfVec4f>();
+        AiNodeSetRGBA(node, name.GetText(), v[0], v[1], v[2], v[3]);
+    } else {
+        _DeclareAndAssignFromArray(
+            node, name, _tokens->constantArray, value, isColor);
+    }
 }
 
 } // namespace
@@ -284,10 +339,27 @@ void HdAiSetParameter(
 void HdAiSetConstantPrimvar(
     AtNode* node, const SdfPath& id, HdSceneDelegate* delegate,
     const HdPrimvarDescriptor& primvarDesc) {
-    TF_UNUSED(node);
-    TF_UNUSED(id);
-    TF_UNUSED(delegate);
-    TF_UNUSED(primvarDesc);
+    const auto isColor = primvarDesc.role == HdPrimvarRoleTokens->color;
+    if (primvarDesc.name == HdTokens->color && isColor) {
+        if (!_Declare(
+                node, primvarDesc.name, _tokens->constant, _tokens->RGBA)) {
+            return;
+        }
+        const auto value = delegate->Get(id, primvarDesc.name);
+        if (value.IsHolding<GfVec4f>()) {
+            const auto& v = value.UncheckedGet<GfVec4f>();
+            AiNodeSetRGBA(
+                node, primvarDesc.name.GetText(), v[0], v[1], v[2], v[3]);
+        } else if (value.IsHolding<VtVec4fArray>()) {
+            const auto& arr = value.UncheckedGet<VtVec4fArray>();
+            if (arr.empty()) { return; }
+            const auto& v = arr[0];
+            AiNodeSetRGBA(
+                node, primvarDesc.name.GetText(), v[0], v[1], v[2], v[3]);
+        }
+    }
+    _DeclareAndAssignConstant(
+        node, primvarDesc.name, delegate->Get(id, primvarDesc.name), isColor);
 }
 
 void HdAiSetUniformPrimvar(
