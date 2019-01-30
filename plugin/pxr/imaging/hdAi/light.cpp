@@ -158,11 +158,12 @@ auto domeLightSync = [](AtNode* light, const AtNodeEntry* nentry,
         delegate->GetLightParamValue(id, UsdLuxTokens->textureFormat);
     if (formatValue.IsHolding<TfToken>()) {
         const auto& textureFormat = formatValue.UncheckedGet<TfToken>();
-        AiNodeSetStr(light, formatStr, angularStr); // default value
         if (textureFormat == UsdLuxTokens->latlong) {
             AiNodeSetStr(light, formatStr, latlongStr);
         } else if (textureFormat == UsdLuxTokens->mirroredBall) {
             AiNodeSetStr(light, formatStr, mirroredBallStr);
+        } else {
+            AiNodeSetStr(light, formatStr, angularStr); // default value    
         }
     }
 };
