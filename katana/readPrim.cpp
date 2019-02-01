@@ -29,11 +29,13 @@
 // ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "readPrim.h"
 
+#include <pxr/base/tf/envSetting.h>
 #include <pxr/base/tf/type.h>
 #include <pxr/usd/usd/primRange.h>
 #include <pxr/usd/usdAi/aiAOV.h>
 #include <pxr/usd/usdAi/aiMaterialAPI.h>
 #include <pxr/usd/usdAi/aiShapeAPI.h>
+#include <pxr/usd/usdGeom/gprim.h>
 #include <pxr/usd/usdShade/material.h>
 #include <pxr/usd/usdShade/shader.h>
 
@@ -45,6 +47,11 @@
 #include "readMaterial.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
+
+TF_DEFINE_ENV_SETTING(
+    USD_ARNOLD_KATANA_CONVERT_FLOAT_2, true,
+    "Set true to enable conversion of float/2 arbitrary attributes to vertex "
+    "2.");
 
 // TODO: Implement AttributeKeyedCache subclass to reuse computed AOV data, key
 // it off of some subset of the op args (and possibly graph state, if needed).
@@ -257,6 +264,47 @@ void readPrimLocation(
     static const std::string statementsName("arnoldStatements");
     updateOrCreateAttr(
         interface, statementsName, getArnoldStatementsGroup(prim));
+
+    // We have to check all the existing arbitrary attributes and
+    // modify the ones with inputType of float and elementSize of 2,
+    // to not have the elementSize and change the inputType to vector2.
+    const UsdGeomGprim gprim(prim);
+    static const auto convertFloat2 =
+        TfGetEnvSetting(USD_ARNOLD_KATANA_CONVERT_FLOAT_2);
+    if (convertFloat2 && gprim) {
+        FnKat::GroupAttribute attr =
+            interface.getOutputAttr("geometry.arbitrary");
+        if (attr.isValid()) {
+            const auto numChildren = attr.getNumberOfChildren();
+            for (auto c = decltype(numChildren){0}; c < numChildren; ++c) {
+                FnKat::GroupAttribute child = attr.getChildByIndex(c);
+                if (!child.isValid()) { continue; }
+                FnKat::StringAttribute inputType =
+                    child.getChildByName("inputType");
+                if (!inputType.isValid()) { continue; }
+                FnKat::IntAttribute elementSize =
+                    child.getChildByName("elementSize");
+                if (!elementSize.isValid()) { continue; }
+                if (inputType.getValue() != "float" ||
+                    elementSize.getValue() != 2) {
+                    continue;
+                }
+                const auto childName = attr.getChildName(c);
+                {
+                    std::stringstream ss;
+                    ss << "geometry.arbitrary." << childName << ".elementSize";
+                    interface.deleteAttr(ss.str());
+                }
+                {
+                    std::stringstream ss;
+                    ss << "geometry.arbitrary." << childName << ".inputType";
+                    FnAttribute::StringBuilder builder(1);
+                    builder.push_back("vector2");
+                    interface.setAttr(ss.str(), builder.build());
+                }
+            }
+        }
+    }
 
     // We are handling connections here, because usd-arnold stores the
     // connections in it's own way. So we check for the materials connected to
