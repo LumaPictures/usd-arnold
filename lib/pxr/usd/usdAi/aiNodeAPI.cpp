@@ -335,7 +335,7 @@ _flipTupleVector(const std::vector<std::tuple<A, B>>& v) {
 }
 
 auto _tokenSort = [](const TfToken& a, const TfToken& b) -> bool {
-    return TfToken::LTTokenFunctor()(a, b);
+    return a < b;
 };
 
 // TODO: sort Tokens.
