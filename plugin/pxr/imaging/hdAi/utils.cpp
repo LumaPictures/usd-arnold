@@ -325,7 +325,7 @@ void HdAiSetConstantPrimvar(
     AtNode* node, const SdfPath& id, HdSceneDelegate* delegate,
     const HdPrimvarDescriptor& primvarDesc) {
     const auto isColor = primvarDesc.role == HdPrimvarRoleTokens->color;
-    if (primvarDesc.name == HdTokens->color && isColor) {
+    if (primvarDesc.name == HdPrimvarRoleTokens->color && isColor) {
         if (!_Declare(
                 node, primvarDesc.name, _tokens->constant, _tokens->RGBA)) {
             return;
