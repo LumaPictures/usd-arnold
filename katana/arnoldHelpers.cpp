@@ -162,126 +162,114 @@ void getArnoldVDBVolumeOpArgs(
 }
 
 FnKat::Attribute getArnoldStatementsGroup(const UsdPrim& prim) {
-    UsdAiShapeAPI shapeAPI(prim);
-    if (!shapeAPI) {
-        // API Schema was not applied to `prim`
-        return FnKat::Attribute();
-    }
-
-    // Sadly std::array needs the size passed as a parameter, so a static const
-    // std::vector will do the same in our case.
-    static const std::vector<_attributeDefinition<bool>> boolAttrs = {
-        {&UsdAiShapeAPI::GetAiVisibleToCameraAttr, "visibility.AI_RAY_CAMERA",
-         true},
-        {&UsdAiShapeAPI::GetAiVisibleToShadowAttr, "visibility.AI_RAY_SHADOW",
-         true},
-        {&UsdAiShapeAPI::GetAiVisibleToDiffuseTransmitAttr,
-         "visibility.AI_RAY_DIFFUSE_TRANSMIT", true},
-        {&UsdAiShapeAPI::GetAiVisibleToSpecularTransmitAttr,
-         "visibility.AI_RAY_SPECULAR_TRANSMIT", true},
-        {&UsdAiShapeAPI::GetAiVisibleToVolumeAttr, "visibility.AI_RAY_VOLUME",
-         true},
-        {&UsdAiShapeAPI::GetAiVisibleToDiffuseReflectAttr,
-         "visibility.AI_RAY_DIFFUSE_REFLECT", true},
-        {&UsdAiShapeAPI::GetAiVisibleToSpecularReflectAttr,
-         "visibility.AI_RAY_SPECULAR_REFLECT", true},
-        {&UsdAiShapeAPI::GetAiVisibleToSubsurfaceAttr,
-         "visibility.AI_RAY_SUBSURFACE", true},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToCameraAttr,
-         "sidedness.AI_RAY_CAMERA", true},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToShadowAttr,
-         "sidedness.AI_RAY_SHADOW", true},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToDiffuseTransmitAttr,
-         "sidedness.AI_RAY_DIFFUSE_TRANSMIT", true},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToSpecularTransmitAttr,
-         "sidedness.AI_RAY_SPECULAR_TRANSMIT", true},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToVolumeAttr,
-         "sidedness.AI_RAY_VOLUME", true},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToDiffuseReflectAttr,
-         "sidedness.AI_RAY_DIFFUSE_REFLECT", true},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToSpecularReflectAttr,
-         "sidedness.AI_RAY_SPECULAR_REFLECT", true},
-        {&UsdAiShapeAPI::GetAiDoubleSidedToSubsurfaceAttr,
-         "sidedness.AI_RAY_SUBSURFACE", true},
-        {&UsdAiShapeAPI::GetAiAutobumpVisibleToCameraAttr,
-         "autobump_visibility.AI_RAY_CAMERA", true},
-        {&UsdAiShapeAPI::GetAiAutobumpVisibleToShadowAttr,
-         "autobump_visibility.AI_RAY_SHADOW", true},
-        {&UsdAiShapeAPI::GetAiAutobumpVisibleToDiffuseTransmitAttr,
-         "autobump_visibility.AI_RAY_DIFFUSE_TRANSMIT", true},
-        {&UsdAiShapeAPI::GetAiAutobumpVisibleToSpecularTransmitAttr,
-         "autobump_visibility.AI_RAY_SPECULAR_TRANSMIT", true},
-        {&UsdAiShapeAPI::GetAiAutobumpVisibleToVolumeAttr,
-         "autobump_visibility.AI_RAY_VOLUME", true},
-        {&UsdAiShapeAPI::GetAiAutobumpVisibleToDiffuseReflectAttr,
-         "autobump_visibility.AI_RAY_DIFFUSE_REFLECT", true},
-        {&UsdAiShapeAPI::GetAiAutobumpVisibleToSpecularReflectAttr,
-         "autobump_visibility.AI_RAY_SPECULAR_REFLECT", true},
-        {&UsdAiShapeAPI::GetAiAutobumpVisibleToSubsurfaceAttr,
-         "autobump_visibility.AI_RAY_SUBSURFACE", true},
-        // Non visibility attributes where the pattern still applies.
-        {&UsdAiShapeAPI::GetAiOpaqueAttr, "opaque", true},
-        {&UsdAiShapeAPI::GetAiReceiveShadowsAttr, "receive_shadows", true},
-        {&UsdAiShapeAPI::GetAiSelfShadowsAttr, "self_shadows", true},
-        // Parameters with false as their default value.
-        {&UsdAiShapeAPI::GetAiMatteAttr, "matte", false},
-        {&UsdAiShapeAPI::GetAiSmoothingAttr, "smoothing", false},
-        {&UsdAiShapeAPI::GetAiSubdivSmoothDerivsAttr, "subdiv_smooth_derivs",
-         false},
-        {&UsdAiShapeAPI::GetAiDispAutobumpAttr, "disp_autobump", false}};
-
-    static const std::vector<_attributeDefinition<float>> floatAttrs{
-        {&UsdAiShapeAPI::GetAiSubdivAdaptiveErrorAttr, "subdiv_adaptive_error",
-         0.0f},
-        {&UsdAiShapeAPI::GetAiDispPaddingAttr, "disp_padding", 0.0f},
-        {&UsdAiShapeAPI::GetAiDispHeightAttr, "disp_height", 1.0f},
-        {&UsdAiShapeAPI::GetAiDispZeroValueAttr, "zero_value", 0.0f},
-        {&UsdAiShapeAPI::GetAiRayBiasAttr, "ray_bias", 0.000001f},
-    };
-
-    static const std::vector<_attributeDefinition<unsigned int>> uintAttrs{
-        {&UsdAiShapeAPI::GetAiSubdivIterationsAttr, "iterations", 1},
-    };
-
-    static const std::vector<_attributeDefinition<TfToken>> stringAttrs{
-        {&UsdAiShapeAPI::GetAiSubdivTypeAttr, "subdiv_type", TfToken("none")},
-        {&UsdAiShapeAPI::GetAiSubdivAdaptiveMetricAttr,
-         "subdiv_adaptive_metric", TfToken("auto_")},
-        {&UsdAiShapeAPI::GetAiSubdivAdaptiveSpaceAttr, "subdiv_adaptive_space",
-         TfToken("raster")},
-        {&UsdAiShapeAPI::GetAiSubdivUVSmoothingAttr, "subdiv_uv_smoothing",
-         TfToken("pin_corners")},
-        {&UsdAiShapeAPI::GetAiTransformTypeAttr, "transform_type",
-         TfToken("rotate_about_center")},
-    };
-
     FnKat::GroupBuilder builder;
 
-    handleAttributes(boolAttrs, shapeAPI, builder);
-    handleAttributes(floatAttrs, shapeAPI, builder);
-    handleAttributes(uintAttrs, shapeAPI, builder);
-    handleAttributes(stringAttrs, shapeAPI, builder);
+    // Generic shape attributes
+    if (auto shapeAPI = UsdAiShapeAPI(prim)) {
+        // Sadly std::array needs the size passed as a parameter, so a static
+        // const std::vector will do the same in our case.
+        static const std::vector<_attributeDefinition<bool>> boolAttrs = {
+            {&UsdAiShapeAPI::GetAiVisibleToCameraAttr,
+              "visibility.AI_RAY_CAMERA", true},
+            {&UsdAiShapeAPI::GetAiVisibleToShadowAttr,
+              "visibility.AI_RAY_SHADOW", true},
+            {&UsdAiShapeAPI::GetAiVisibleToDiffuseTransmitAttr,
+             "visibility.AI_RAY_DIFFUSE_TRANSMIT", true},
+            {&UsdAiShapeAPI::GetAiVisibleToSpecularTransmitAttr,
+             "visibility.AI_RAY_SPECULAR_TRANSMIT", true},
+            {&UsdAiShapeAPI::GetAiVisibleToVolumeAttr,
+             "visibility.AI_RAY_VOLUME", true},
+            {&UsdAiShapeAPI::GetAiVisibleToDiffuseReflectAttr,
+             "visibility.AI_RAY_DIFFUSE_REFLECT", true},
+            {&UsdAiShapeAPI::GetAiVisibleToSpecularReflectAttr,
+             "visibility.AI_RAY_SPECULAR_REFLECT", true},
+            {&UsdAiShapeAPI::GetAiVisibleToSubsurfaceAttr,
+             "visibility.AI_RAY_SUBSURFACE", true},
+            {&UsdAiShapeAPI::GetAiDoubleSidedToCameraAttr,
+             "sidedness.AI_RAY_CAMERA", true},
+            {&UsdAiShapeAPI::GetAiDoubleSidedToShadowAttr,
+             "sidedness.AI_RAY_SHADOW", true},
+            {&UsdAiShapeAPI::GetAiDoubleSidedToDiffuseTransmitAttr,
+             "sidedness.AI_RAY_DIFFUSE_TRANSMIT", true},
+            {&UsdAiShapeAPI::GetAiDoubleSidedToSpecularTransmitAttr,
+             "sidedness.AI_RAY_SPECULAR_TRANSMIT", true},
+            {&UsdAiShapeAPI::GetAiDoubleSidedToVolumeAttr,
+             "sidedness.AI_RAY_VOLUME", true},
+            {&UsdAiShapeAPI::GetAiDoubleSidedToDiffuseReflectAttr,
+             "sidedness.AI_RAY_DIFFUSE_REFLECT", true},
+            {&UsdAiShapeAPI::GetAiDoubleSidedToSpecularReflectAttr,
+             "sidedness.AI_RAY_SPECULAR_REFLECT", true},
+            {&UsdAiShapeAPI::GetAiDoubleSidedToSubsurfaceAttr,
+             "sidedness.AI_RAY_SUBSURFACE", true},
+            {&UsdAiShapeAPI::GetAiAutobumpVisibleToCameraAttr,
+             "autobump_visibility.AI_RAY_CAMERA", true},
+            {&UsdAiShapeAPI::GetAiAutobumpVisibleToShadowAttr,
+             "autobump_visibility.AI_RAY_SHADOW", true},
+            {&UsdAiShapeAPI::GetAiAutobumpVisibleToDiffuseTransmitAttr,
+             "autobump_visibility.AI_RAY_DIFFUSE_TRANSMIT", true},
+            {&UsdAiShapeAPI::GetAiAutobumpVisibleToSpecularTransmitAttr,
+             "autobump_visibility.AI_RAY_SPECULAR_TRANSMIT", true},
+            {&UsdAiShapeAPI::GetAiAutobumpVisibleToVolumeAttr,
+             "autobump_visibility.AI_RAY_VOLUME", true},
+            {&UsdAiShapeAPI::GetAiAutobumpVisibleToDiffuseReflectAttr,
+             "autobump_visibility.AI_RAY_DIFFUSE_REFLECT", true},
+            {&UsdAiShapeAPI::GetAiAutobumpVisibleToSpecularReflectAttr,
+             "autobump_visibility.AI_RAY_SPECULAR_REFLECT", true},
+            {&UsdAiShapeAPI::GetAiAutobumpVisibleToSubsurfaceAttr,
+             "autobump_visibility.AI_RAY_SUBSURFACE", true},
+            // Non visibility attributes where the pattern still applies.
+            {&UsdAiShapeAPI::GetAiOpaqueAttr, "opaque", true},
+            {&UsdAiShapeAPI::GetAiReceiveShadowsAttr, "receive_shadows", true},
+            {&UsdAiShapeAPI::GetAiSelfShadowsAttr, "self_shadows", true},
+            // Parameters with false as their default value.
+            {&UsdAiShapeAPI::GetAiMatteAttr, "matte", false},
+            {&UsdAiShapeAPI::GetAiSmoothingAttr, "smoothing", false},
+            {&UsdAiShapeAPI::GetAiSubdivSmoothDerivsAttr,
+             "subdiv_smooth_derivs", false},
+            {&UsdAiShapeAPI::GetAiDispAutobumpAttr, "disp_autobump", false}};
 
-    // SubdivAdaptiveMetricAttr will require special handling,
-    // if we decide to setup parameters even with the
-    // default values. It requires special handling, because one of the values
-    // is named auto. The way USD generates tokens, it collides with the c++
-    // auto keyword, so we had to name it auto_.
+        static const std::vector<_attributeDefinition<float>> floatAttrs{
+            {&UsdAiShapeAPI::GetAiSubdivAdaptiveErrorAttr,
+             "subdiv_adaptive_error", 0.0f},
+            {&UsdAiShapeAPI::GetAiDispPaddingAttr, "disp_padding", 0.0f},
+            {&UsdAiShapeAPI::GetAiDispHeightAttr, "disp_height", 1.0f},
+            {&UsdAiShapeAPI::GetAiDispZeroValueAttr, "zero_value", 0.0f},
+            {&UsdAiShapeAPI::GetAiRayBiasAttr, "ray_bias", 0.000001f},
+        };
 
-    // To support width and parameter interpolation for basis curves we have
-    // to check if the value of the type and the basis on the BasisCurve to
-    // setup arnoldStatements.curve_basis.
+        static const std::vector<_attributeDefinition<unsigned int>> uintAttrs{
+            {&UsdAiShapeAPI::GetAiSubdivIterationsAttr, "iterations", 1},
+        };
 
-    UsdGeomBasisCurves basisCurves(prim);
+        static const std::vector<_attributeDefinition<TfToken>> stringAttrs{
+            {&UsdAiShapeAPI::GetAiSubdivTypeAttr, "subdiv_type",
+             TfToken("none")},
+            {&UsdAiShapeAPI::GetAiSubdivAdaptiveMetricAttr,
+             "subdiv_adaptive_metric", TfToken("auto_")},
+            {&UsdAiShapeAPI::GetAiSubdivAdaptiveSpaceAttr,
+             "subdiv_adaptive_space", TfToken("raster")},
+            {&UsdAiShapeAPI::GetAiSubdivUVSmoothingAttr,
+             "subdiv_uv_smoothing", TfToken("pin_corners")},
+            {&UsdAiShapeAPI::GetAiTransformTypeAttr, "transform_type",
+             TfToken("rotate_about_center")},
+        };
 
-    if (basisCurves) {
+        handleAttributes(boolAttrs, shapeAPI, builder);
+        handleAttributes(floatAttrs, shapeAPI, builder);
+        handleAttributes(uintAttrs, shapeAPI, builder);
+        handleAttributes(stringAttrs, shapeAPI, builder);
+    }
+
+    // Curves attributes
+    if (auto basisCurves = UsdGeomBasisCurves(prim)) {
         TfToken type;
         basisCurves.GetTypeAttr().Get<TfToken>(&type);
 
         std::string curveBasis;
         if (type == UsdGeomTokens->linear) {
             curveBasis = "linear";
-        } else {
+        }
+        else {
             TfToken basis;
             basisCurves.GetBasisAttr().Get<TfToken>(&basis);
             if (basis == UsdGeomTokens->bezier) {
