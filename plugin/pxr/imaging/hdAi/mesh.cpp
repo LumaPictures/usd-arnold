@@ -208,8 +208,28 @@ void HdAiMesh::Sync(
         }
         for (const auto& primvar : delegate->GetPrimvarDescriptors(
                  id, HdInterpolation::HdInterpolationVertex)) {
-            if (primvar.name == HdTokens->points) { continue; }
-            HdAiSetVertexPrimvar(_mesh, id, delegate, primvar);
+            if (primvar.name == HdTokens->points) {
+                continue;
+            } else if (
+                primvar.name == _tokens->st || primvar.name == _tokens->uv) {
+                const auto v = delegate->Get(id, primvar.name);
+                if (v.IsHolding<VtArray<GfVec2f>>()) {
+                    const auto& uv = v.UncheckedGet<VtArray<GfVec2f>>();
+                    const auto numUVs = static_cast<unsigned int>(uv.size());
+                    // Can assume uvs are flattened, with indices matching
+                    // vert indices
+                    auto* uvlist =
+                        AiArrayConvert(numUVs, 1, AI_TYPE_VECTOR2, uv.data());
+                    auto* uvidxs =
+                        AiArrayCopy(AiNodeGetArray(_mesh, Str::vidxs));
+
+                    AiNodeSetArray(_mesh, Str::uvlist, uvlist);
+                    AiNodeSetArray(_mesh, Str::uvidxs, uvidxs);
+                }
+
+            } else {
+                HdAiSetVertexPrimvar(_mesh, id, delegate, primvar);
+            }
         }
         for (const auto& primvar : delegate->GetPrimvarDescriptors(
                  id, HdInterpolation::HdInterpolationFaceVarying)) {
