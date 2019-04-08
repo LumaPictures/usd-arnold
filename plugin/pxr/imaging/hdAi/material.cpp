@@ -15,6 +15,7 @@
 
 #include <pxr/usdImaging/usdImaging/tokens.h>
 
+#include "pxr/imaging/hdAi/debugCodes.h"
 #include "pxr/imaging/hdAi/utils.h"
 
 PXR_NAMESPACE_OPEN_SCOPE
@@ -65,6 +66,10 @@ AtNode* HdAiMaterial::GetSurfaceShader() const { return _surface; }
 AtNode* HdAiMaterial::GetDisplacementShader() const { return _displacement; }
 
 AtNode* HdAiMaterial::ReadMaterialNetwork(const HdMaterialNetwork& network) {
+    TF_DEBUG(HDAI_MATERIAL)
+        .Msg(
+            "HdAiMaterial::ReadMaterialNetwork - %s - num nodes: %lu\n",
+            GetId().GetText(), network.nodes.size());
     if (network.nodes.empty()) { return nullptr; }
 
     std::vector<AtNode*> nodes;
@@ -93,20 +98,38 @@ AtNode* HdAiMaterial::ReadMaterial(const HdMaterialNode& material) {
     const auto* nodeTypeStr = material.identifier.GetText();
     const AtString nodeType(
         strncmp(nodeTypeStr, "ai:", 3) == 0 ? nodeTypeStr + 3 : nodeTypeStr);
+
+    TF_DEBUG(HDAI_MATERIAL)
+        .Msg(
+            "HdAiMaterial::ReadMaterial - node %s - type %s\n",
+            nodeName.c_str(), nodeType.c_str());
     AtNode* ret = nullptr;
     const auto nodeIt = _nodes.find(nodeName);
     if (nodeIt != _nodes.end()) {
         if (AiNodeEntryGetNameAtString(AiNodeGetNodeEntry(nodeIt->second)) !=
             nodeType) {
+            TF_DEBUG(HDAI_MATERIAL)
+                .Msg(
+                    "  existing node found, but type mismatch - deleting old "
+                    "node\n");
             AiNodeDestroy(nodeIt->second);
             _nodes.erase(nodeIt);
         } else {
+            TF_DEBUG(HDAI_MATERIAL).Msg("  existing node found - using it\n");
             ret = nodeIt->second;
         }
     }
     if (ret == nullptr) {
         ret = AiNode(_delegate->GetUniverse(), nodeType);
-        if (ret == nullptr) { return nullptr; }
+        if (ret == nullptr) {
+            TF_DEBUG(HDAI_MATERIAL)
+                .Msg(
+                    "  unable to create node of type %s - aborting\n",
+                    nodeType.c_str());
+            return nullptr;
+        }
+        TF_DEBUG(HDAI_MATERIAL)
+            .Msg("  created node of type %s\n", nodeType.c_str());
         AiNodeSetStr(ret, nameStr, nodeName);
         _nodes.emplace(nodeName, ret);
     }

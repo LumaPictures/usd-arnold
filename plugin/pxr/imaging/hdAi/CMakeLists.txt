@@ -54,6 +54,9 @@ pxr_plugin(hdAi
         nodes/driver.cpp
         nodes/nodes.cpp
 
+    PRIVATE_CLASSES
+        debugCodes
+
     PRIVATE_HEADERS
         nodes/nodes.h
 
