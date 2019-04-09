@@ -79,15 +79,45 @@ AtNode* HdAiMaterial::ReadMaterialNetwork(const HdMaterialNetwork& network) {
         if (n != nullptr) { nodes.push_back(n); }
     }
 
-    // Currently USD can't describe partial connections, so we just do a full
-    // link.
     for (const auto& relationship : network.relationships) {
         auto* inputNode = FindMaterial(relationship.inputId);
         if (inputNode == nullptr) { continue; }
         std::remove(nodes.begin(), nodes.end(), inputNode);
         auto* outputNode = FindMaterial(relationship.outputId);
         if (outputNode == nullptr) { continue; }
-        AiNodeLink(inputNode, relationship.outputName.GetText(), outputNode);
+
+        // See if the inputName is a single channel we recognize
+        bool usedInputName = false;
+        if (relationship.inputName.size() == 1) {
+            const char* inputName = relationship.inputName.GetText();
+            if (inputName[0] == 'r' || inputName[0] == 'g' ||
+                inputName[0] == 'b' || inputName[0] == 'a' ||
+                inputName[0] == 'x' || inputName[0] == 'y' ||
+                inputName[0] == 'z' || inputName[0] == 'w') {
+                usedInputName = true;
+                TF_DEBUG(HDAI_MATERIAL)
+                    .Msg(
+                        "HdAiMaterial::ReadMaterialNetwork - Linking %s.%s => "
+                        "%s.%s\n",
+                        relationship.inputId.GetText(),
+                        relationship.inputName.GetText(),
+                        relationship.outputId.GetText(),
+                        relationship.outputName.GetText());
+                AiNodeLinkOutput(
+                    inputNode, inputName, outputNode,
+                    relationship.outputName.GetText());
+            }
+        }
+        if (!usedInputName) {
+            TF_DEBUG(HDAI_MATERIAL)
+                .Msg(
+                    "HdAiMaterial::ReadMaterialNetwork - Linking %s => %s.%s\n",
+                    relationship.inputId.GetText(),
+                    relationship.outputId.GetText(),
+                    relationship.outputName.GetText());
+            AiNodeLink(
+                inputNode, relationship.outputName.GetText(), outputNode);
+        }
     }
 
     return nodes.empty() ? nullptr : nodes.front();
