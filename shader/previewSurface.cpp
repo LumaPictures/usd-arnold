@@ -57,6 +57,33 @@ node_initialize {}
 
 #include <iostream>
 
+// Thanks to  Chris­t­ian Schuler, for the contangent_frame
+//     + perturb_normal funcs:
+// http://www.thetenthplanet.de/archives/1180
+AtMatrix cotangentFrame(AtShaderGlobals* sg) {
+    // get edge vectors of the pixel triangle
+    AtVector dp1 = sg->dPdx;
+    AtVector dp2 = sg->dPdy;
+    AtVector2 duv1(sg->dudx, sg->dvdx);
+    AtVector2 duv2(sg->dudy, sg->dvdy);
+
+    // solve the linear system
+    AtVector dp2perp = AiV3Cross(dp2, sg->N);
+    AtVector dp1perp = AiV3Cross(sg->N, dp1);
+    AtVector T = dp2perp * duv1.x + dp1perp * duv2.x;
+    AtVector B = dp2perp * duv1.y + dp1perp * duv2.y;
+
+    // construct a scale-invariant frame
+    float invmax = 1.0 / sqrt(std::max(AiV3Dot(T, T), AiV3Dot(B, B)));
+    return AiM4Transpose(
+        AiM4Frame(AtVector(0, 0, 0), T * invmax, B * invmax, sg->N));
+}
+
+AtVector perturbNormal(AtShaderGlobals* sg, AtVector tangentNormal) {
+    AtMatrix TBN = cotangentFrame(sg);
+    return AiV3Normalize(AiM4VectorByMatrixMult(TBN, tangentNormal));
+}
+
 node_update {}
 
 node_finish {}
@@ -77,8 +104,21 @@ shader_evaluate {
         return;
     }
 
+    const auto tangentNormal = AiShaderEvalParamVec(p_normal);
+    if (!AiV3IsSmall(tangentNormal) &&
+        !AiV3IsSmall(tangentNormal - AtVector(0, 0, 1))) {
+        sg->N = perturbNormal(sg, tangentNormal);
+        // TODO: confirm that Nf is facing forward w/rt Rd
+        // sg->Nf = sg->N;
+        // AiFaceForward(sg->Nf, -sg->Rd);
+        AtVector newNf = sg->N;
+        AiFaceForward(sg->N, sg->Nf);
+        sg->Nf = newNf;
+    }
+
     // TODO: implement the full shader.
-    closures.add(AiOrenNayarBSDF(sg, AiShaderEvalParamRGB(p_diffuseColor), sg->Nf));
+    closures.add(
+        AiOrenNayarBSDF(sg, AiShaderEvalParamRGB(p_diffuseColor), sg->Nf));
     const auto emissiveColor = AiShaderEvalParamRGB(p_emissiveColor);
     if (!AiColorIsSmall(emissiveColor)) {
         closures.add(AiClosureEmission(sg, emissiveColor));
