@@ -117,8 +117,11 @@ shader_evaluate {
     }
 
     // TODO: implement the full shader.
-    closures.add(
-        AiOrenNayarBSDF(sg, AiShaderEvalParamRGB(p_diffuseColor), sg->Nf));
+    const auto roughness = AiShaderEvalParamFlt(p_roughness);
+    const auto occlusion = AiShaderEvalParamFlt(p_occlusion);
+    closures.add(AiOrenNayarBSDF(
+        sg, occlusion * AiShaderEvalParamRGB(p_diffuseColor), sg->Nf,
+        roughness));
     const auto emissiveColor = AiShaderEvalParamRGB(p_emissiveColor);
     if (!AiColorIsSmall(emissiveColor)) {
         closures.add(AiClosureEmission(sg, emissiveColor));
