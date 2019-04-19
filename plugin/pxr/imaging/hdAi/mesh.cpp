@@ -28,6 +28,7 @@ namespace {
 namespace Str {
 const AtString name("name");
 const AtString polymesh("polymesh");
+const AtString visibility("visibility");
 const AtString vlist("vlist");
 const AtString vidxs("vidxs");
 const AtString nsides("nsides");
@@ -88,6 +89,13 @@ void HdAiMesh::Sync(
             }
             AiNodeSetArray(_mesh, Str::vlist, arr);
         }
+    }
+
+    if (HdChangeTracker::IsVisibilityDirty(*dirtyBits, id)) {
+        _UpdateVisibility(delegate, dirtyBits);
+        AiNodeSetByte(
+            _mesh, Str::visibility,
+            _sharedData.visible ? AI_RAY_ALL : uint8_t(0));
     }
 
     if (HdChangeTracker::IsTopologyDirty(*dirtyBits, id)) {
@@ -261,7 +269,7 @@ HdDirtyBits HdAiMesh::GetInitialDirtyBitsMask() const {
     return HdChangeTracker::Clean | HdChangeTracker::InitRepr |
            HdChangeTracker::DirtyPoints | HdChangeTracker::DirtyTopology |
            HdChangeTracker::DirtyTransform | HdChangeTracker::DirtyMaterialId |
-           HdChangeTracker::DirtyPrimvar;
+           HdChangeTracker::DirtyPrimvar | HdChangeTracker::DirtyVisibility;
 }
 
 HdDirtyBits HdAiMesh::_PropagateDirtyBits(HdDirtyBits bits) const {
