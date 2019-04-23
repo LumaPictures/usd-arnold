@@ -27,6 +27,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 namespace {
 
 const AtString pointLightType("point_light");
+const AtString spotLightType("spot_light");
 const AtString distantLightType("distant_light");
 const AtString diskLightType("disk_light");
 const AtString rectLightType("quad_light");
@@ -37,6 +38,8 @@ const AtString formatStr("format");
 const AtString angularStr("angular");
 const AtString latlongStr("latlong");
 const AtString mirroredBallStr("mirrored_ball");
+const AtString coneAngleStr("cone_angle");
+const AtString penumbraAngleStr("penumbra_angle");
 
 const AtString shaderStr("shader");
 const AtString imageStr("image");
@@ -63,11 +66,40 @@ std::vector<ParamDesc> genericParams = {
 
 std::vector<ParamDesc> pointParams = {{"radius", HdLightTokens->radius}};
 
+std::vector<ParamDesc> spotParams = {
+    {"radius", HdLightTokens->radius},
+    // cone_angle
+    // penumbra_angle
+    {"cosine_power", HdLightTokens->shapingFocus}};
+
 std::vector<ParamDesc> distantParams = {{"angle", HdLightTokens->angle}};
 
 std::vector<ParamDesc> diskParams = {{"radius", HdLightTokens->radius}};
 
 std::vector<ParamDesc> cylinderParams = {{"radius", HdLightTokens->radius}};
+
+bool hasSpotLightParams(HdSceneDelegate* delegate, const SdfPath& id) {
+    auto isDefault = [&delegate, &id](
+                         const TfToken& paramName, float defaultVal) -> bool {
+        auto val = delegate->GetLightParamValue(id, paramName);
+        if (val.IsEmpty()) { return true; }
+        if (val.IsHolding<float>()) {
+            return defaultVal == val.UncheckedGet<float>();
+        }
+        if (val.IsHolding<double>()) {
+            return defaultVal == static_cast<float>(val.UncheckedGet<double>());
+        }
+        // If it's holding an unexpected type, we won't be
+        // able to deal with that anyway, so treat it as
+        // default
+        return true;
+    };
+
+    if (!isDefault(HdLightTokens->shapingFocus, 0.0f)) { return true; }
+    if (!isDefault(HdLightTokens->shapingConeAngle, 180.0f)) { return true; }
+    if (!isDefault(HdLightTokens->shapingConeSoftness, 0.0f)) { return true; }
+    return false;
+}
 
 void iterateParams(
     AtNode* light, const AtNodeEntry* nentry, const SdfPath& id,
@@ -81,23 +113,44 @@ void iterateParams(
     }
 }
 
-auto pointLightSync = [](AtNode* light, const AtNodeEntry* nentry,
-                         const SdfPath& id, HdSceneDelegate* delegate) {
+auto pointLightSync = [](HdAiLight& aiLight, AtNode* light,
+                         const AtNodeEntry* nentry, const SdfPath& id,
+                         HdSceneDelegate* delegate) {
     iterateParams(light, nentry, id, delegate, pointParams);
 };
 
-auto distantLightSync = [](AtNode* light, const AtNodeEntry* nentry,
-                           const SdfPath& id, HdSceneDelegate* delegate) {
+auto spotLightSync = [](HdAiLight& aiLight, AtNode* light,
+                        const AtNodeEntry* nentry, const SdfPath& id,
+                        HdSceneDelegate* delegate) {
+    iterateParams(light, nentry, id, delegate, spotParams);
+
+    float hdAngle =
+        delegate->GetLightParamValue(id, HdLightTokens->shapingConeAngle)
+            .GetWithDefault(180.0f);
+    float softness =
+        delegate->GetLightParamValue(id, HdLightTokens->shapingConeSoftness)
+            .GetWithDefault(0.0f);
+    float arnoldAngle = hdAngle * 2;
+    float penumbra = arnoldAngle * softness;
+    AiNodeSetFlt(light, coneAngleStr, arnoldAngle);
+    AiNodeSetFlt(light, penumbraAngleStr, penumbra);
+};
+
+auto distantLightSync = [](HdAiLight& aiLight, AtNode* light,
+                           const AtNodeEntry* nentry, const SdfPath& id,
+                           HdSceneDelegate* delegate) {
     iterateParams(light, nentry, id, delegate, distantParams);
 };
 
-auto diskLightSync = [](AtNode* light, const AtNodeEntry* nentry,
-                        const SdfPath& id, HdSceneDelegate* delegate) {
+auto diskLightSync = [](HdAiLight& aiLight, AtNode* light,
+                        const AtNodeEntry* nentry, const SdfPath& id,
+                        HdSceneDelegate* delegate) {
     iterateParams(light, nentry, id, delegate, diskParams);
 };
 
-auto rectLightSync = [](AtNode* light, const AtNodeEntry* nentry,
-                        const SdfPath& id, HdSceneDelegate* delegate) {
+auto rectLightSync = [](HdAiLight& aiLight, AtNode* light,
+                        const AtNodeEntry* nentry, const SdfPath& id,
+                        HdSceneDelegate* delegate) {
     float width = 1.0f;
     float height = 1.0f;
     const auto& widthValue =
@@ -122,8 +175,9 @@ auto rectLightSync = [](AtNode* light, const AtNodeEntry* nentry,
             AtVector(-width, -height, 0.0f)));
 };
 
-auto cylinderLightSync = [](AtNode* light, const AtNodeEntry* nentry,
-                            const SdfPath& id, HdSceneDelegate* delegate) {
+auto cylinderLightSync = [](HdAiLight& aiLight, AtNode* light,
+                            const AtNodeEntry* nentry, const SdfPath& id,
+                            HdSceneDelegate* delegate) {
     iterateParams(light, nentry, id, delegate, cylinderParams);
     float length = 1.0f;
     const auto& lengthValue =
@@ -134,10 +188,12 @@ auto cylinderLightSync = [](AtNode* light, const AtNodeEntry* nentry,
     length /= 2.0f;
     AiNodeSetVec(light, "bottom", 0.0f, -length, 0.0f);
     AiNodeSetVec(light, "top", 0.0f, length, 0.0f);
+    return light;
 };
 
-auto domeLightSync = [](AtNode* light, const AtNodeEntry* nentry,
-                        const SdfPath& id, HdSceneDelegate* delegate) {
+auto domeLightSync = [](HdAiLight& aiLight, AtNode* light,
+                        const AtNodeEntry* nentry, const SdfPath& id,
+                        HdSceneDelegate* delegate) {
     const auto& formatValue =
         delegate->GetLightParamValue(id, UsdLuxTokens->textureFormat);
     if (formatValue.IsHolding<TfToken>()) {
@@ -147,16 +203,65 @@ auto domeLightSync = [](AtNode* light, const AtNodeEntry* nentry,
         } else if (textureFormat == UsdLuxTokens->mirroredBall) {
             AiNodeSetStr(light, formatStr, mirroredBallStr);
         } else {
-            AiNodeSetStr(light, formatStr, angularStr); // default value    
+            AiNodeSetStr(light, formatStr, angularStr); // default value
         }
     }
 };
 
 } // namespace
 
-HdAiLight* HdAiLight::CreatePointLight(
+void HdAiLight::SpotOrPointLightSync(
+    AtNode* light, const AtNodeEntry* nentry, const SdfPath& id,
+    HdSceneDelegate* sceneDelegate) {
+    if (hasSpotLightParams(sceneDelegate, id)) {
+        // It's currently a point_light, but it has spot_light parameters...
+        // we need to convert this from a point_light into a spot_light.
+        // We do this by:
+        //
+        // 1. Rename the point_light to a temporary name
+        // 2. Create a spot_light with the old_name
+        // 3. Swap the nodes with AiNodeReplace
+        // 4. Update the internal data
+
+        auto universe = _delegate->GetUniverse();
+
+        // 1. Rename the point_light to a temporary name
+        AtNode* oldLight = light;
+        auto oldName = AiNodeGetName(light);
+        std::string tempNameBase(std::string(oldName) + "_old_point_light");
+        std::string tempName(tempNameBase);
+        for (int i = 0; AiNodeLookUpByName(universe, tempName.c_str()); ++i) {
+            tempName.replace(
+                tempName.begin() + tempNameBase.size(), tempName.end(),
+                std::to_string(i));
+        }
+        AiNodeSetStr(oldLight, "name", tempName.c_str());
+
+        // 2. Create a spot_light with the old_name
+        light = AiNode(universe, spotLightType);
+        AiNodeSetStr(light, "name", oldName);
+
+        // 3. Swap the nodes with AiNodeReplace
+        AiNodeReplace(oldLight, light, true);
+
+        // 4. Update the internal data
+        _light = light;
+        _syncParams = spotLightSync;
+
+        return spotLightSync(*this, light, nentry, id, sceneDelegate);
+    }
+    return pointLightSync(*this, light, nentry, id, sceneDelegate);
+}
+
+HdAiLight* HdAiLight::CreatePointSpotLight(
     HdAiRenderDelegate* delegate, const SdfPath& id) {
-    return new HdAiLight(delegate, id, pointLightType, pointLightSync);
+    // Don't know how to check if it's a spot light at creation
+    // time, so we default to point, and will convert to spot
+    // on sync, if needed.
+    // This also allows us to deal with animated lights, that, don't
+    // initially look like spotLights, but do later
+    return new HdAiLight(
+        delegate, id, pointLightType, &HdAiLight::SpotOrPointLightSync);
 }
 
 HdAiLight* HdAiLight::CreateDistantLight(
@@ -195,7 +300,7 @@ void HdAiLight::Sync(
         const auto id = GetId();
         const auto* nentry = AiNodeGetNodeEntry(_light);
         iterateParams(_light, nentry, id, sceneDelegate, genericParams);
-        _syncParams(_light, nentry, id, sceneDelegate);
+        _syncParams(*this, _light, nentry, id, sceneDelegate);
         if (_supportsTexture) {
             SetupTexture(sceneDelegate->GetLightParamValue(
                 id, HdLightTokens->textureFile));

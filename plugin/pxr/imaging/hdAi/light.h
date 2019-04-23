@@ -28,7 +28,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 class HdAiLight : public HdLight {
 public:
     HDAI_API
-    static HdAiLight* CreatePointLight(
+    static HdAiLight* CreatePointSpotLight(
         HdAiRenderDelegate* delegate, const SdfPath& id);
 
     HDAI_API
@@ -60,7 +60,8 @@ public:
 
 protected:
     using SyncParams = std::function<void(
-        AtNode*, const AtNodeEntry*, const SdfPath&, HdSceneDelegate*)>;
+        HdAiLight&, AtNode*, const AtNodeEntry*, const SdfPath&,
+        HdSceneDelegate*)>;
 
     HDAI_API
     HdAiLight(
@@ -79,6 +80,11 @@ protected:
     AtNode* _light;
     AtNode* _texture = nullptr;
     bool _supportsTexture = false;
+
+private:
+    void SpotOrPointLightSync(
+        AtNode* light, const AtNodeEntry* nentry, const SdfPath& id,
+        HdSceneDelegate* sceneDelegate);
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

@@ -354,7 +354,7 @@ HdSprim* HdAiRenderDelegate::CreateSprim(
         return new HdAiMaterial(this, sprimId);
     }
     if (typeId == HdPrimTypeTokens->sphereLight) {
-        return HdAiLight::CreatePointLight(this, sprimId);
+        return HdAiLight::CreatePointSpotLight(this, sprimId);
     }
     if (typeId == HdPrimTypeTokens->distantLight) {
         return HdAiLight::CreateDistantLight(this, sprimId);
@@ -383,7 +383,7 @@ HdSprim* HdAiRenderDelegate::CreateFallbackSprim(const TfToken& typeId) {
         return new HdAiMaterial(this, SdfPath::EmptyPath());
     }
     if (typeId == HdPrimTypeTokens->sphereLight) {
-        return HdAiLight::CreatePointLight(this, SdfPath::EmptyPath());
+        return HdAiLight::CreatePointSpotLight(this, SdfPath::EmptyPath());
     }
     if (typeId == HdPrimTypeTokens->distantLight) {
         return HdAiLight::CreateDistantLight(this, SdfPath::EmptyPath());
