@@ -91,10 +91,6 @@ void readUSDVolVolume(
     PxrUsdKatanaReadPrim(prim, privateData, attrs);
     attrs.toInterface(interface);
 
-    // Advertise the connected field names
-    interface.setAttr(
-        "info.usdAi.vdbFields", FnKat::StringAttribute(vdbFieldNames));
-
     // If any of the VDB field prims are children of the Volume prim (which is
     // the recommended organization), tell the `pxrUsdIn` op to skip over them,
     // to avoid generating extra empty groups that may cause confusion.
@@ -106,6 +102,10 @@ void readUSDVolVolume(
     FnKat::GroupBuilder argsBuilder;
     getArnoldVDBVolumeOpArgs(prim, argsBuilder);
     argsBuilder.set("filename", FnKat::StringAttribute(*vdbPaths.begin()));
+
+    // TODO: We should not send all the grids to Arnold.
+    // Ideally Ktoa should pick only the grids uses by shaders.
+    argsBuilder.set("grids", FnAttribute::StringAttribute(vdbFieldNames));
 
     FnKat::GroupAttribute xform;
     if (PxrUsdKatanaReadXformable(volume, privateData, xform)) {
