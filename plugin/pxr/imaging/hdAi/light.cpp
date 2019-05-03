@@ -222,6 +222,7 @@ void HdAiLight::SpotOrPointLightSync(
         // 2. Create a spot_light with the old_name
         // 3. Swap the nodes with AiNodeReplace
         // 4. Update the internal data
+        // 5. Re-sync
 
         auto universe = _delegate->GetUniverse();
 
@@ -248,6 +249,9 @@ void HdAiLight::SpotOrPointLightSync(
         _light = light;
         _syncParams = spotLightSync;
 
+        // 5. Re-sync
+        nentry = AiNodeGetNodeEntry(light);
+        iterateParams(light, nentry, id, sceneDelegate, genericParams);
         return spotLightSync(*this, light, nentry, id, sceneDelegate);
     }
     return pointLightSync(*this, light, nentry, id, sceneDelegate);
