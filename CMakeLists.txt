@@ -2,6 +2,11 @@ project(usdai)
 
 # >=3.1 is required for CMAKE_CXX_STANDARD
 cmake_minimum_required(VERSION 3.1)
+
+if (UNIX AND NOT APPLE)
+    set(LINUX TRUE)
+endif ()
+
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/defaults
                       ${CMAKE_SOURCE_DIR}/cmake/modules
                       ${CMAKE_SOURCE_DIR}/cmake/macros)
