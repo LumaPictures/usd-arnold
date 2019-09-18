@@ -124,6 +124,22 @@ foreach (lib ${USD_MAYA_LIBS})
     endif ()
 endforeach ()
 
+set(USD_KATANA_LIBS usdKatana;vtKatana)
+
+foreach (lib ${USD_KATANA_LIBS})
+    find_library(USD_KATANA_${lib}_LIBRARY
+        NAMES ${USD_LIB_PREFIX}${lib}${USD_LIB_EXTENSION}
+        HINTS ${USD_KATANA_LIBRARY_DIR})
+    if (USD_KATANA_${lib}_LIBRARY)
+        add_library(${lib} INTERFACE IMPORTED)
+        set_target_properties(${lib}
+            PROPERTIES
+            INTERFACE_LINK_LIBRARIES ${USD_KATANA_${lib}_LIBRARY}
+        )
+        list(APPEND USD_KATANA_LIBRARIES ${USD_KATANA_${lib}_LIBRARY})
+    endif ()
+endforeach ()
+
 include(FindPackageHandleStandardArgs)
 
 find_package_handle_standard_args(USD
