@@ -3,11 +3,11 @@
 if (WIN32)
     # On Windows we need to find ".lib"... which is CMAKE_STATIC_LIBRARY_SUFFIX
     # on WIN32 (CMAKE_SHARED_LIBRARY_SUFFIX is ".dll")
-    set(USD_LIB_EXTENSION ${CMAKE_STATIC_LIBRARY_SUFFIX}
+    set(USD_LIB_SUFFIX ${CMAKE_STATIC_LIBRARY_SUFFIX}
         CACHE STRING "Extension of USD libraries")
 else ()
     # Defaults to ".so" on Linux, ".dylib" on MacOS
-    set(USD_LIB_EXTENSION ${CMAKE_SHARED_LIBRARY_SUFFIX}
+    set(USD_LIB_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX}
         CACHE STRING "Extension of USD libraries")
 endif ()
 
@@ -37,8 +37,8 @@ find_path(USD_INCLUDE_DIR pxr/pxr.h
 # We need to find either usd or usd_ms, with taking the prefix into account.
 find_path(USD_LIBRARY_DIR
     NAMES
-        ${USD_LIB_PREFIX}usd${USD_LIB_EXTENSION}
-        ${USD_LIB_PREFIX}usd_ms${USD_LIB_EXTENSION}
+        ${USD_LIB_PREFIX}usd${USD_LIB_SUFFIX}
+        ${USD_LIB_PREFIX}usd_ms${USD_LIB_SUFFIX}
     HINTS
         ${USD_ROOT}/lib
         $ENV{USD_ROOT}/lib
@@ -56,7 +56,7 @@ find_path(USD_MAYA_INCLUDE_DIR usdMaya/api.h
 
 find_path(USD_MAYA_LIBRARY_DIR
     NAMES
-        ${USD_LIB_PREFIX}usdMaya${USD_LIB_EXTENSION}
+        ${USD_LIB_PREFIX}usdMaya${USD_LIB_SUFFIX}
     HINTS
         ${USD_ROOT}/third_party/maya/lib
         $ENV{USD_ROOT}/third_party/maya/lib
@@ -76,7 +76,7 @@ find_path(USD_KATANA_INCLUDE_DIR usdKatana/api.h
 
 find_path(USD_KATANA_LIBRARY_DIR
     NAMES
-        ${USD_LIB_PREFIX}usdKatana${USD_LIB_EXTENSION}
+        ${USD_LIB_PREFIX}usdKatana${USD_LIB_SUFFIX}
     HINTS
         ${USD_ROOT}/third_party/katana/lib
         $ENV{USD_ROOT}/third_party/katana/lib
@@ -96,7 +96,7 @@ find_path(USD_HOUDINI_INCLUDE_DIR gusd/api.h
 
 find_path(USD_HOUDINI_LIBRARY_DIR
     NAMES
-        ${USD_LIB_PREFIX}gusd${USD_LIB_EXTENSION}
+        ${USD_LIB_PREFIX}gusd${USD_LIB_SUFFIX}
     HINTS 
         ${USD_ROOT}/third_party/houdini/lib
         $ENV{USD_ROOT}/third_party/houdini/lib
@@ -119,7 +119,7 @@ set(USD_LIBS ar;arch;cameraUtil;garch;gf;glf;hd;hdSt;hdx;hf;hgi;hgiGL;hio;js;kin
 
 foreach (lib ${USD_LIBS})
     find_library(USD_${lib}_LIBRARY
-        NAMES ${USD_LIB_PREFIX}${lib}${USD_LIB_EXTENSION}
+        NAMES ${USD_LIB_PREFIX}${lib}${USD_LIB_SUFFIX}
         HINTS ${USD_LIBRARY_DIR})
     if (USD_${lib}_LIBRARY)
         add_library(${lib} INTERFACE IMPORTED)
@@ -135,7 +135,7 @@ set(USD_MAYA_LIBS px_vp20;pxrUsdMayaGL;usdMaya)
 
 foreach (lib ${USD_MAYA_LIBS})
     find_library(USD_MAYA_${lib}_LIBRARY
-        NAMES ${USD_LIB_PREFIX}${lib}${USD_LIB_EXTENSION}
+        NAMES ${USD_LIB_PREFIX}${lib}${USD_LIB_SUFFIX}
         HINTS ${USD_MAYA_LIBRARY_DIR})
     if (USD_MAYA_${lib}_LIBRARY)
         add_library(${lib} INTERFACE IMPORTED)
@@ -151,7 +151,7 @@ set(USD_KATANA_LIBS usdKatana;vtKatana)
 
 foreach (lib ${USD_KATANA_LIBS})
     find_library(USD_KATANA_${lib}_LIBRARY
-        NAMES ${USD_LIB_PREFIX}${lib}${USD_LIB_EXTENSION}
+        NAMES ${USD_LIB_PREFIX}${lib}${USD_LIB_SUFFIX}
         HINTS ${USD_KATANA_LIBRARY_DIR})
     if (USD_KATANA_${lib}_LIBRARY)
         add_library(${lib} INTERFACE IMPORTED)
