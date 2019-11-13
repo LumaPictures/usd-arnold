@@ -34,7 +34,8 @@ find_path(USD_INCLUDE_DIR pxr/pxr.h
         $ENV{USD_ROOT}/include
     DOC "USD Include directory")
 
-# We need to find either usd or usd_ms, with taking the prefix into account.
+# We need to find either usd or usd_ms (the monolithic-shared library),
+# with taking the prefix into account.
 find_path(USD_LIBRARY_DIR
     NAMES
         ${USD_LIB_PREFIX}usd${USD_LIB_SUFFIX}
