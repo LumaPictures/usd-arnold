@@ -45,6 +45,15 @@ find_path(USD_LIBRARY_DIR
         $ENV{USD_ROOT}/lib
     DOC "USD Libraries directory")
 
+find_file(USD_GENSCHEMA
+    NAMES usdGenSchema
+    HINTS
+        ${USD_ROOT}
+        $ENV{USD_ROOT}
+    PATH_SUFFIXES
+        bin
+    DOC "USD Gen schema application")
+
 # USD Maya components
 
 find_path(USD_MAYA_INCLUDE_DIR usdMaya/api.h
