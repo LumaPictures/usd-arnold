@@ -1,23 +1,32 @@
 # Simple module to find USD.
 
-if (LINUX)
-    set(USD_LIB_EXTENSION ".so"
+if (WIN32)
+    # On Windows we need to find ".lib"... which is CMAKE_STATIC_LIBRARY_SUFFIX
+    # on WIN32 (CMAKE_SHARED_LIBRARY_SUFFIX is ".dll")
+    set(USD_LIB_EXTENSION ${CMAKE_STATIC_LIBRARY_SUFFIX}
         CACHE STRING "Extension of USD libraries")
-elseif (WIN32)
-    set(USD_LIB_EXTENSION ".lib"
-        CACHE STRING "Extension of USD libraries")
-else () # MacOS
-    set(USD_LIB_EXTENSION ".dylib"
+else ()
+    # Defaults to ".so" on Linux, ".dylib" on MacOS
+    set(USD_LIB_EXTENSION ${CMAKE_SHARED_LIBRARY_SUFFIX}
         CACHE STRING "Extension of USD libraries")
 endif ()
 
-if (WIN32)
-    set(USD_LIB_PREFIX ""
-        CACHE STRING "Prefix of USD libraries")
-else ()
-    set(USD_LIB_PREFIX lib
-        CACHE STRING "Prefix of USD libraries")
-endif ()
+# Note: for USD <= 0.19.11, there was a bug where, regardless of what
+# PXR_LIB_PREFIX was set to, the behavior on windows was that the .lib files
+# ALWAYS had no prefix.  However, the PXR_LIB_PREFIX - which defaulted to "lib",
+# even on windows - WAS used for the .dll names.
+#
+# So, if PXR_LIB_PREFIX was left at it's default value of "lib", you
+# had output libs like:
+#    usd.lib
+#    libusd.dll
+#
+# The upshot is that, for windows and USD <= 0.19.11, you probably want to
+# leave USD_LIB_PREFIX at it's default (empty string on windows), even if you
+# set a PXR_LIB_PREFIX when building USD core.
+
+set(USD_LIB_PREFIX ${CMAKE_SHARED_LIBRARY_PREFIX}
+    CACHE STRING "Prefix of USD libraries")
 
 find_path(USD_INCLUDE_DIR pxr/pxr.h
     HINTS
