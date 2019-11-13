@@ -20,7 +20,7 @@ else ()
 endif ()
 
 find_path(USD_INCLUDE_DIR pxr/pxr.h
-    PATHS
+    HINTS
         ${USD_ROOT}/include
         $ENV{USD_ROOT}/include
     DOC "USD Include directory")
@@ -30,7 +30,7 @@ find_path(USD_LIBRARY_DIR
     NAMES
         ${USD_LIB_PREFIX}usd${USD_LIB_EXTENSION}
         ${USD_LIB_PREFIX}usd_ms${USD_LIB_EXTENSION}
-    PATHS
+    HINTS
         ${USD_ROOT}/lib
         $ENV{USD_ROOT}/lib
     DOC "USD Libraries directory")
@@ -38,7 +38,7 @@ find_path(USD_LIBRARY_DIR
 # USD Maya components
 
 find_path(USD_MAYA_INCLUDE_DIR usdMaya/api.h
-    PATHS
+    HINTS
         ${USD_ROOT}/third_party/maya/include
         $ENV{USD_ROOT}/third_party/maya/include
         ${USD_MAYA_ROOT}/third_party/maya/include
@@ -48,7 +48,7 @@ find_path(USD_MAYA_INCLUDE_DIR usdMaya/api.h
 find_path(USD_MAYA_LIBRARY_DIR
     NAMES
         ${USD_LIB_PREFIX}usdMaya${USD_LIB_EXTENSION}
-    PATHS
+    HINTS
         ${USD_ROOT}/third_party/maya/lib
         $ENV{USD_ROOT}/third_party/maya/lib
         ${USD_MAYA_ROOT}/third_party/maya/lib
@@ -58,7 +58,7 @@ find_path(USD_MAYA_LIBRARY_DIR
 # USD Katana components
 
 find_path(USD_KATANA_INCLUDE_DIR usdKatana/api.h
-    PATHS
+    HINTS
         ${USD_ROOT}/third_party/katana/include
         $ENV{USD_ROOT}/third_party/katana/include
         ${USD_KATANA_ROOT}/third_party/katana/include
@@ -68,7 +68,7 @@ find_path(USD_KATANA_INCLUDE_DIR usdKatana/api.h
 find_path(USD_KATANA_LIBRARY_DIR
     NAMES
         ${USD_LIB_PREFIX}usdKatana${USD_LIB_EXTENSION}
-    PATHS
+    HINTS
         ${USD_ROOT}/third_party/katana/lib
         $ENV{USD_ROOT}/third_party/katana/lib
         ${USD_KATANA_ROOT}/third_party/katana/lib
@@ -78,7 +78,7 @@ find_path(USD_KATANA_LIBRARY_DIR
 # USD Houdini components
 
 find_path(USD_HOUDINI_INCLUDE_DIR gusd/api.h
-    PATHS
+    HINTS
         ${USD_ROOT}/third_party/houdini/include
         $ENV{USD_ROOT}/third_party/houdini/include
         ${USD_HOUDINI_ROOT}/third_party/houdini/include
@@ -88,7 +88,7 @@ find_path(USD_HOUDINI_INCLUDE_DIR gusd/api.h
 find_path(USD_HOUDINI_LIBRARY_DIR
     NAMES
         ${USD_LIB_PREFIX}gusd${USD_LIB_EXTENSION}
-    PATHS 
+    HINTS 
         ${USD_ROOT}/third_party/houdini/lib
         $ENV{USD_ROOT}/third_party/houdini/lib
         ${USD_HOUDINI_ROOT}/third_party/houdini/lib
