@@ -58,6 +58,11 @@ find_file(USD_GENSCHEMA
 
 find_path(USD_MAYA_INCLUDE_DIR usdMaya/api.h
     HINTS
+        # If we're using Autodesk Maya-USD repo
+        ${MAYA_USD_ROOT}/plugin/pxr/maya/include
+        $ENV{MAYA_USD_ROOT}/plugin/pxr/maya/include
+
+        # If we're using Pixar USD core repo (<=0.19.11)
         ${USD_ROOT}/third_party/maya/include
         $ENV{USD_ROOT}/third_party/maya/include
         ${USD_MAYA_ROOT}/third_party/maya/include
@@ -66,8 +71,17 @@ find_path(USD_MAYA_INCLUDE_DIR usdMaya/api.h
 
 find_path(USD_MAYA_LIBRARY_DIR
     NAMES
+        # If we're using Autodesk Maya-USD repo
+        usdMaya${USD_LIB_SUFFIX}
+
+        # If we're using Pixar USD core repo (<=0.19.11)
         ${USD_LIB_PREFIX}usdMaya${USD_LIB_SUFFIX}
     HINTS
+        # If we're using Autodesk Maya-USD repo
+        ${MAYA_USD_ROOT}/plugin/pxr/maya/lib
+        $ENV{MAYA_USD_ROOT}/plugin/pxr/maya/lib
+
+        # If we're using Pixar USD core repo (<=0.19.11)
         ${USD_ROOT}/third_party/maya/lib
         $ENV{USD_ROOT}/third_party/maya/lib
         ${USD_MAYA_ROOT}/third_party/maya/lib
@@ -145,7 +159,12 @@ set(USD_MAYA_LIBS px_vp20;pxrUsdMayaGL;usdMaya)
 
 foreach (lib ${USD_MAYA_LIBS})
     find_library(USD_MAYA_${lib}_LIBRARY
-        NAMES ${USD_LIB_PREFIX}${lib}${USD_LIB_SUFFIX}
+        NAMES
+            # If we're using Autodesk Maya-USD repo
+            ${lib}${USD_LIB_SUFFIX}
+
+            # If we're using Pixar USD core repo (<=0.19.11)
+            ${USD_LIB_PREFIX}${lib}${USD_LIB_SUFFIX}        
         HINTS ${USD_MAYA_LIBRARY_DIR})
     if (USD_MAYA_${lib}_LIBRARY)
         add_library(${lib} INTERFACE IMPORTED)
