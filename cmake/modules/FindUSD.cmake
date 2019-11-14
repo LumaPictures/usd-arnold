@@ -34,6 +34,12 @@ find_path(USD_INCLUDE_DIR pxr/pxr.h
         $ENV{USD_ROOT}/include
     DOC "USD Include directory")
 
+find_file(USD_CONFIG_FILE
+          names pxrConfig.cmake
+          PATHS ${USD_ROOT}
+                $ENV{USD_ROOT}
+          DOC "USD cmake configuration file")
+
 # We need to find either usd or usd_ms (the monolithic-shared library),
 # with taking the prefix into account.
 find_path(USD_LIBRARY_DIR
