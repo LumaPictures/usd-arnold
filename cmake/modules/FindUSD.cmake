@@ -81,7 +81,7 @@ find_path(USD_MAYA_INCLUDE_DIR usdMaya/api.h
 find_path(USD_MAYA_LIBRARY_DIR
     NAMES
         # If we're using Autodesk Maya-USD repo
-        usdMaya${USD_LIB_SUFFIX}
+        ${CMAKE_SHARED_LIBRARY_PREFIX}usdMaya${USD_LIB_SUFFIX}
 
         # If we're using Pixar USD core repo (<=0.19.11)
         ${USD_LIB_PREFIX}usdMaya${USD_LIB_SUFFIX}
