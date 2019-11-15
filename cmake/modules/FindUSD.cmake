@@ -34,11 +34,14 @@ find_path(USD_INCLUDE_DIR pxr/pxr.h
         $ENV{USD_ROOT}/include
     DOC "USD Include directory")
 
-find_file(USD_CONFIG_FILE
-          names pxrConfig.cmake
-          PATHS ${USD_ROOT}
-                $ENV{USD_ROOT}
-          DOC "USD cmake configuration file")
+# Disabled because this FindUSD doesn't work with pxrConfig.cmake - see note
+# below
+
+# find_file(USD_CONFIG_FILE
+#           names pxrConfig.cmake
+#           PATHS ${USD_ROOT}
+#                 $ENV{USD_ROOT}
+#           DOC "USD cmake configuration file")
 
 # We need to find either usd or usd_ms (the monolithic-shared library),
 # with taking the prefix into account.
@@ -144,6 +147,13 @@ if(USD_INCLUDE_DIR AND EXISTS "${USD_INCLUDE_DIR}/pxr/pxr.h")
     endforeach()
     set(USD_VERSION ${USD_MAJOR_VERSION}.${USD_MINOR_VERSION}.${USD_PATCH_VERSION})
 endif()
+
+# NOTE: setting the usd libs to be INTERFACE IMPORTED targets conflicts with
+#       usage of pxrConfig.cmake - so if you are using this FindUSD, you
+#       currently can't use pxrConfig.cmake.  You could comment out / remove
+#       these sections to allow usage of pxrConfig.cmake.
+#       We considered using pxrConfig.cmake, but we don't like the fact that it
+#       bakes in full paths to the various dependencies
 
 set(USD_LIBS ar;arch;cameraUtil;garch;gf;glf;hd;hdSt;hdx;hf;hgi;hgiGL;hio;js;kind;ndr;pcp;plug;pxOsd;sdf;sdr;tf;trace;usd;usdAppUtils;usdGeom;usdHydra;usdImaging;usdImagingGL;usdLux;usdRender;usdRi;usdShade;usdShaders;usdSkel;usdSkelImaging;usdUI;usdUtils;usdviewq;usdVol;usdVolImaging;vt;work;usd_ms)
 
