@@ -3,6 +3,7 @@ set(PLUGIN_NAME arnoldForUsdMaya)
 find_package(Maya)
 find_package(USDArnold REQUIRED)
 
+link_directories(${MAYA_USD_LIBRARY_DIR})
 link_directories(${USD_MAYA_LIBRARY_DIR})
 link_directories(${MAYA_LIBRARY_DIR})
 
@@ -20,6 +21,7 @@ target_link_libraries(${PLUGIN_NAME}
                       tf gf sdf usd usdGeom ${USD_ARNOLD_LIBRARY} usdMaya)
 set_target_properties(${PLUGIN_NAME} PROPERTIES INSTALL_RPATH_USE_LINK_PATH ON)
 target_include_directories(${PLUGIN_NAME} PRIVATE SYSTEM ${Boost_INCLUDE_DIRS})
+target_include_directories(${PLUGIN_NAME} PRIVATE ${MAYA_USD_INCLUDE_DIR})
 target_include_directories(${PLUGIN_NAME} PRIVATE ${USD_MAYA_INCLUDE_DIR})
 target_include_directories(${PLUGIN_NAME} PRIVATE ${MAYA_INCLUDE_DIRS})
 target_include_directories(${PLUGIN_NAME} PRIVATE ${USD_ARNOLD_INCLUDE_DIR})

@@ -97,6 +97,24 @@ find_path(USD_MAYA_LIBRARY_DIR
         $ENV{USD_MAYA_ROOT}/third_party/maya/lib
     DOC "USD Maya Library directory")
 
+# Maya USD (autodesk repo) - only components
+
+find_path(MAYA_USD_INCLUDE_DIR mayaUsd/mayaUsd.h
+    HINTS
+        # If we're using Autodesk Maya-USD repo
+        ${MAYA_USD_ROOT}/include
+        $ENV{MAYA_USD_ROOT}/include
+    DOC "Maya-USD Core Include directory")
+
+find_path(MAYA_USD_LIBRARY_DIR
+    NAMES
+    	mayaUsd
+    HINTS
+        # If we're using Autodesk Maya-USD repo
+        ${MAYA_USD_ROOT}/lib
+        $ENV{MAYA_USD_ROOT}/lib
+    DOC "USD Maya Library directory")
+
 # USD Katana components
 
 find_path(USD_KATANA_INCLUDE_DIR usdKatana/api.h
@@ -130,7 +148,7 @@ find_path(USD_HOUDINI_INCLUDE_DIR gusd/api.h
 find_path(USD_HOUDINI_LIBRARY_DIR
     NAMES
         ${USD_LIB_PREFIX}gusd${USD_LIB_SUFFIX}
-    HINTS 
+    HINTS
         ${USD_ROOT}/third_party/houdini/lib
         $ENV{USD_ROOT}/third_party/houdini/lib
         ${USD_HOUDINI_ROOT}/third_party/houdini/lib
@@ -180,7 +198,7 @@ foreach (lib ${USD_MAYA_LIBS})
             ${lib}${USD_LIB_SUFFIX}
 
             # If we're using Pixar USD core repo (<=0.19.11)
-            ${USD_LIB_PREFIX}${lib}${USD_LIB_SUFFIX}        
+            ${USD_LIB_PREFIX}${lib}${USD_LIB_SUFFIX}
         HINTS ${USD_MAYA_LIBRARY_DIR})
     if (USD_MAYA_${lib}_LIBRARY)
         add_library(${lib} INTERFACE IMPORTED)

@@ -16,7 +16,7 @@
 
 #include <pxr/usd/usdAi/aiShaderExport.h>
 
-#include <usdMaya/util.h>
+#include <mayaUsd/utils/util.h>
 
 #include <maya/MDagPath.h>
 #include <maya/MObject.h>
