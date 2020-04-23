@@ -77,12 +77,52 @@ PXR_NAMESPACE_OPEN_SCOPE
 */
 
 
-void readMaterial(
-    UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
-    const UsdAiMaterialAPI& material) {
-    auto mapRelations = [&stage](
-                            const UsdRelationship& relationship,
-                            std::function<void(const UsdPrim&)> fn) {
+void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
+                  const UsdAiMaterialAPI& material)
+{
+    FnKat::GroupAttribute nodesAttr = interface.getOutputAttr("material.nodes");
+    if (!nodesAttr.isValid()) {
+        return;
+    }
+
+    const UsdRelationship& surfaceRel = material.GetSurfaceRel();
+    const UsdRelationship& dispRel = material.GetDisplacementRel();
+    if (!(surfaceRel.HasAuthoredTargets() || dispRel.HasAuthoredTargets())) {
+        return;
+    }
+
+    // Build a sparse map of shader prims whose handles have been mangled by
+    // usdKatana to preserve uniqueness.
+    std::unordered_map<SdfPath, std::string, SdfPath::Hash> uniquifiedShaderHandles;
+    for (int64_t i = 0; i < nodesAttr.getNumberOfChildren(); i++)
+    {
+        FnKat::GroupAttribute nodeGroup = nodesAttr.getChildByIndex(i);
+        // This attr will only be set if the handle has been uniquified.
+        FnKat::StringAttribute primPathAttr = 
+            nodeGroup.getChildByName("usdPrimPath");
+        if (primPathAttr.isValid()) {
+            FnKat::StringAttribute nameAttr = nodeGroup.getChildByName("name");
+            uniquifiedShaderHandles.emplace(
+                SdfPath(primPathAttr.getValue("", false)),
+                nameAttr.getValue("", false)
+            );
+        }
+    }
+
+
+    auto getShaderHandle = [&uniquifiedShaderHandles](const UsdPrim& shader) -> std::string
+    {
+        auto it = uniquifiedShaderHandles.find(shader.GetPath());
+        if (it != uniquifiedShaderHandles.end()) {
+            return it->second;
+        }
+        return PxrUsdKatanaUtils::GenerateShadingNodeHandle(shader);
+    };
+
+
+    auto mapRelations = [&stage](const UsdRelationship& relationship,
+                                 std::function<void(const UsdPrim&)> fn) 
+    {
         static thread_local SdfPathVector targets;
         targets.clear();
         relationship.GetTargets(&targets);
@@ -95,24 +135,23 @@ void readMaterial(
     // It's hard to decide the exact frequency of inserts
     // and reads, but most likely it's the same magnitude.
     // We could also try a vector here.
-    std::set<std::string> processedMaterials;
+    std::unordered_set<std::string> processedShaders;
 
     // We can't use auto here, otherwise the lambda won't be able to capture
     // itself.
     std::function<void(const UsdPrim&)> traverseShader = [&](const UsdPrim&
                                                                  shader) {
         // TODO: we can also use getInputs from the new API.
-        const auto shadingNodeHandle =
-            PxrUsdKatanaUtils::GenerateShadingNodeHandle(shader);
-        if (processedMaterials.find(shadingNodeHandle) !=
-            processedMaterials.end()) {
+        const auto shadingNodeHandle = getShaderHandle(shader);
+        auto insertResult = processedShaders.insert(shadingNodeHandle);
+        if (!insertResult.second) {
             return;
         }
-        processedMaterials.insert(shadingNodeHandle);
-        static const std::string baseAttr("material.nodes.");
-        std::stringstream ss;
-        ss << baseAttr << shadingNodeHandle;
-        if (!interface.getOutputAttr(ss.str()).isValid()) { return; }
+
+        if (!nodesAttr.getChildByName(shadingNodeHandle).isValid()) {
+            return;
+        }
+
         FnKat::GroupBuilder builder;
         for (const auto& relationship : shader.GetRelationships()) {
             static const std::string connectedSourceFor("connectedSourceFor:");
@@ -158,8 +197,7 @@ void readMaterial(
             }
             const auto targetPrim =
                 stage->GetPrimAtPath(target.GetParentPath());
-            const auto targetHandle =
-                PxrUsdKatanaUtils::GenerateShadingNodeHandle(targetPrim);
+            const auto targetHandle = getShaderHandle(targetPrim);
             std::stringstream targetSS;
             targetSS << targetName << '@';
             targetSS << targetHandle;
@@ -212,9 +250,8 @@ void readMaterial(
                     } else {
                         continue;
                     }
-                    const auto sourcePrimHandle =
-                        PxrUsdKatanaUtils::GenerateShadingNodeHandle(
-                            sourcePrim);
+
+                    const auto sourcePrimHandle = getShaderHandle(sourcePrim);
                     static thread_local param_split_t _targetParamSplit;
                     const auto _targetSplitCount =
                         splitParamName(inParamName, _targetParamSplit);
@@ -279,12 +316,14 @@ void readMaterial(
 
         FnKat::Attribute connections =
             builder.isValid() ? builder.build() : FnKat::Attribute();
-        ss << ".connections";
+        static const std::string baseAttr("material.nodes.");
+        std::stringstream ss;
+        ss << baseAttr << shadingNodeHandle << ".connections";
         updateOrCreateAttr(interface, ss.str(), connections);
     };
 
-    mapRelations(material.GetSurfaceRel(), traverseShader);
-    mapRelations(material.GetDisplacementRel(), traverseShader);
+    mapRelations(surfaceRel, traverseShader);
+    mapRelations(dispRel, traverseShader);
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
