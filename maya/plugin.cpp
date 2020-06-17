@@ -14,9 +14,9 @@
 #include <maya/MFnPlugin.h>
 #include <maya/MItDependencyNodes.h>
 
-#include <usdMaya/shadingModeExporter.h>
-#include <usdMaya/shadingModeRegistry.h>
-#include <usdMaya/userAttributeWriterRegistry.h>
+#include <mayaUsd/fileio/shading/shadingModeExporter.h>
+#include <mayaUsd/fileio/shading/shadingModeRegistry.h>
+#include <mayaUsd/fileio/utils/userAttributeWriterRegistry.h>
 
 #include "ArnoldShaderExport.h"
 
