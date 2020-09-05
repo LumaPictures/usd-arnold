@@ -152,62 +152,6 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
             return;
         }
 
-        FnKat::GroupBuilder builder;
-        for (const auto& relationship : shader.GetRelationships()) {
-            static const std::string connectedSourceFor("connectedSourceFor:");
-            const auto relationshipName = relationship.GetName().GetString();
-            if (relationshipName.compare(
-                    0, connectedSourceFor.length(), connectedSourceFor) != 0) {
-                continue;
-            }
-
-            auto paramName =
-                relationshipName.substr(connectedSourceFor.length());
-            auto colonPos = paramName.find(':');
-            if (colonPos != paramName.npos) { // either array elem or component
-                auto comp = paramName.substr(colonPos + 1);
-                paramName = paramName.substr(0, colonPos);
-                if (comp.length() == 0) {
-                    continue;
-                } // Just to make sure it's not a malformed
-                // variable, like one that ends with a :
-                if (comp[0] == 'i') { // array connection
-                    paramName += ":" + comp.substr(1);
-                } else {
-                    paramName += "." + comp;
-                }
-            } else {
-                continue; // The existing code already handles this!
-            }
-
-            static thread_local SdfPathVector targets;
-            targets.clear();
-            relationship.GetTargets(&targets);
-            if (targets.size() != 1) { continue; }
-
-            const auto& target = targets.front();
-            auto targetName = target.GetName();
-            static const std::string outputs("outputs:");
-            if (targetName.compare(0, outputs.length(), outputs) != 0) {
-                continue;
-            }
-            targetName = targetName.substr(outputs.length());
-            if (targetName != "out") { // component connection
-                targetName = "out." + targetName;
-            }
-            const auto targetPrim =
-                stage->GetPrimAtPath(target.GetParentPath());
-            const auto targetHandle = getShaderHandle(targetPrim);
-            std::stringstream targetSS;
-            targetSS << targetName << '@';
-            targetSS << targetHandle;
-            builder.set(paramName, FnKat::StringAttribute(targetSS.str()));
-
-            // TODO: we might traverse things twice because of this.
-            // Also, infinite recursion, beware!
-            mapRelations(relationship, traverseShader);
-        }
-
         using param_split_t = std::vector<std::string>;
         auto splitParamName = [](const std::string& name,
                                  param_split_t& out) -> size_t {
@@ -223,6 +167,9 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
             }
             return out.size();
         };
+
+        FnKat::GroupBuilder builder;
+
         // Per array connections already work with the new API.
         // It seems we can't do full connections and component connections at
         // the same time. To support both combined (full connections and partial
