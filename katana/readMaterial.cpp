@@ -87,11 +87,45 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
         return;
     }
 
-    const UsdAiMaterialAPI aiMaterial(material.GetPrim());
+    // Collect shader prims that are connected to either Arnold UsdShadeOutputs
+    // or UsdAi relationships on the material.
+    static const TfToken _arnold("arnold");
+    std::vector<UsdPrim> materialOutputPrims;
+    {
+        // UsdShade outputs in "arnold:" namespace
+        UsdShadeConnectableAPI source;
+        TfToken srcName;
+        UsdShadeAttributeType srcType;
+        for (auto outputGetter : {&UsdShadeMaterial::GetSurfaceOutput,
+                                  &UsdShadeMaterial::GetDisplacementOutput,
+                                  &UsdShadeMaterial::GetVolumeOutput})
+        {
+            if (UsdShadeOutput output = ((material).*(outputGetter))(_arnold)) {
+                if (output.GetConnectedSource(&source, &srcName, &srcType)) {
+                    materialOutputPrims.emplace_back(source.GetPrim());
+                }
+            }
+        }
 
-    const UsdRelationship& surfaceRel = aiMaterial.GetSurfaceRel();
-    const UsdRelationship& dispRel = aiMaterial.GetDisplacementRel();
-    if (!(surfaceRel.HasAuthoredTargets() || dispRel.HasAuthoredTargets())) {
+        // UsdAi material relationships
+        const UsdAiMaterialAPI aiMaterial(material.GetPrim());
+        SdfPathVector targets;
+        for (auto relationshipGetter : {&UsdAiMaterialAPI::GetSurfaceRel,
+                                        &UsdAiMaterialAPI::GetDisplacementRel,
+                                        &UsdAiMaterialAPI::GetVolumeRel})
+        {
+            if (UsdRelationship rel = ((aiMaterial).*(relationshipGetter))()) {
+                targets.clear();
+                if (rel.GetForwardedTargets(&targets) && targets.size() > 0) {
+                    // We only care about the first target.
+                    materialOutputPrims.emplace_back(
+                        stage->GetPrimAtPath(targets[0]));
+                }
+            }
+        }
+    }
+
+    if (materialOutputPrims.empty()) {
         return;
     }
 
@@ -124,21 +158,6 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
     };
 
 
-    auto mapRelations = [&stage](const UsdRelationship& relationship,
-                                 std::function<void(const UsdPrim&)> fn) 
-    {
-        static thread_local SdfPathVector targets;
-        targets.clear();
-        relationship.GetTargets(&targets);
-        for (const auto& target : targets) {
-            const auto shader = stage->GetPrimAtPath(target);
-            if (shader.IsValid()) { fn(shader); }
-        }
-    };
-
-    // It's hard to decide the exact frequency of inserts
-    // and reads, but most likely it's the same magnitude.
-    // We could also try a vector here.
     std::unordered_set<std::string> processedShaders;
 
     // We can't use auto here, otherwise the lambda won't be able to capture
@@ -279,8 +298,11 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
         updateOrCreateAttr(interface, ss.str(), connections);
     };
 
-    mapRelations(surfaceRel, traverseShader);
-    mapRelations(dispRel, traverseShader);
+    for (const UsdPrim& shaderPrim : materialOutputPrims) {
+        if (shaderPrim.IsValid()) {
+            traverseShader(shaderPrim);
+        }
+    }
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
