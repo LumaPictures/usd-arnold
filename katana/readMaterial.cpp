@@ -15,6 +15,8 @@
 
 #include <pxr/usd/usdShade/connectableAPI.h>
 
+#include <pxr/usd/usdAi/aiMaterialAPI.h>
+
 #include <usdKatana/utils.h>
 
 #include "arnoldHelpers.h"
@@ -78,15 +80,17 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 
 void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
-                  const UsdAiMaterialAPI& material)
+                  const UsdShadeMaterial& material)
 {
     FnKat::GroupAttribute nodesAttr = interface.getOutputAttr("material.nodes");
     if (!nodesAttr.isValid()) {
         return;
     }
 
-    const UsdRelationship& surfaceRel = material.GetSurfaceRel();
-    const UsdRelationship& dispRel = material.GetDisplacementRel();
+    const UsdAiMaterialAPI aiMaterial(material.GetPrim());
+
+    const UsdRelationship& surfaceRel = aiMaterial.GetSurfaceRel();
+    const UsdRelationship& dispRel = aiMaterial.GetDisplacementRel();
     if (!(surfaceRel.HasAuthoredTargets() || dispRel.HasAuthoredTargets())) {
         return;
     }

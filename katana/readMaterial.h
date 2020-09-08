@@ -16,7 +16,7 @@
 
 #include <pxr/pxr.h>
 
-#include <pxr/usd/usdAi/aiMaterialAPI.h>
+#include <pxr/usd/usdShade/material.h>
 
 #include <FnGeolib/op/FnGeolibCookInterface.h>
 
@@ -24,7 +24,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 void readMaterial(
     UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
-    const UsdAiMaterialAPI& material);
+    const UsdShadeMaterial& material);
 
 PXR_NAMESPACE_CLOSE_SCOPE
 

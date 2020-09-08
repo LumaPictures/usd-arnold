@@ -243,12 +243,9 @@ void readPrimLocation(
     // We are handling connections here, because usd-arnold stores the
     // connections in it's own way. So we check for the materials connected to
     // the node.
-    // TODO: Shouldn't we just register our own op to handle the extra material
-    // connection requirements?
     const UsdShadeMaterial material(prim);
     if (material) {
-        UsdAiMaterialAPI aiMaterialAPI(prim);
-        readMaterial(stage, interface, aiMaterialAPI);
+        readMaterial(stage, interface, material);
     }
 }
 
