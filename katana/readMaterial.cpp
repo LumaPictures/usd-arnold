@@ -207,9 +207,6 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
             return;
         }
 
-        // TODO: We really need to use more optimal data storage here
-        std::set<std::string> fullConnections;
-        std::map<std::string, std::set<std::string>> partialConnections;
         for (const auto& input : connectableAPI.GetInputs()) {
             if (!input.HasConnectedSource()) {
                 continue;
@@ -268,10 +265,6 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
                 continue;
             }
 
-            if (_targetSplitCount == 2) {
-                partialConnections[_targetParamSplit[0]].insert(
-                    _targetParamSplit[1]);
-            }
             const auto sourceParamAndComponentName =
                 (_sourceParamSplit[1] == "out"
                      ? "out@"
@@ -281,15 +274,6 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
             builder.set(
                 targetParamName,
                 FnKat::StringAttribute(sourceParamAndComponentName));
-        }
-
-        for (auto it = partialConnections.cbegin();
-             it != partialConnections.cend(); ++it) {
-            if (fullConnections.find(it->first) == fullConnections.end()) {
-                // We don't have to do anything, the full connection will be
-                // replaced.
-                continue;
-            }
         }
 
         FnKat::Attribute connections =
