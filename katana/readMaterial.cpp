@@ -150,11 +150,14 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
 
     auto getShaderHandle = [&uniquifiedShaderHandles](const UsdPrim& shader) -> std::string
     {
-        auto it = uniquifiedShaderHandles.find(shader.GetPath());
+        const SdfPath primPath = shader.GetPath();
+        auto it = uniquifiedShaderHandles.find(primPath);
         if (it != uniquifiedShaderHandles.end()) {
             return it->second;
         }
-        return PxrUsdKatanaUtils::GenerateShadingNodeHandle(shader);
+        const std::string handle = PxrUsdKatanaUtils::GenerateShadingNodeHandle(shader);
+        uniquifiedShaderHandles.emplace(primPath, handle);
+        return handle;
     };
 
 
