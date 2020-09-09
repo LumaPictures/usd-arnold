@@ -178,86 +178,92 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
         // manually connect the rest of the component connections not covered by
         // the user.
         UsdShadeConnectableAPI connectableAPI(shader);
-        if (connectableAPI) {
-            // TODO: We really need to use more optimal data storage here
-            std::set<std::string> fullConnections;
-            std::map<std::string, std::set<std::string>> partialConnections;
-            for (const auto& input : connectableAPI.GetInputs()) {
-                if (input.HasConnectedSource()) {
-                    const auto inParamName = input.GetBaseName().GetString();
-                    SdfPathVector sourcePaths;
-                    input.GetRawConnectedSourcePaths(&sourcePaths);
-                    if (sourcePaths.empty()) { continue; }
-                    // We are only checking for the first connection
-                    const auto& sourceParamPath = sourcePaths[0];
-                    const auto sourcePath = sourceParamPath.GetPrimPath();
-                    const auto sourcePrim = stage->GetPrimAtPath(sourcePath);
-                    if (sourcePrim.IsValid()) {
-                        traverseShader(sourcePrim);
-                    } else {
-                        continue;
-                    }
+        if (!connectableAPI) {
+            return;
+        }
 
-                    const auto sourcePrimHandle = getShaderHandle(sourcePrim);
-                    static thread_local param_split_t _targetParamSplit;
-                    const auto _targetSplitCount =
-                        splitParamName(inParamName, _targetParamSplit);
-                    if (_targetSplitCount >= 3) {
-                        // Connection to Array elements, no idea how to handle
-                        // this. Yet.
-                        continue;
-                    }
-
-                    // Connections to array elements are already handled.
-                    // Or we are having an invalid string.
-                    // But we still need to handle cases when a source component
-                    // is connected to a target tuple. The source param to
-                    // target param is done properly by pxrUsdIn.
-                    if (_targetSplitCount == 2 &&
-                        (_targetParamSplit[1].empty() ||
-                         _targetParamSplit[1].front() == 'i')) {
-                        continue;
-                    }
-
-                    const auto targetParamName =
-                        _targetSplitCount == 1
-                            ? _targetParamSplit[0]
-                            : _targetParamSplit[0] + "." + _targetParamSplit[1];
-
-                    const auto& sourceParam = sourceParamPath.GetName();
-                    static thread_local param_split_t _sourceParamSplit;
-                    const auto sourceSplitCount =
-                        splitParamName(sourceParam, _sourceParamSplit);
-                    if (sourceSplitCount != 2) {
-                        continue;
-                    } // we only support component connections for now
-                    // this is both covers out and components
-                    if ((_sourceParamSplit[1].empty() ||
-                         _sourceParamSplit[1].front() == 'i')) {
-                        continue;
-                    }
-                    if (_targetSplitCount == 2) {
-                        partialConnections[_targetParamSplit[0]].insert(
-                            _targetParamSplit[1]);
-                    }
-                    const auto sourceParamAndComponentName =
-                        (_sourceParamSplit[1] == "out"
-                             ? "out@"
-                             : ("out." + _sourceParamSplit[1] + "@")) +
-                        sourcePrimHandle;
-
-                    builder.set(
-                        targetParamName,
-                        FnKat::StringAttribute(sourceParamAndComponentName));
-                }
+        // TODO: We really need to use more optimal data storage here
+        std::set<std::string> fullConnections;
+        std::map<std::string, std::set<std::string>> partialConnections;
+        for (const auto& input : connectableAPI.GetInputs()) {
+            if (!input.HasConnectedSource()) {
+                continue;
             }
-            for (auto it = partialConnections.cbegin();
-                 it != partialConnections.cend(); ++it) {
-                if (fullConnections.find(it->first) == fullConnections.end()) {
-                    // We don't have to do anything, the full connection will be
-                    // replaced.
-                    continue;
-                }
+
+            const auto inParamName = input.GetBaseName().GetString();
+            SdfPathVector sourcePaths;
+            input.GetRawConnectedSourcePaths(&sourcePaths);
+            if (sourcePaths.empty()) { continue; }
+            // We are only checking for the first connection
+            const auto& sourceParamPath = sourcePaths[0];
+            const auto sourcePath = sourceParamPath.GetPrimPath();
+            const auto sourcePrim = stage->GetPrimAtPath(sourcePath);
+            if (sourcePrim.IsValid()) {
+                traverseShader(sourcePrim);
+            } else {
+                continue;
+            }
+
+            const auto sourcePrimHandle = getShaderHandle(sourcePrim);
+            static thread_local param_split_t _targetParamSplit;
+            const auto _targetSplitCount =
+                splitParamName(inParamName, _targetParamSplit);
+            if (_targetSplitCount >= 3) {
+                // Connection to Array elements, no idea how to handle
+                // this. Yet.
+                continue;
+            }
+
+            // Connections to array elements are already handled.
+            // Or we are having an invalid string.
+            // But we still need to handle cases when a source component
+            // is connected to a target tuple. The source param to
+            // target param is done properly by pxrUsdIn.
+            if (_targetSplitCount == 2 &&
+                    (_targetParamSplit[1].empty() ||
+                     _targetParamSplit[1].front() == 'i')) {
+                continue;
+            }
+
+            const auto targetParamName =
+                _targetSplitCount == 1
+                    ? _targetParamSplit[0]
+                    : _targetParamSplit[0] + "." + _targetParamSplit[1];
+
+            const auto& sourceParam = sourceParamPath.GetName();
+            static thread_local param_split_t _sourceParamSplit;
+            const auto sourceSplitCount =
+                splitParamName(sourceParam, _sourceParamSplit);
+            if (sourceSplitCount != 2) {
+                continue;
+            } // we only support component connections for now
+            // this is both covers out and components
+            if (_sourceParamSplit[1].empty() ||
+                    _sourceParamSplit[1].front() == 'i') {
+                continue;
+            }
+
+            if (_targetSplitCount == 2) {
+                partialConnections[_targetParamSplit[0]].insert(
+                    _targetParamSplit[1]);
+            }
+            const auto sourceParamAndComponentName =
+                (_sourceParamSplit[1] == "out"
+                     ? "out@"
+                     : ("out." + _sourceParamSplit[1] + "@")) +
+                sourcePrimHandle;
+
+            builder.set(
+                targetParamName,
+                FnKat::StringAttribute(sourceParamAndComponentName));
+        }
+
+        for (auto it = partialConnections.cbegin();
+             it != partialConnections.cend(); ++it) {
+            if (fullConnections.find(it->first) == fullConnections.end()) {
+                // We don't have to do anything, the full connection will be
+                // replaced.
+                continue;
             }
         }
 
