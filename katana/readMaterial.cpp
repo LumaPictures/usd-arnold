@@ -164,7 +164,6 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
     // itself.
     std::function<void(const UsdPrim&)> traverseShader = [&](const UsdPrim&
                                                                  shader) {
-        // TODO: we can also use getInputs from the new API.
         const auto shadingNodeHandle = getShaderHandle(shader);
         auto insertResult = processedShaders.insert(shadingNodeHandle);
         if (!insertResult.second) {
@@ -175,9 +174,9 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
             return;
         }
 
-        using param_split_t = std::vector<std::string>;
+        using StringVector = std::vector<std::string>;
         auto splitParamName = [](const std::string& name,
-                                 param_split_t& out) -> size_t {
+                                 StringVector& out) -> size_t {
             out.clear();
             size_t currentIndex = 0;
             const auto lastPos = name.size() - 1;
@@ -228,8 +227,8 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
             }
 
             const auto sourcePrimHandle = getShaderHandle(sourcePrim);
-            static thread_local param_split_t _targetParamSplit;
-            const auto _targetSplitCount =
+            static thread_local StringVector _targetParamSplit;
+            const size_t _targetSplitCount =
                 splitParamName(inParamName, _targetParamSplit);
             if (_targetSplitCount >= 3) {
                 // Connection to Array elements, no idea how to handle
@@ -254,8 +253,8 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
                     : _targetParamSplit[0] + "." + _targetParamSplit[1];
 
             const auto& sourceParam = sourceParamPath.GetName();
-            static thread_local param_split_t _sourceParamSplit;
-            const auto sourceSplitCount =
+            static thread_local StringVector _sourceParamSplit;
+            const size_t sourceSplitCount =
                 splitParamName(sourceParam, _sourceParamSplit);
             if (sourceSplitCount != 2) {
                 continue;
