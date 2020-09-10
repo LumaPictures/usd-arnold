@@ -165,9 +165,8 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
 
     // We can't use auto here, otherwise the lambda won't be able to capture
     // itself.
-    std::function<void(const UsdPrim&)> traverseShader = [&](const UsdPrim&
-                                                                 shader) {
-        const auto shadingNodeHandle = getShaderHandle(shader);
+    std::function<void(const UsdPrim&)> traverseShader = [&](const UsdPrim& shader) {
+        const std::string shadingNodeHandle = getShaderHandle(shader);
         auto insertResult = processedShaders.insert(shadingNodeHandle);
         if (!insertResult.second) {
             return;
@@ -187,7 +186,7 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
                 size_t colonPos = name.find(':', currentIndex);
                 out.push_back(
                     name.substr(currentIndex, colonPos - currentIndex));
-                if (colonPos == name.npos || colonPos == lastPos) { break; }
+                if (colonPos == std::string::npos || colonPos == lastPos) { break; }
                 currentIndex = colonPos + 1;
             }
             return out.size();
@@ -226,7 +225,6 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
                 continue;
             }
 
-            const auto sourcePrimHandle = getShaderHandle(sourcePrim);
             static thread_local StringVector _targetParamSplit;
             const size_t _targetSplitCount =
                 splitParamName(inParamName, _targetParamSplit);
@@ -258,22 +256,42 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
                 splitParamName(sourceParam, _sourceParamSplit);
             if (sourceSplitCount != 2) {
                 continue;
-            } // we only support component connections for now
-            // this is both covers out and components
+            }
             if (_sourceParamSplit[1].empty() ||
-                    _sourceParamSplit[1].front() == 'i') {
+                    _sourceParamSplit[1].front() == 'i' ||
+                    _sourceParamSplit[1] == "out") {
                 continue;
             }
 
-            const auto sourceParamAndComponentName =
-                (_sourceParamSplit[1] == "out"
-                     ? "out@"
-                     : ("out." + _sourceParamSplit[1] + "@")) +
-                sourcePrimHandle;
+            const std::string sourceShaderHandle = getShaderHandle(sourcePrim);
+            std::string connectionSource;
+            connectionSource.reserve(sourceShaderHandle.size() + 6);
 
-            builder.set(
-                targetParamName,
-                FnKat::StringAttribute(sourceParamAndComponentName));
+            static const std::string _validComponents("rgbaxyzw");
+            if (_sourceParamSplit[1].size() == 1 &&
+                    _validComponents.find(
+                        _sourceParamSplit[1].front()) != std::string::npos) {
+                // The connected input corresponds to a recognized Arnold shader
+                // component (e.g. "outputs:r"), so append the component name to
+                // the Katana connection spec.
+                connectionSource.append("out.");
+                connectionSource.push_back(_sourceParamSplit[1].front());
+                connectionSource.push_back('@');
+            }
+            else {
+                // Any other name just gets dropped in favor of the default
+                // "out" spec, in order to avoid confusing KtoA and/or anyone
+                // inspecting the connection attributes. This is mostly in
+                // response to the weird naming coming from the HtoA LOPs shader
+                // translator, which names each shader's primary output using
+                // its datatype (e.g. the primary output from a `float_to_rgb`
+                // shader gets named "outputs:rgb").
+                connectionSource.append("out@");
+            }
+            connectionSource.append(sourceShaderHandle);
+
+            builder.set(targetParamName,
+                        FnKat::StringAttribute(connectionSource));
         }
 
         FnKat::Attribute connections =
