@@ -294,12 +294,14 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
                         FnKat::StringAttribute(connectionSource));
         }
 
-        FnKat::Attribute connections =
-            builder.isValid() ? builder.build() : FnKat::Attribute();
-        static const std::string baseAttr("material.nodes.");
-        std::stringstream ss;
-        ss << baseAttr << shadingNodeHandle << ".connections";
-        updateOrCreateAttr(interface, ss.str(), connections);
+        if (builder.isValid()) {
+            std::string attrName;
+            attrName.reserve(shadingNodeHandle.size() + 27);
+            attrName.append("material.nodes.");
+            attrName.append(shadingNodeHandle);
+            attrName.append(".connections");
+            updateOrCreateAttr(interface, attrName, builder.build());
+        }
     };
 
     for (const UsdPrim& shaderPrim : materialOutputPrims) {
