@@ -211,7 +211,6 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
                 continue;
             }
 
-            const auto inParamName = input.GetBaseName().GetString();
             SdfPathVector sourcePaths;
             input.GetRawConnectedSourcePaths(&sourcePaths);
             if (sourcePaths.empty()) { continue; }
@@ -221,14 +220,16 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
             const auto sourcePrim = stage->GetPrimAtPath(sourcePath);
             if (sourcePrim.IsValid()) {
                 traverseShader(sourcePrim);
-            } else {
+            }
+            else {
                 continue;
             }
 
             static thread_local StringVector _targetParamSplit;
-            const size_t _targetSplitCount =
+            const std::string inParamName = input.GetBaseName().GetString();
+            const size_t targetSplitCount =
                 splitParamName(inParamName, _targetParamSplit);
-            if (_targetSplitCount >= 3) {
+            if (targetSplitCount >= 3) {
                 // Connection to Array elements, no idea how to handle
                 // this. Yet.
                 continue;
@@ -239,16 +240,11 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
             // But we still need to handle cases when a source component
             // is connected to a target tuple. The source param to
             // target param is done properly by pxrUsdIn.
-            if (_targetSplitCount == 2 &&
+            if (targetSplitCount == 2 &&
                     (_targetParamSplit[1].empty() ||
                      _targetParamSplit[1].front() == 'i')) {
                 continue;
             }
-
-            const auto targetParamName =
-                _targetSplitCount == 1
-                    ? _targetParamSplit[0]
-                    : _targetParamSplit[0] + "." + _targetParamSplit[1];
 
             const auto& sourceParam = sourceParamPath.GetName();
             static thread_local StringVector _sourceParamSplit;
@@ -289,6 +285,11 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
                 connectionSource.append("out@");
             }
             connectionSource.append(sourceShaderHandle);
+
+            const std::string targetParamName =
+                targetSplitCount == 1
+                    ? _targetParamSplit[0]
+                    : _targetParamSplit[0] + "." + _targetParamSplit[1];
 
             builder.set(targetParamName,
                         FnKat::StringAttribute(connectionSource));
