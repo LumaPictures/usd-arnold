@@ -206,18 +206,18 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
             return;
         }
 
+        UsdShadeConnectableAPI source;
+        TfToken sourceName;
+        UsdShadeAttributeType sourceType;
         for (const auto& input : connectableAPI.GetInputs()) {
-            if (!input.HasConnectedSource()) {
+            if (!input.GetConnectedSource(&source, &sourceName, &sourceType)) {
+                continue;
+            }
+            if (sourceType == UsdShadeAttributeType::Invalid) {
                 continue;
             }
 
-            SdfPathVector sourcePaths;
-            input.GetRawConnectedSourcePaths(&sourcePaths);
-            if (sourcePaths.empty()) { continue; }
-            // We are only checking for the first connection
-            const auto& sourceParamPath = sourcePaths[0];
-            const auto sourcePath = sourceParamPath.GetPrimPath();
-            const auto sourcePrim = stage->GetPrimAtPath(sourcePath);
+            const UsdPrim sourcePrim = source.GetPrim();
             if (sourcePrim.IsValid()) {
                 traverseShader(sourcePrim);
             }
@@ -246,32 +246,27 @@ void readMaterial(UsdStageWeakPtr stage, FnKat::GeolibCookInterface& interface,
                 continue;
             }
 
-            const auto& sourceParam = sourceParamPath.GetName();
-            static thread_local StringVector _sourceParamSplit;
-            const size_t sourceSplitCount =
-                splitParamName(sourceParam, _sourceParamSplit);
-            if (sourceSplitCount != 2) {
-                continue;
-            }
-            if (_sourceParamSplit[1].empty() ||
-                    _sourceParamSplit[1].front() == 'i' ||
-                    _sourceParamSplit[1] == "out") {
+            const std::string& sourceNameString = sourceName.GetString();
+            if (sourceNameString.empty() ||
+                    sourceNameString.front() == 'i' ||
+                    sourceNameString == "out") {
                 continue;
             }
 
+            // At this point we know we need to modify the connection source.
             const std::string sourceShaderHandle = getShaderHandle(sourcePrim);
             std::string connectionSource;
             connectionSource.reserve(sourceShaderHandle.size() + 6);
 
             static const std::string _validComponents("rgbaxyzw");
-            if (_sourceParamSplit[1].size() == 1 &&
+            if (sourceNameString.size() == 1 &&
                     _validComponents.find(
-                        _sourceParamSplit[1].front()) != std::string::npos) {
+                        sourceNameString.front()) != std::string::npos) {
                 // The connected input corresponds to a recognized Arnold shader
                 // component (e.g. "outputs:r"), so append the component name to
                 // the Katana connection spec.
                 connectionSource.append("out.");
-                connectionSource.push_back(_sourceParamSplit[1].front());
+                connectionSource.push_back(sourceNameString.front());
                 connectionSource.push_back('@');
             }
             else {
